@@ -3,9 +3,10 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofBackground(0);
-
     isRecording = false;
 
+    sender.setup("127.0.0.1", 9999);
+    receiver.setup(8888);
 #ifdef USE_VIDEO
     videoGrabber.setDeviceID(0);
     videoGrabber.setDesiredFrameRate(25);
@@ -15,13 +16,6 @@ void ofApp::setup(){
     videoRecorder.start();
 #endif
 
-    sender.setup("127.0.0.1", 9999);
-
-#ifdef LOAD_DUMPFILE
-    ofLogNotice() << "Importing messages...";
-    libloFile.open(ofToDataPath("mabi_test_dump_12.osc").c_str());
-#else
-    receiver.setup(8888);
     for (int i = 0; i < 3; ++i) {
         sensor_source_t source;
         source.id = "10" + ofToString(i);
@@ -56,20 +50,19 @@ void ofApp::setup(){
         }
         sources.push_back(source);
     }
-#endif
-
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-#ifdef LOAD_DUMPFILE
-    if (libloFile.hasWaitingMessages()) {
-        ofxOscMessage msg = libloFile.getNextMessage();
-        sender.sendMessage(msg, true);
+#ifdef USE_VIDEO
+    videoGrabber.update();
+    if (videoGrabber.isFrameNew()) {
+        videoRecorder.addFrame(videoGrabber.getPixels());
     }
-#else
+#endif
+
     while (receiver.hasWaitingMessages()) {
-        uint64_t time_received = ofGetSystemTimeMicros();
+        uint64_t time_received = ofGetSystemTime();
         ofxOscMessage msg;
         receiver.getNextMessage(msg);
         sender.sendMessage(msg, true);
@@ -78,7 +71,6 @@ void ofApp::update(){
             for (sensor_source_t & source : sources) {
                 if (source.type == address[0] && source.id == address[1]) {
                     sensor_frame_t frame;
-                    frame.time = time_received;
                     for (int i = 0; i < msg.getNumArgs(); ++i) {
                         string type = msg.getArgTypeName(i);
                         if (type == "f") {
@@ -87,12 +79,11 @@ void ofApp::update(){
                             frame.calibration = msg.getArgAsBlob(i);
                         } else if (type == "T") {
                             // TODO: fix timetag
-                            /*
                             if (source.startTime == 0) {
-                                source.startTime = msg.getArgAsTimetag(i);
+                                source.startTime = time_received;
                             }
-                            source.lastTime = msg.getArgAsTimetag(i);
-                             */
+                            source.lastTime = time_received;
+                            frame.time = time_received;
                         }
                     }
                     if (frame.data.size() == 6) {
@@ -104,12 +95,6 @@ void ofApp::update(){
             }
         }
     }
-#ifdef USE_VIDEO
-    videoGrabber.update();
-    if (videoGrabber.isFrameNew()) {
-        videoRecorder.addFrame(videoGrabber.getPixels());
-    }
-#endif
     uint8_t count = 0;
     float xoffset = 40.f;
     for (sensor_source_t & source : sources) {
@@ -135,7 +120,6 @@ void ofApp::update(){
         }
         ++count;
     }
-#endif
 }
 
 //--------------------------------------------------------------
@@ -152,7 +136,6 @@ void ofApp::draw(){
         ofDrawBitmapString("REC", ofGetWindowWidth() - 60.f, 40.f);
         ofPopStyle();
     }
-
 
     uint8_t count = 0;
     for (sensor_source_t & source : sources) {
@@ -189,15 +172,22 @@ void ofApp::keyPressed(int key){
         case ' ':
             isRecording = !isRecording;
             if (isRecording) {
+                recordingStart = ofGetSystemTime();
+                recordingStartMicros = ofGetSystemTimeMicros();
                 tstamp = ofGetTimestampString();
             } else {
 #ifdef USE_VIDEO
                 videoRecorder.close();
 #endif
                 for (sensor_source_t &source : sources) {
+                    if (source.frames.size() == 0) {
+                        continue;
+                    }
                     ofFile file;
                     file.open(source.type + source.id + tstamp + ".txt", ofFile::WriteOnly);
                     ofBuffer out;
+                    out.append(ofToString(recordingStart) + " " + ofToString(recordingStartMicros) + "\n");
+                    out.append(ofToString(source.startTime) + " " + ofToString(source.lastTime) + "\n");
                     for (sensor_frame_t &frame : source.frames) {
                         out.append(ofToString(frame.time) + " ");
                         for (float &val : frame.data) {

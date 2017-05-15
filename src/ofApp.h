@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "ofxOsc.h"
-#include "LibloDumpFile.h"
 
 #ifdef USE_VIDEO
 #include "ofxVideoRecorder.h"
@@ -33,8 +32,6 @@ public:
     void keyPressed(int key);
     void windowResized(int w, int h);
 
-    LibloDumpFile libloFile;
-
 #ifdef USE_VIDEO
     ofxVideoRecorder videoRecorder;
     ofVideoGrabber videoGrabber;
@@ -45,5 +42,7 @@ public:
 
     vector<sensor_source_t> sources;
     string tstamp;
+    uint64_t recordingStart;
+    uint64_t recordingStartMicros;
     bool isRecording;
 };
