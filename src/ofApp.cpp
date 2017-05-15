@@ -61,6 +61,7 @@ void ofApp::update(){
         uint64_t time_received = ofGetSystemTimeMicros();
         ofxOscMessage msg;
         receiver.getNextMessage(msg);
+        sender.sendMessage(msg, true);
         vector<string> address = ofSplitString(msg.getAddress(), "/", true, true);
         if (address.size() == 2) {
             for (sensor_source_t & source : sources) {
