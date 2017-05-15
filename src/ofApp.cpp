@@ -4,7 +4,7 @@
 void ofApp::setup(){
     ofBackground(0);
 
-    tstamp = ofGetTimestampString();
+    isRecording = false;
 
 #ifdef USE_VIDEO
     videoGrabber.setDeviceID(0);
@@ -96,7 +96,9 @@ void ofApp::update(){
                         }
                     }
                     if (frame.data.size() == 6) {
-                        source.frames.push_back(frame);
+                        if (isRecording) {
+                            source.frames.push_back(frame);
+                        }
                     }
                 }
             }
@@ -144,6 +146,14 @@ void ofApp::draw(){
 
     ofDrawBitmapString(ofToString(ofGetFrameRate(), 2, 5, '0'), ofGetWindowWidth() - 140.f, 40.f);
 
+    if (isRecording) {
+        ofPushStyle();
+        ofSetColor(255, 0, 0);
+        ofDrawBitmapString("REC", ofGetWindowWidth() - 60.f, 40.f);
+        ofPopStyle();
+    }
+
+
     uint8_t count = 0;
     for (sensor_source_t & source : sources) {
         float xoffset = 40.f;
@@ -176,77 +186,52 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     switch (key) {
+        case ' ':
+            isRecording = !isRecording;
+            if (isRecording) {
+                tstamp = ofGetTimestampString();
+            } else {
+#ifdef USE_VIDEO
+                videoRecorder.close();
+#endif
+                for (sensor_source_t &source : sources) {
+                    ofFile file;
+                    file.open(source.type + source.id + tstamp + ".txt", ofFile::WriteOnly);
+                    ofBuffer out;
+                    for (sensor_frame_t &frame : source.frames) {
+                        out.append(ofToString(frame.time) + " ");
+                        for (float &val : frame.data) {
+                            out.append(ofToString(val) + " ");
+                        }
+                        string calibration = "";
+                        for (char &c : frame.calibration) {
+                            if (c == 0x1) {
+                                calibration += "1";
+                            } else if (c == 0x2) {
+                                calibration += "2";
+                            } else if (c == 0x3) {
+                                calibration += "3";
+                            } else {
+                                calibration += "0";
+                            }
+                        }
+                        out.append(calibration);
+                        out.append("\n");
+                    }
+                    file.writeFromBuffer(out);
+
+                    out.clear();
+                    source.startTime = 0;
+                    source.lastTime = 0;
+                    source.frames.clear();
+                }
+            }
+            break;
         case 'f':
             ofToggleFullscreen();
             break;
-        case 'd':
-#ifdef USE_VIDEO
-            videoRecorder.close();
-#endif
-            for (sensor_source_t & source : sources) {
-                ofFile file;
-                file.open(source.type + source.id + tstamp + ".txt", ofFile::WriteOnly);
-                ofBuffer out;
-                for (sensor_frame_t & frame : source.frames) {
-                    out.append(ofToString(frame.time) + " ");
-                    for (float & val : frame.data) {
-                        out.append(ofToString(val) + " ");
-                    }
-                    string calibration = "";
-                    for (char & c : frame.calibration) {
-                        if (c == 0x1) {
-                            calibration += "1";
-                        } else if (c == 0x2) {
-                            calibration += "2";
-                        } else if (c == 0x3) {
-                            calibration += "3";
-                        } else {
-                            calibration += "0";
-                        }
-                    }
-                    out.append(calibration);
-                    out.append("\n");
-                }
-                file.writeFromBuffer(out);
-                out.clear();
-            }
-            break;
+
     }
-}
-
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
-
 }
 
 //--------------------------------------------------------------
@@ -254,12 +239,3 @@ void ofApp::windowResized(int w, int h){
 
 }
 
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
-
-}
