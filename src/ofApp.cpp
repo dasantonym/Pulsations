@@ -4,6 +4,17 @@
 void ofApp::setup(){
     ofBackground(0);
 
+    tstamp = ofGetTimestampString();
+
+#ifdef USE_VIDEO
+    videoGrabber.setDeviceID(0);
+    videoGrabber.setDesiredFrameRate(25);
+    videoGrabber.setup(1280, 720);
+
+    videoRecorder.setup(tstamp + ".mp4", 1280, 720, 25);
+    videoRecorder.start();
+#endif
+
     sender.setup("127.0.0.1", 9999);
 
 #ifdef LOAD_DUMPFILE
@@ -91,6 +102,12 @@ void ofApp::update(){
             }
         }
     }
+#ifdef USE_VIDEO
+    videoGrabber.update();
+    if (videoGrabber.isFrameNew()) {
+        videoRecorder.addFrame(videoGrabber.getPixels());
+    }
+#endif
     uint8_t count = 0;
     float xoffset = 40.f;
     for (sensor_source_t & source : sources) {
@@ -121,6 +138,10 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+#ifdef USE_VIDEO
+    videoGrabber.draw(20.0, 20.0);
+#endif
+
     ofDrawBitmapString(ofToString(ofGetFrameRate(), 2, 5, '0'), ofGetWindowWidth() - 140.f, 40.f);
 
     uint8_t count = 0;
@@ -155,8 +176,13 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     switch (key) {
+        case 'f':
+            ofToggleFullscreen();
+            break;
         case 'd':
-            string tstamp = ofGetTimestampString();
+#ifdef USE_VIDEO
+            videoRecorder.close();
+#endif
             for (sensor_source_t & source : sources) {
                 ofFile file;
                 file.open(source.type + source.id + tstamp + ".txt", ofFile::WriteOnly);
