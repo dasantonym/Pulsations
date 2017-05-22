@@ -3,10 +3,38 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofBackground(0);
+
+    settings.load("settings.xml");
+
     isRecording = false;
 
-    sender.setup("127.0.0.1", 9999);
-    receiver.setup(8888);
+    gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
+    gui->addHeader(":: PULSATIONS ::");
+
+    gui->addFRM();
+
+    gui->addFolder("OSC", ofColor::white);
+    gui->addToggle("Record data", false);
+    gui->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
+    gui->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
+    gui->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
+
+    gui->addFolder("BNO055 Sensor 1", ofColor::yellow);
+    gui->addSlider("Trigger ACC 1", 0.f, 50.f, (float) settings.getValue("sensor:id1:accelerationThreshold", 8.f));
+
+    gui->addFolder("BNO055 Sensor 2", ofColor::yellow);
+    gui->addSlider("Trigger ACC 2", 0.f, 50.f, (float) settings.getValue("sensor:id2:accelerationThreshold", 8.f));
+
+    gui->addFolder("BNO055 Sensor 3", ofColor::yellow);
+    gui->addSlider("Trigger ACC 3", 0.f, 50.f, (float) settings.getValue("sensor:id3:accelerationThreshold", 8.f));
+
+    gui->onButtonEvent(this, &ofApp::onButtonEvent);
+    gui->onSliderEvent(this, &ofApp::onSliderEvent);
+    gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
+
+    sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 8888));
+    receiver.setup(settings.getValue("osc:inputPort", 8888));
+
 #ifdef USE_VIDEO
     videoGrabber.setDeviceID(0);
     videoGrabber.setDesiredFrameRate(25);
@@ -19,8 +47,10 @@ void ofApp::setup(){
     for (int i = 0; i < 3; ++i) {
         sensor_source_t source;
         source.id = "10" + ofToString(i);
-        source.type = "bno055";
+        source.type = "BNO055";
         source.startTime = 0;
+        source.settings.active = true;
+        source.settings.accelerationThreshold = (float) settings.getValue("sensor:id" + ofToString(i) + ":accelerationThreshold", 8.f);
         for (int i = 0; i < 6; ++i) {
             ofPath path;
             path.setFilled(false);
@@ -52,6 +82,80 @@ void ofApp::setup(){
     }
 }
 
+void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
+    if (e.target->getLabel() == "Record data") {
+        isRecording = e.target->getEnabled();
+        if (isRecording) {
+            recordingStart = ofGetSystemTime();
+            recordingStartMicros = ofGetSystemTimeMicros();
+            tstamp = ofGetTimestampString();
+        } else {
+#ifdef USE_VIDEO
+            videoRecorder.close();
+#endif
+            for (sensor_source_t &source : sources) {
+                if (source.frames.size() == 0) {
+                    continue;
+                }
+                ofFile file;
+                file.open(source.type + source.id + tstamp + ".txt", ofFile::WriteOnly);
+                ofBuffer out;
+                out.append(ofToString(recordingStart) + " " + ofToString(recordingStartMicros) + "\n");
+                out.append(ofToString(source.startTime) + " " + ofToString(source.lastTime) + "\n");
+                for (sensor_frame_t &frame : source.frames) {
+                    out.append(ofToString(frame.time) + " ");
+                    for (float &val : frame.data) {
+                        out.append(ofToString(val) + " ");
+                    }
+                    string calibration = "";
+                    for (char &c : frame.calibration) {
+                        if (c == 0x1) {
+                            calibration += "1";
+                        } else if (c == 0x2) {
+                            calibration += "2";
+                        } else if (c == 0x3) {
+                            calibration += "3";
+                        } else {
+                            calibration += "0";
+                        }
+                    }
+                    out.append(calibration);
+                    out.append("\n");
+                }
+                file.writeFromBuffer(out);
+
+                out.clear();
+                source.startTime = 0;
+                source.lastTime = 0;
+                source.frames.clear();
+            }
+        }
+    }
+}
+
+void ofApp::onSliderEvent(ofxDatGuiSliderEvent e) {
+    if (e.target->getLabel() == "Trigger ACC 1") {
+        sources[0].settings.accelerationThreshold = (float) e.target->getValue();
+        settings.setValue("sensor:id1:accelerationThreshold", e.target->getValue());
+    } else if (e.target->getLabel() == "Trigger ACC 2") {
+        sources[1].settings.accelerationThreshold = (float) e.target->getValue();
+        settings.setValue("sensor:id2:accelerationThreshold", e.target->getValue());
+    } else if (e.target->getLabel() == "Trigger ACC 3") {
+        sources[2].settings.accelerationThreshold = (float) e.target->getValue();
+        settings.setValue("sensor:id3:accelerationThreshold", e.target->getValue());
+    }
+}
+
+void ofApp::onTextInputEvent(ofxDatGuiTextInputEvent e) {
+    if (e.target->getLabel() == "Input port") {
+        settings.setValue("osc:inputPort", ofToInt(e.target->getText()));
+    } else if (e.target->getLabel() == "Forward IP") {
+        settings.setValue("osc:forwardIP", e.target->getText());
+    } else if (e.target->getLabel() == "Forward port") {
+        settings.setValue("osc:forwardPort", ofToInt(e.target->getText()));
+    }
+}
+
 //--------------------------------------------------------------
 void ofApp::update(){
 #ifdef USE_VIDEO
@@ -64,21 +168,27 @@ void ofApp::update(){
     while (receiver.hasWaitingMessages()) {
         uint64_t time_received = ofGetSystemTime();
         ofxOscMessage msg;
+        ofxOscMessage filteredMessage;
+        filteredMessage.setAddress(msg.getAddress());
         receiver.getNextMessage(msg);
-        sender.sendMessage(msg, true);
         vector<string> address = ofSplitString(msg.getAddress(), "/", true, true);
         if (address.size() == 2) {
             for (sensor_source_t & source : sources) {
-                if (source.type == address[0] && source.id == address[1]) {
+                if (source.settings.active && source.type == address[0] && source.id == address[1]) {
+                    // FIXME: timetags are not received properly...
+
+                    filteredMessage.addTimetagArg(time_received);
                     sensor_frame_t frame;
                     for (int i = 0; i < msg.getNumArgs(); ++i) {
                         string type = msg.getArgTypeName(i);
                         if (type == "f") {
                             frame.data.push_back(msg.getArgAsFloat(i));
+                            if (fabs(msg.getArgAsFloat(i)) >= source.settings.accelerationThreshold) {
+                                filteredMessage.addFloatArg(msg.getArgAsFloat(i));
+                            }
                         } else if (type == "b") {
                             frame.calibration = msg.getArgAsBlob(i);
                         } else if (type == "T") {
-                            // TODO: fix timetag
                             if (source.startTime == 0) {
                                 source.startTime = time_received;
                             }
@@ -93,6 +203,7 @@ void ofApp::update(){
                     }
                 }
             }
+            sender.sendMessage(filteredMessage, true);
         }
     }
     uint8_t count = 0;
@@ -128,34 +239,31 @@ void ofApp::draw(){
     videoGrabber.draw(20.0, 20.0);
 #endif
 
-    ofDrawBitmapString(ofToString(ofGetFrameRate(), 2, 5, '0'), ofGetWindowWidth() - 140.f, 40.f);
-
-    if (isRecording) {
-        ofPushStyle();
-        ofSetColor(255, 0, 0);
-        ofDrawBitmapString("REC", ofGetWindowWidth() - 60.f, 40.f);
-        ofPopStyle();
-    }
-
     uint8_t count = 0;
     for (sensor_source_t & source : sources) {
         float xoffset = 40.f;
         float yoffset = 40.f + 110.f * count;
         ofDrawBitmapString(source.type + source.id, xoffset, yoffset);
-        string calibration = "cal: ";
+        string data = "";
         if (source.frames.size() > 0) {
+            data += "DAT: ";
+            for (float &f : source.frames[source.frames.size() - 1].data) {
+                data += ofToString(f, 3, 8, '0') + "  ";
+            }
+
+            data += "CAL: ";
             for (char &c : source.frames[source.frames.size() - 1].calibration) {
                 if (c == 0x1) {
-                    calibration += "1 ";
+                    data += "1 ";
                 } else if (c == 0x2) {
-                    calibration += "2 ";
+                    data += "2 ";
                 } else if (c == 0x3) {
-                    calibration += "3 ";
+                    data += "3 ";
                 } else {
-                    calibration += "0 ";
+                    data += "0 ";
                 }
             }
-            ofDrawBitmapString(calibration, xoffset + 100.f, yoffset);
+            ofDrawBitmapString(data, xoffset + 100.f, yoffset);
 
             for (ofPath & path : source.paths) {
                 path.draw();
@@ -169,63 +277,19 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     switch (key) {
-        case ' ':
-            isRecording = !isRecording;
-            if (isRecording) {
-                recordingStart = ofGetSystemTime();
-                recordingStartMicros = ofGetSystemTimeMicros();
-                tstamp = ofGetTimestampString();
-            } else {
-#ifdef USE_VIDEO
-                videoRecorder.close();
-#endif
-                for (sensor_source_t &source : sources) {
-                    if (source.frames.size() == 0) {
-                        continue;
-                    }
-                    ofFile file;
-                    file.open(source.type + source.id + tstamp + ".txt", ofFile::WriteOnly);
-                    ofBuffer out;
-                    out.append(ofToString(recordingStart) + " " + ofToString(recordingStartMicros) + "\n");
-                    out.append(ofToString(source.startTime) + " " + ofToString(source.lastTime) + "\n");
-                    for (sensor_frame_t &frame : source.frames) {
-                        out.append(ofToString(frame.time) + " ");
-                        for (float &val : frame.data) {
-                            out.append(ofToString(val) + " ");
-                        }
-                        string calibration = "";
-                        for (char &c : frame.calibration) {
-                            if (c == 0x1) {
-                                calibration += "1";
-                            } else if (c == 0x2) {
-                                calibration += "2";
-                            } else if (c == 0x3) {
-                                calibration += "3";
-                            } else {
-                                calibration += "0";
-                            }
-                        }
-                        out.append(calibration);
-                        out.append("\n");
-                    }
-                    file.writeFromBuffer(out);
-
-                    out.clear();
-                    source.startTime = 0;
-                    source.lastTime = 0;
-                    source.frames.clear();
-                }
-            }
-            break;
         case 'f':
             ofToggleFullscreen();
             break;
-
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
 
+}
+
+//--------------------------------------------------------------
+void ofApp::exit() {
+    settings.save("settings.xml");
 }
 

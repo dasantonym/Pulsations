@@ -1,4 +1,4 @@
-ofxGui
+ofxDatGui
 ofxOsc
 ofxVideoRecorder
 ofxXmlSettings
