@@ -47,7 +47,8 @@ void ofApp::setup(){
     for (int i = 0; i < 3; ++i) {
         sensor_source_t source;
         source.id = "10" + ofToString(i);
-        source.type = "BNO055";
+        source.type = "bno055";
+        source.name = "BNO 055 IMU Fusion Sensor";
         source.startTime = 0;
         source.settings.active = true;
         source.settings.accelerationThreshold = (float) settings.getValue("sensor:id" + ofToString(i) + ":accelerationThreshold", 8.f);
@@ -169,21 +170,23 @@ void ofApp::update(){
         uint64_t time_received = ofGetSystemTime();
         ofxOscMessage msg;
         ofxOscMessage filteredMessage;
-        filteredMessage.setAddress(msg.getAddress());
         receiver.getNextMessage(msg);
         vector<string> address = ofSplitString(msg.getAddress(), "/", true, true);
         if (address.size() == 2) {
+            filteredMessage.setAddress(msg.getAddress());
+            filteredMessage.addTimetagArg(0);
             for (sensor_source_t & source : sources) {
-                if (source.settings.active && source.type == address[0] && source.id == address[1]) {
+                if (source.type == address[0] && source.id == address[1]) {
                     // FIXME: timetags are not received properly...
-
-                    filteredMessage.addTimetagArg(time_received);
                     sensor_frame_t frame;
                     for (int i = 0; i < msg.getNumArgs(); ++i) {
                         string type = msg.getArgTypeName(i);
                         if (type == "f") {
-                            frame.data.push_back(msg.getArgAsFloat(i));
-                            if (fabs(msg.getArgAsFloat(i)) >= source.settings.accelerationThreshold) {
+                            if (i > 3 && i < 8) {
+                                if (fabs(msg.getArgAsFloat(i)) >= source.settings.accelerationThreshold) {
+                                    filteredMessage.addFloatArg(msg.getArgAsFloat(i));
+                                }
+                            } else {
                                 filteredMessage.addFloatArg(msg.getArgAsFloat(i));
                             }
                         } else if (type == "b") {
@@ -197,9 +200,11 @@ void ofApp::update(){
                         }
                     }
                     if (frame.data.size() == 6) {
-                        if (isRecording) {
-                            source.frames.push_back(frame);
-                        }
+                        source.frames.push_back(frame);
+                    }
+                    if (!isRecording && source.frames.size() > 600) {
+                        source.frames.erase(
+                                source.frames.begin(), source.frames.begin() + source.frames.size() - 599);
                     }
                 }
             }
@@ -209,7 +214,7 @@ void ofApp::update(){
     uint8_t count = 0;
     float xoffset = 40.f;
     for (sensor_source_t & source : sources) {
-        float yoffset = 40.f + 110.f * count;
+        float yoffset = 40.f + 180.f * count;
         long frameCount = source.frames.size() > 600 ? source.frames.size() - 600 : 0;
         float tickSize = (ofGetWindowWidth() - 2.f * xoffset) / 600.f;
         for (long f = source.frames.size() - 1; f >= frameCount ; --f) {
@@ -218,14 +223,14 @@ void ofApp::update(){
                 if (i < source.paths.size()) {
                     float ypos;
                     if (i == 0) {
-                        ypos = 50.f * frame.data[i] / 360.f - 25.f;
+                        ypos = 80.f * frame.data[i] / 360.f - 40.f;
                     } else if (i > 0 && i < 3) {
-                        ypos = 25.f * frame.data[i] / 180.f;
+                        ypos = 40.f * frame.data[i] / 180.f;
                     } else {
                         ypos = frame.data[i] * 2.f;
                     }
                     source.paths[i].lineTo(xoffset + (600 - (f - frameCount)) * tickSize,
-                            yoffset + 20.f + (i < 3 ? 25.f : 50.f) + ypos);
+                            yoffset + 20.f + (i < 3 ? 40.f : 50.f) + ypos);
                 }
             }
         }
@@ -242,25 +247,26 @@ void ofApp::draw(){
     uint8_t count = 0;
     for (sensor_source_t & source : sources) {
         float xoffset = 40.f;
-        float yoffset = 40.f + 110.f * count;
-        ofDrawBitmapString(source.type + source.id, xoffset, yoffset);
+        float yoffset = 40.f + 200.f * count;
+        ofDrawBitmapString("/" + source.type + "/" + source.id, xoffset, yoffset);
         string data = "";
         if (source.frames.size() > 0) {
-            data += "DAT: ";
+            /*
+            data += "DATA: ";
             for (float &f : source.frames[source.frames.size() - 1].data) {
-                data += ofToString(f, 3, 8, '0') + "  ";
+                data += ofToString(f, 2, 6, ' ') + " ";
             }
 
-            data += "CAL: ";
+            data += "STATE: ";
             for (char &c : source.frames[source.frames.size() - 1].calibration) {
                 if (c == 0x1) {
-                    data += "1 ";
+                    data += "1";
                 } else if (c == 0x2) {
-                    data += "2 ";
+                    data += "2";
                 } else if (c == 0x3) {
-                    data += "3 ";
+                    data += "3";
                 } else {
-                    data += "0 ";
+                    data += "0";
                 }
             }
             ofDrawBitmapString(data, xoffset + 100.f, yoffset);
@@ -269,6 +275,7 @@ void ofApp::draw(){
                 path.draw();
                 path.clear();
             }
+             */
         }
         ++count;
     }

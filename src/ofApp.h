@@ -23,6 +23,7 @@ struct sensor_frame_t {
 struct sensor_source_t {
     string id;
     string type;
+    string name;
     uint64_t startTime;
     uint64_t lastTime;
     vector<ofPath> paths;
