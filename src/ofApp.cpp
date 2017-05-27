@@ -7,6 +7,7 @@ void ofApp::setup(){
     settings.load("settings.xml");
 
     isRecording = false;
+    drawCurves = settings.getValue("ui:drawCurves", true);
 
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
     gui->addHeader(":: PULSATIONS ::");
@@ -14,6 +15,7 @@ void ofApp::setup(){
     gui->addFRM();
 
     gui->addFolder("OSC", ofColor::white);
+    gui->addToggle("Draw curves", drawCurves);
     gui->addToggle("Record data", false);
     gui->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
     gui->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
@@ -32,7 +34,7 @@ void ofApp::setup(){
     gui->onSliderEvent(this, &ofApp::onSliderEvent);
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
-    sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 8888));
+    sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
     receiver.setup(settings.getValue("osc:inputPort", 8888));
 
 #ifdef USE_VIDEO
@@ -131,6 +133,9 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
                 source.frames.clear();
             }
         }
+    } else if (e.target->getLabel() == "Draw curves") {
+        drawCurves = !drawCurves;
+        settings.setValue("ui:drawCurves", drawCurves);
     }
 }
 
@@ -169,10 +174,11 @@ void ofApp::update(){
     while (receiver.hasWaitingMessages()) {
         uint64_t time_received = ofGetSystemTime();
         ofxOscMessage msg;
-        ofxOscMessage filteredMessage;
         receiver.getNextMessage(msg);
         vector<string> address = ofSplitString(msg.getAddress(), "/", true, true);
-        if (address.size() == 2) {
+        if (address.size() == 2 && address[0] == "bno055") {
+            bool sendFrame = false;
+            filteredMessage.clear();
             filteredMessage.setAddress(msg.getAddress());
             filteredMessage.addTimetagArg(0);
             for (sensor_source_t & source : sources) {
@@ -182,12 +188,15 @@ void ofApp::update(){
                     for (int i = 0; i < msg.getNumArgs(); ++i) {
                         string type = msg.getArgTypeName(i);
                         if (type == "f") {
-                            if (i > 3 && i < 8) {
+                            if (i > 3 && i < 7) {
                                 if (fabs(msg.getArgAsFloat(i)) >= source.settings.accelerationThreshold) {
+                                    sendFrame = true;
                                     filteredMessage.addFloatArg(msg.getArgAsFloat(i));
                                 }
+                                frame.data.push_back(msg.getArgAsFloat(i));
                             } else {
                                 filteredMessage.addFloatArg(msg.getArgAsFloat(i));
+                                frame.data.push_back(msg.getArgAsFloat(i));
                             }
                         } else if (type == "b") {
                             frame.calibration = msg.getArgAsBlob(i);
@@ -199,38 +208,40 @@ void ofApp::update(){
                             frame.time = time_received;
                         }
                     }
-                    if (frame.data.size() == 6) {
-                        source.frames.push_back(frame);
-                    }
-                    if (!isRecording && source.frames.size() > 600) {
-                        source.frames.erase(
-                                source.frames.begin(), source.frames.begin() + source.frames.size() - 599);
-                    }
+                    source.frames.push_back(frame);
                 }
             }
-            sender.sendMessage(filteredMessage, true);
+            if (sendFrame) {
+                sender.sendMessage(filteredMessage, true);
+            }
         }
     }
+    
     uint8_t count = 0;
     float xoffset = 40.f;
     for (sensor_source_t & source : sources) {
-        float yoffset = 40.f + 180.f * count;
-        long frameCount = source.frames.size() > 600 ? source.frames.size() - 600 : 0;
-        float tickSize = (ofGetWindowWidth() - 2.f * xoffset) / 600.f;
-        for (long f = source.frames.size() - 1; f >= frameCount ; --f) {
-            sensor_frame_t frame = source.frames[f];
-            for (int i = 0; i < frame.data.size(); ++i) {
-                if (i < source.paths.size()) {
-                    float ypos;
-                    if (i == 0) {
-                        ypos = 80.f * frame.data[i] / 360.f - 40.f;
-                    } else if (i > 0 && i < 3) {
-                        ypos = 40.f * frame.data[i] / 180.f;
-                    } else {
-                        ypos = frame.data[i] * 2.f;
+        if (!isRecording && source.frames.size() > 600) {
+            source.frames.erase(source.frames.begin(), source.frames.begin() + source.frames.size() - 600);
+        }
+        if (drawCurves) {
+            float yoffset = 40.f + 180.f * count;
+            long frameCount = source.frames.size() > 600 ? source.frames.size() - 600 : 0;
+            float tickSize = (ofGetWindowWidth() - 2.f * xoffset) / 600.f;
+            for (long f = source.frames.size() - 1; f >= frameCount ; --f) {
+                sensor_frame_t frame = source.frames[f];
+                for (int i = 0; i < frame.data.size(); ++i) {
+                    if (i < source.paths.size()) {
+                        float ypos;
+                        if (i == 0) {
+                            ypos = 80.f * frame.data[i] / 360.f - 40.f;
+                        } else if (i > 0 && i < 3) {
+                            ypos = 40.f * frame.data[i] / 180.f;
+                        } else {
+                            ypos = frame.data[i] * 2.f;
+                        }
+                        source.paths[i].lineTo(xoffset + (600 - (f - frameCount)) * tickSize,
+                                yoffset + 20.f + (i < 3 ? 40.f : 50.f) + ypos);
                     }
-                    source.paths[i].lineTo(xoffset + (600 - (f - frameCount)) * tickSize,
-                            yoffset + 20.f + (i < 3 ? 40.f : 50.f) + ypos);
                 }
             }
         }
@@ -270,9 +281,11 @@ void ofApp::draw(){
             }
             ofDrawBitmapString(data, xoffset + 100.f, yoffset);
 
-            for (ofPath & path : source.paths) {
-                path.draw();
-                path.clear();
+            if (drawCurves) {
+                for (ofPath & path : source.paths) {
+                    path.draw();
+                    path.clear();
+                }
             }
         }
         ++count;

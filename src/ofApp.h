@@ -55,10 +55,12 @@ public:
     ofxDatGui* gui;
     ofxOscSender sender;
     ofxOscReceiver receiver;
+    ofxOscMessage filteredMessage;
 
     vector<sensor_source_t> sources;
     string tstamp;
     uint64_t recordingStart;
     uint64_t recordingStartMicros;
     bool isRecording;
+    bool drawCurves;
 };
