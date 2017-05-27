@@ -251,7 +251,6 @@ void ofApp::draw(){
         ofDrawBitmapString("/" + source.type + "/" + source.id, xoffset, yoffset);
         string data = "";
         if (source.frames.size() > 0) {
-            /*
             data += "DATA: ";
             for (float &f : source.frames[source.frames.size() - 1].data) {
                 data += ofToString(f, 2, 6, ' ') + " ";
@@ -275,7 +274,6 @@ void ofApp::draw(){
                 path.draw();
                 path.clear();
             }
-             */
         }
         ++count;
     }
