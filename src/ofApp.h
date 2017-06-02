@@ -52,6 +52,7 @@ class ofApp : public ofBaseApp{
 public:
     void setup();
     void update();
+    void updateStats(uint8_t sourceId);
     void draw();
 
     void keyPressed(int key);

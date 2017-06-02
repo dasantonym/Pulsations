@@ -181,6 +181,64 @@ void ofApp::onTextInputEvent(ofxDatGuiTextInputEvent e) {
 }
 
 //--------------------------------------------------------------
+void ofApp::updateStats(uint8_t sourceId){
+    while (sources[sourceId].stats.accelerationValues.size() > 0 && ofGetSystemTime() - sources[sourceId].stats.accelerationValues[0].w > sources[sourceId].stats.bufferTimeMillis) {
+        sources[sourceId].stats.accelerationValues.erase(sources[sourceId].stats.accelerationValues.begin(), sources[sourceId].stats.accelerationValues.begin() + 1);
+    }
+    while (sources[sourceId].stats.orientationValues.size() > 0 && ofGetSystemTime() - sources[sourceId].stats.orientationValues[0].w > sources[sourceId].stats.bufferTimeMillis) {
+        sources[sourceId].stats.orientationValues.erase(sources[sourceId].stats.orientationValues.begin(), sources[sourceId].stats.orientationValues.begin() + 1);
+    }
+    for (ofVec4f & vec : sources[sourceId].stats.accelerationValues) {
+        sources[sourceId].stats.accelerationAvg.x += vec.x;
+        sources[sourceId].stats.accelerationAvg.y += vec.y;
+        sources[sourceId].stats.accelerationAvg.z += vec.z;
+        if (vec.x > sources[sourceId].stats.accelerationMax.x) {
+            sources[sourceId].stats.accelerationMax.x = vec.x;
+        }
+        if (vec.y > sources[sourceId].stats.accelerationMax.y) {
+            sources[sourceId].stats.accelerationMax.y = vec.y;
+        }
+        if (vec.z > sources[sourceId].stats.accelerationMax.z) {
+            sources[sourceId].stats.accelerationMax.z = vec.z;
+        }
+        if (vec.x < sources[sourceId].stats.accelerationMin.x) {
+            sources[sourceId].stats.accelerationMin.x = vec.x;
+        }
+        if (vec.y < sources[sourceId].stats.accelerationMin.y) {
+            sources[sourceId].stats.accelerationMin.y = vec.y;
+        }
+        if (vec.z < sources[sourceId].stats.accelerationMin.z) {
+            sources[sourceId].stats.accelerationMin.z = vec.z;
+        }
+    }
+
+    if (sources[sourceId].stats.accelerationMax.x > sources[sourceId].stats.accelerationMaxGlobal) {
+        sources[sourceId].stats.accelerationMaxGlobal = sources[sourceId].stats.accelerationMax.x;
+    }
+    if (sources[sourceId].stats.accelerationMax.y > sources[sourceId].stats.accelerationMaxGlobal) {
+        sources[sourceId].stats.accelerationMaxGlobal = sources[sourceId].stats.accelerationMax.y;
+    }
+    if (sources[sourceId].stats.accelerationMax.y > sources[sourceId].stats.accelerationMaxGlobal) {
+        sources[sourceId].stats.accelerationMaxGlobal = sources[sourceId].stats.accelerationMax.y;
+    }
+    if (sources[sourceId].stats.accelerationMin.x < sources[sourceId].stats.accelerationMinGlobal) {
+        sources[sourceId].stats.accelerationMinGlobal = sources[sourceId].stats.accelerationMin.x;
+    }
+    if (sources[sourceId].stats.accelerationMin.y > sources[sourceId].stats.accelerationMinGlobal) {
+        sources[sourceId].stats.accelerationMinGlobal = sources[sourceId].stats.accelerationMin.y;
+    }
+    if (sources[sourceId].stats.accelerationMin.y > sources[sourceId].stats.accelerationMinGlobal) {
+        sources[sourceId].stats.accelerationMinGlobal = sources[sourceId].stats.accelerationMin.y;
+    }
+
+    sources[sourceId].stats.accelerationAvg.x = sources[sourceId].stats.accelerationValues.size() ? sources[sourceId].stats.accelerationAvg.x / (float) sources[sourceId].stats.accelerationValues.size() : 0.f;
+    sources[sourceId].stats.accelerationAvg.y = sources[sourceId].stats.accelerationValues.size() ? sources[sourceId].stats.accelerationAvg.y / (float) sources[sourceId].stats.accelerationValues.size() : 0.f;
+    sources[sourceId].stats.accelerationAvg.z = sources[sourceId].stats.accelerationValues.size() ? sources[sourceId].stats.accelerationAvg.z / (float) sources[sourceId].stats.accelerationValues.size() : 0.f;
+
+    sources[sourceId].stats.accelerationAvgGlobal = ( sources[sourceId].stats.accelerationAvg.x + sources[sourceId].stats.accelerationAvg.y + sources[sourceId].stats.accelerationAvg.z) / 3.f;
+}
+
+//--------------------------------------------------------------
 void ofApp::update(){
 #ifdef USE_VIDEO
     videoGrabber.update();
@@ -270,64 +328,10 @@ void ofApp::update(){
     uint8_t count = 0;
     float xoffset = 40.f;
     for (sensor_source_t & source : sources) {
-        while (source.stats.accelerationValues.size() > 0 && ofGetSystemTime() - source.stats.accelerationValues[0].w > source.stats.bufferTimeMillis) {
-            source.stats.accelerationValues.erase(source.stats.accelerationValues.begin(), source.stats.accelerationValues.begin() + 1);
-        }
-        for (ofVec4f & vec : source.stats.accelerationValues) {
-            source.stats.accelerationAvg.x += vec.x;
-            source.stats.accelerationAvg.y += vec.y;
-            source.stats.accelerationAvg.z += vec.z;
-            if (vec.x > source.stats.accelerationMax.x) {
-                source.stats.accelerationMax.x = vec.x;
-            }
-            if (vec.y > source.stats.accelerationMax.y) {
-                source.stats.accelerationMax.y = vec.y;
-            }
-            if (vec.z > source.stats.accelerationMax.z) {
-                source.stats.accelerationMax.z = vec.z;
-            }
-            if (vec.x < source.stats.accelerationMin.x) {
-                source.stats.accelerationMin.x = vec.x;
-            }
-            if (vec.y < source.stats.accelerationMin.y) {
-                source.stats.accelerationMin.y = vec.y;
-            }
-            if (vec.z < source.stats.accelerationMin.z) {
-                source.stats.accelerationMin.z = vec.z;
-            }
-        }
-
-        if (source.stats.accelerationMax.x > source.stats.accelerationMaxGlobal) {
-            source.stats.accelerationMaxGlobal = source.stats.accelerationMax.x;
-        }
-        if (source.stats.accelerationMax.y > source.stats.accelerationMaxGlobal) {
-            source.stats.accelerationMaxGlobal = source.stats.accelerationMax.y;
-        }
-        if (source.stats.accelerationMax.y > source.stats.accelerationMaxGlobal) {
-            source.stats.accelerationMaxGlobal = source.stats.accelerationMax.y;
-        }
-        if (source.stats.accelerationMin.x < source.stats.accelerationMinGlobal) {
-            source.stats.accelerationMinGlobal = source.stats.accelerationMin.x;
-        }
-        if (source.stats.accelerationMin.y > source.stats.accelerationMinGlobal) {
-            source.stats.accelerationMinGlobal = source.stats.accelerationMin.y;
-        }
-        if (source.stats.accelerationMin.y > source.stats.accelerationMinGlobal) {
-            source.stats.accelerationMinGlobal = source.stats.accelerationMin.y;
-        }
-
-        source.stats.accelerationAvg.x = source.stats.accelerationValues.size() ? source.stats.accelerationAvg.x / (float) source.stats.accelerationValues.size() : 0.f;
-        source.stats.accelerationAvg.y = source.stats.accelerationValues.size() ? source.stats.accelerationAvg.y / (float) source.stats.accelerationValues.size() : 0.f;
-        source.stats.accelerationAvg.z = source.stats.accelerationValues.size() ? source.stats.accelerationAvg.z / (float) source.stats.accelerationValues.size() : 0.f;
-
-        source.stats.accelerationAvgGlobal = ( source.stats.accelerationAvg.x + source.stats.accelerationAvg.y + source.stats.accelerationAvg.z) / 3.f;
+        updateStats(count);
 
         //gui->getValuePlotter("Avg 1s " + ofToString(count + 1))->setValue(source.stats.accelerationAvgGlobal);
         gui->getSlider("Avg 1s " + ofToString(count + 1))->setValue(source.stats.accelerationAvgGlobal);
-
-        for (ofVec4f & vec : source.stats.orientationValues) {
-
-        }
 
         if (!isRecording && source.frames.size() > 600) {
             source.frames.erase(source.frames.begin(), source.frames.begin() + source.frames.size() - 600);
@@ -343,14 +347,14 @@ void ofApp::update(){
                     if (i < source.paths.size()) {
                         float ypos;
                         if (i == 0) {
-                            ypos = 40.f * (frame.data[i] - 180.f) / 180.f;
+                            ypos = 80.f * (frame.data[i] / 360.f) - 40.f;
                         } else if (i > 0 && i < 3) {
                             ypos = 40.f * frame.data[i] / 180.f;
                         } else {
                             ypos = frame.data[i] * 2.f;
                         }
                         source.paths[i].lineTo(xoffset + (600 - (f - frameCount)) * tickSize,
-                                yoffset + 20.f + (i < 3 ? 40.f : 50.f) + ypos);
+                                yoffset + 70.f + ypos);
                     }
                 }
             }
