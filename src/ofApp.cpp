@@ -7,6 +7,7 @@ void ofApp::setup(){
     settings.load("settings.xml");
 
     isRecording = false;
+    isLoop = false;
     drawCurves = (bool) settings.getValue("ui:drawCurves", true);
 
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
@@ -14,28 +15,38 @@ void ofApp::setup(){
 
     gui->addFRM();
 
-    gui->addFolder("OSC", ofColor::white);
     gui->addToggle("Draw curves", drawCurves);
     gui->addToggle("Record data", false);
-    gui->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 7777)));
-    gui->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
-    gui->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
 
-    gui->addFolder("BNO055 Sensor 1", ofColor::yellow);
-    gui->addSlider("Trigger ACC 1", 0.f, 50.f, (float) settings.getValue("sensor:id1:accelerationThreshold", 8.f));
+    ofxDatGuiFolder *osc = gui->addFolder("OSC", ofColor::white);
+    osc->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
+    osc->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
+    osc->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
 
-    gui->addFolder("BNO055 Sensor 2", ofColor::yellow);
-    gui->addSlider("Trigger ACC 2", 0.f, 50.f, (float) settings.getValue("sensor:id2:accelerationThreshold", 8.f));
+    ofxDatGuiFolder *sensor1 = gui->addFolder("BNO055 Sensor 1", ofColor::yellow);
+    sensor1->addTextInput("Sensor ID 1", settings.getValue("sensor:id1:sid", "100"));
+    sensor1->addSlider("Trigger ACC 1", 0.f, 50.f, (float) settings.getValue("sensor:id1:accelerationThreshold", 6.f));
+    sensor1->addSlider("Avg 1s 1", -10.f, 10.f, 0.0);
+    // sensor1->addValuePlotter("Avg 1s 1", -10.f, 10.f)->setDrawMode(ofxDatGuiGraph::LINES);
 
-    gui->addFolder("BNO055 Sensor 3", ofColor::yellow);
-    gui->addSlider("Trigger ACC 3", 0.f, 50.f, (float) settings.getValue("sensor:id3:accelerationThreshold", 8.f));
+    ofxDatGuiFolder *sensor2 = gui->addFolder("BNO055 Sensor 2", ofColor::yellow);
+    sensor2->addTextInput("Sensor ID 2", settings.getValue("sensor:id2:sid", "101"));
+    sensor2->addSlider("Trigger ACC 2", 0.f, 50.f, (float) settings.getValue("sensor:id2:accelerationThreshold", 6.f));
+    sensor2->addSlider("Avg 1s 2", -10.f, 10.f, 0.f);
+    //sensor2->addValuePlotter("Avg 1s 2", -10.f, 10.f)->setDrawMode(ofxDatGuiGraph::LINES);
+
+    ofxDatGuiFolder *sensor3 = gui->addFolder("BNO055 Sensor 3", ofColor::yellow);
+    sensor3->addTextInput("Sensor ID 3", settings.getValue("sensor:id3:sid", "102"));
+    sensor3->addSlider("Trigger ACC 3", 0.f, 50.f, (float) settings.getValue("sensor:id3:accelerationThreshold", 6.f));
+    sensor3->addSlider("Avg 1s 3", -10.f, 10.f, 0.0);
+    //sensor3->addValuePlotter("Avg 1s 3", -10.f, 10.f)->setDrawMode(ofxDatGuiGraph::LINES);
 
     gui->onButtonEvent(this, &ofApp::onButtonEvent);
     gui->onSliderEvent(this, &ofApp::onSliderEvent);
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
     sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
-    receiver.setup(settings.getValue("osc:inputPort", 7777));
+    receiver.setup(settings.getValue("osc:inputPort", 8888));
 
 #ifdef USE_VIDEO
     videoGrabber.setDeviceID(0);
@@ -47,13 +58,14 @@ void ofApp::setup(){
 #endif
 
     for (int i = 0; i < 3; ++i) {
+        string valuePath = "sensor:id" + ofToString(i+1);
         sensor_source_t source;
-        source.id = "10" + ofToString(i);
+        source.id = settings.getValue(valuePath + ":sid", "10" + ofToString(i));
         source.type = "bno055";
         source.name = "BNO 055 IMU Fusion Sensor";
         source.startTime = 0;
         source.settings.active = true;
-        source.settings.accelerationThreshold = (float) settings.getValue("sensor:id" + ofToString(i) + ":accelerationThreshold", 8.f);
+        source.settings.accelerationThreshold = (float) settings.getValue(valuePath + ":accelerationThreshold", 6.f);
         for (int i = 0; i < 6; ++i) {
             ofPath path;
             path.setFilled(false);
@@ -159,6 +171,12 @@ void ofApp::onTextInputEvent(ofxDatGuiTextInputEvent e) {
         settings.setValue("osc:forwardIP", e.target->getText());
     } else if (e.target->getLabel() == "Forward port") {
         settings.setValue("osc:forwardPort", ofToInt(e.target->getText()));
+    } else if (e.target->getLabel() == "Sensor ID 1") {
+        settings.setValue("sensor:id1:sid", ofToInt(e.target->getText()));
+    } else if (e.target->getLabel() == "Sensor ID 2") {
+        settings.setValue("sensor:id2:sid", ofToInt(e.target->getText()));
+    } else if (e.target->getLabel() == "Sensor ID 3") {
+        settings.setValue("sensor:id3:sid", ofToInt(e.target->getText()));
     }
 }
 
@@ -178,6 +196,7 @@ void ofApp::update(){
         vector<string> address = ofSplitString(msg.getAddress(), "/", true, true);
         if (address.size() == 2 && address[0] == "bno055") {
             bool sendFrame = false;
+            ofVec4f acceleration, orientation;
             filteredMessage.clear();
             filteredMessage.setAddress(msg.getAddress());
             filteredMessage.addTimetagArg(time_received);
@@ -188,6 +207,28 @@ void ofApp::update(){
                     for (int i = 0; i < msg.getNumArgs(); ++i) {
                         string type = msg.getArgTypeName(i);
                         if (type == "f") {
+                            switch (i) {
+                                case 1:
+                                    orientation.x = msg.getArgAsFloat(i);
+                                    break;
+                                case 2:
+                                    orientation.y = msg.getArgAsFloat(i);
+                                    break;
+                                case 3:
+                                    orientation.z = msg.getArgAsFloat(i);
+                                    break;
+                                case 4:
+                                    acceleration.x = msg.getArgAsFloat(i);
+                                    break;
+                                case 5:
+                                    acceleration.y = msg.getArgAsFloat(i);
+                                    break;
+                                case 6:
+                                    acceleration.z = msg.getArgAsFloat(i);
+                                    break;
+                                default:
+                                    break;
+                            }
                             if (i > 3 && i < 7) {
                                 if (fabs(msg.getArgAsFloat(i)) >= source.settings.accelerationThreshold) {
                                     sendFrame = true;
@@ -204,25 +245,94 @@ void ofApp::update(){
                             if (source.startTime == 0) {
                                 source.startTime = time_received;
                             }
+                            orientation.w = time_received;
+                            acceleration.w = time_received;
                             source.lastTime = time_received;
                             frame.time = time_received;
                         }
                     }
+                    source.stats.accelerationValues.push_back(acceleration);
+                    source.stats.orientationValues.push_back(orientation);
                     source.frames.push_back(frame);
                 }
             }
             if (sendFrame) {
+                if (isLoop && sendFrame) {
+                    loopMessages.push_back(filteredMessage);
+                }
                 sender.sendMessage(filteredMessage, true);
             }
         }
     }
+
+
     
     uint8_t count = 0;
     float xoffset = 40.f;
     for (sensor_source_t & source : sources) {
+        while (source.stats.accelerationValues.size() > 0 && ofGetSystemTime() - source.stats.accelerationValues[0].w > source.stats.bufferTimeMillis) {
+            source.stats.accelerationValues.erase(source.stats.accelerationValues.begin(), source.stats.accelerationValues.begin() + 1);
+        }
+        for (ofVec4f & vec : source.stats.accelerationValues) {
+            source.stats.accelerationAvg.x += vec.x;
+            source.stats.accelerationAvg.y += vec.y;
+            source.stats.accelerationAvg.z += vec.z;
+            if (vec.x > source.stats.accelerationMax.x) {
+                source.stats.accelerationMax.x = vec.x;
+            }
+            if (vec.y > source.stats.accelerationMax.y) {
+                source.stats.accelerationMax.y = vec.y;
+            }
+            if (vec.z > source.stats.accelerationMax.z) {
+                source.stats.accelerationMax.z = vec.z;
+            }
+            if (vec.x < source.stats.accelerationMin.x) {
+                source.stats.accelerationMin.x = vec.x;
+            }
+            if (vec.y < source.stats.accelerationMin.y) {
+                source.stats.accelerationMin.y = vec.y;
+            }
+            if (vec.z < source.stats.accelerationMin.z) {
+                source.stats.accelerationMin.z = vec.z;
+            }
+        }
+
+        if (source.stats.accelerationMax.x > source.stats.accelerationMaxGlobal) {
+            source.stats.accelerationMaxGlobal = source.stats.accelerationMax.x;
+        }
+        if (source.stats.accelerationMax.y > source.stats.accelerationMaxGlobal) {
+            source.stats.accelerationMaxGlobal = source.stats.accelerationMax.y;
+        }
+        if (source.stats.accelerationMax.y > source.stats.accelerationMaxGlobal) {
+            source.stats.accelerationMaxGlobal = source.stats.accelerationMax.y;
+        }
+        if (source.stats.accelerationMin.x < source.stats.accelerationMinGlobal) {
+            source.stats.accelerationMinGlobal = source.stats.accelerationMin.x;
+        }
+        if (source.stats.accelerationMin.y > source.stats.accelerationMinGlobal) {
+            source.stats.accelerationMinGlobal = source.stats.accelerationMin.y;
+        }
+        if (source.stats.accelerationMin.y > source.stats.accelerationMinGlobal) {
+            source.stats.accelerationMinGlobal = source.stats.accelerationMin.y;
+        }
+
+        source.stats.accelerationAvg.x = source.stats.accelerationValues.size() ? source.stats.accelerationAvg.x / (float) source.stats.accelerationValues.size() : 0.f;
+        source.stats.accelerationAvg.y = source.stats.accelerationValues.size() ? source.stats.accelerationAvg.y / (float) source.stats.accelerationValues.size() : 0.f;
+        source.stats.accelerationAvg.z = source.stats.accelerationValues.size() ? source.stats.accelerationAvg.z / (float) source.stats.accelerationValues.size() : 0.f;
+
+        source.stats.accelerationAvgGlobal = ( source.stats.accelerationAvg.x + source.stats.accelerationAvg.y + source.stats.accelerationAvg.z) / 3.f;
+
+        //gui->getValuePlotter("Avg 1s " + ofToString(count + 1))->setValue(source.stats.accelerationAvgGlobal);
+        gui->getSlider("Avg 1s " + ofToString(count + 1))->setValue(source.stats.accelerationAvgGlobal);
+
+        for (ofVec4f & vec : source.stats.orientationValues) {
+
+        }
+
         if (!isRecording && source.frames.size() > 600) {
             source.frames.erase(source.frames.begin(), source.frames.begin() + source.frames.size() - 600);
         }
+
         if (drawCurves) {
             float yoffset = 40.f + 180.f * count;
             long frameCount = source.frames.size() > 600 ? source.frames.size() - 600 : 0;
@@ -262,12 +372,10 @@ void ofApp::draw(){
         ofDrawBitmapString("/" + source.type + "/" + source.id, xoffset, yoffset);
         string data = "";
         if (source.frames.size() > 0) {
-            data += "DATA: ";
             for (float &f : source.frames[source.frames.size() - 1].data) {
                 data += ofToString(f, 2, 6, ' ') + " ";
             }
-
-            data += "STATE: ";
+            data += " ";
             for (char &c : source.frames[source.frames.size() - 1].calibration) {
                 if (c == 0x1) {
                     data += "1";
@@ -297,6 +405,9 @@ void ofApp::keyPressed(int key){
     switch (key) {
         case 'f':
             ofToggleFullscreen();
+            break;
+        case ' ':
+            isLoop = !isLoop;
             break;
     }
 }
