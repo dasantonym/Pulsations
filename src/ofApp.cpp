@@ -7,7 +7,7 @@ void ofApp::setup(){
     settings.load("settings.xml");
 
     isRecording = false;
-    drawCurves = settings.getValue("ui:drawCurves", true);
+    drawCurves = (bool) settings.getValue("ui:drawCurves", true);
 
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
     gui->addHeader(":: PULSATIONS ::");
@@ -17,7 +17,7 @@ void ofApp::setup(){
     gui->addFolder("OSC", ofColor::white);
     gui->addToggle("Draw curves", drawCurves);
     gui->addToggle("Record data", false);
-    gui->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
+    gui->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 7777)));
     gui->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
     gui->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
 
@@ -35,7 +35,7 @@ void ofApp::setup(){
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
     sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
-    receiver.setup(settings.getValue("osc:inputPort", 8888));
+    receiver.setup(settings.getValue("osc:inputPort", 7777));
 
 #ifdef USE_VIDEO
     videoGrabber.setDeviceID(0);
@@ -180,7 +180,7 @@ void ofApp::update(){
             bool sendFrame = false;
             filteredMessage.clear();
             filteredMessage.setAddress(msg.getAddress());
-            filteredMessage.addTimetagArg(0);
+            filteredMessage.addTimetagArg(time_received);
             for (sensor_source_t & source : sources) {
                 if (source.type == address[0] && source.id == address[1]) {
                     // FIXME: timetags are not received properly...
@@ -233,7 +233,7 @@ void ofApp::update(){
                     if (i < source.paths.size()) {
                         float ypos;
                         if (i == 0) {
-                            ypos = 80.f * frame.data[i] / 360.f - 40.f;
+                            ypos = 40.f * (frame.data[i] - 180.f) / 180.f;
                         } else if (i > 0 && i < 3) {
                             ypos = 40.f * frame.data[i] / 180.f;
                         } else {
