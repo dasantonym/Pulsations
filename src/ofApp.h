@@ -5,6 +5,7 @@
 #include "ofxXmlSettings.h"
 #include "ofxDatGui.h"
 
+
 #ifdef USE_VIDEO
 #include "ofxVideoRecorder.h"
 #endif
@@ -18,6 +19,17 @@ struct sensor_frame_t {
     uint64_t time;
     vector<float> data;
     ofBuffer calibration;
+};
+
+struct sensor_loop_t {
+    bool active;
+
+    uint64_t time_record;
+    uint64_t time_start;
+    uint64_t duration;
+
+    uint64_t message_index;
+    vector<ofxOscMessage> messages;
 };
 
 struct sensor_stats_t {
@@ -74,9 +86,9 @@ public:
     ofxOscReceiver receiver;
     ofxOscMessage filteredMessage;
 
-    vector<ofxOscMessage> loopMessages;
-
     vector<sensor_source_t> sources;
+    vector<sensor_loop_t> loops;
+    sensor_loop_t _loop;
     string tstamp;
     uint64_t recordingStart;
     uint64_t recordingStartMicros;

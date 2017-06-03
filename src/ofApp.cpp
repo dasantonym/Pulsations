@@ -182,10 +182,10 @@ void ofApp::onTextInputEvent(ofxDatGuiTextInputEvent e) {
 
 //--------------------------------------------------------------
 void ofApp::updateStats(uint8_t sourceId){
-    while (sources[sourceId].stats.accelerationValues.size() > 0 && ofGetSystemTime() - sources[sourceId].stats.accelerationValues[0].w > sources[sourceId].stats.bufferTimeMillis) {
+    while (sources[sourceId].stats.accelerationValues.size() > 0 && ofGetElapsedTimeMillis() - sources[sourceId].stats.accelerationValues[0].w > sources[sourceId].stats.bufferTimeMillis) {
         sources[sourceId].stats.accelerationValues.erase(sources[sourceId].stats.accelerationValues.begin(), sources[sourceId].stats.accelerationValues.begin() + 1);
     }
-    while (sources[sourceId].stats.orientationValues.size() > 0 && ofGetSystemTime() - sources[sourceId].stats.orientationValues[0].w > sources[sourceId].stats.bufferTimeMillis) {
+    while (sources[sourceId].stats.orientationValues.size() > 0 && ofGetElapsedTimeMillis() - sources[sourceId].stats.orientationValues[0].w > sources[sourceId].stats.bufferTimeMillis) {
         sources[sourceId].stats.orientationValues.erase(sources[sourceId].stats.orientationValues.begin(), sources[sourceId].stats.orientationValues.begin() + 1);
     }
     for (ofVec4f & vec : sources[sourceId].stats.accelerationValues) {
@@ -247,8 +247,9 @@ void ofApp::update(){
     }
 #endif
 
+    uint64_t frame_time = ofGetElapsedTimeMillis();
+
     while (receiver.hasWaitingMessages()) {
-        uint64_t time_received = ofGetSystemTime();
         ofxOscMessage msg;
         receiver.getNextMessage(msg);
         vector<string> address = ofSplitString(msg.getAddress(), "/", true, true);
@@ -257,12 +258,13 @@ void ofApp::update(){
             ofVec4f acceleration, orientation;
             filteredMessage.clear();
             filteredMessage.setAddress(msg.getAddress());
-            filteredMessage.addTimetagArg(time_received);
+            filteredMessage.addTimetagArg(frame_time);
             for (sensor_source_t & source : sources) {
                 if (source.type == address[0] && source.id == address[1]) {
                     // FIXME: timetags are not received properly...
+                    sendFrame = false;
                     sensor_frame_t frame;
-                    for (int i = 0; i < msg.getNumArgs(); ++i) {
+                    for (int i = 1; i < msg.getNumArgs(); ++i) {
                         string type = msg.getArgTypeName(i);
                         if (type == "f") {
                             switch (i) {
@@ -294,19 +296,18 @@ void ofApp::update(){
                                 }
                                 frame.data.push_back(msg.getArgAsFloat(i));
                             } else {
-                                filteredMessage.addFloatArg(msg.getArgAsFloat(i));
                                 frame.data.push_back(msg.getArgAsFloat(i));
                             }
                         } else if (type == "b") {
                             frame.calibration = msg.getArgAsBlob(i);
-                        } else if (type == "T") {
+                        } else if (type == "T" || type == "t") {
                             if (source.startTime == 0) {
-                                source.startTime = time_received;
+                                source.startTime = frame_time;
                             }
-                            orientation.w = time_received;
-                            acceleration.w = time_received;
-                            source.lastTime = time_received;
-                            frame.time = time_received;
+                            orientation.w = frame_time;
+                            acceleration.w = frame_time;
+                            source.lastTime = frame_time;
+                            frame.time = frame_time;
                         }
                     }
                     source.stats.accelerationValues.push_back(acceleration);
@@ -316,15 +317,31 @@ void ofApp::update(){
             }
             if (sendFrame) {
                 if (isLoop && sendFrame) {
-                    loopMessages.push_back(filteredMessage);
+                    _loop.messages.push_back(filteredMessage);
                 }
                 sender.sendMessage(filteredMessage, true);
             }
         }
     }
 
+    for (sensor_loop_t & loop : loops) {
+        if (!loop.active || loop.messages.size() == 0) {
+            continue;
+        }
+        int64_t time_diff = loop.messages[loop.message_index].getArgAsTimetag(0) - loop.time_record;
+        int64_t time_rel = frame_time - loop.time_start;
+        while (time_diff <= time_rel) {
+            sender.sendMessage(loop.messages[loop.message_index], true);
+            loop.message_index += 1;
+            if (loop.message_index == loop.messages.size()) {
+                loop.message_index =  0;
+                loop.time_start = frame_time;
+            }
+            time_rel = frame_time - loop.time_start;
+            time_diff = loop.messages[loop.message_index].getArgAsTimetag(0) - loop.time_record;
+        }
+    }
 
-    
     uint8_t count = 0;
     float xoffset = 40.f;
     for (sensor_source_t & source : sources) {
@@ -412,6 +429,20 @@ void ofApp::keyPressed(int key){
             break;
         case ' ':
             isLoop = !isLoop;
+            if (isLoop) {
+                _loop.message_index = 0;
+                _loop.messages.clear();
+                _loop.time_record = ofGetElapsedTimeMillis();
+            } else {
+                sensor_loop_t loop;
+                loop.time_record = _loop.time_record;
+                loop.time_start = ofGetElapsedTimeMillis();
+                loop.duration = loop.time_start - loop.time_record;
+                loop.messages = _loop.messages;
+                loop.message_index = 0;
+                loop.active = true;
+                loops.push_back(loop);
+            }
             break;
     }
 }
