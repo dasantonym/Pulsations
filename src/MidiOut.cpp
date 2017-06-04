@@ -15,6 +15,16 @@ void MidiOut::openPort(uint8_t port) {
 }
 
 //--------------------------------------------------------------
+void MidiOut::openPort(string port) {
+    _midi.openPort(port);
+}
+
+//--------------------------------------------------------------
+void MidiOut::openVirtualPort(string port) {
+    _midi.openVirtualPort(port);
+}
+
+//--------------------------------------------------------------
 void MidiOut::noteOn(uint8_t channel, NoteEvent note) {
     _midi.sendNoteOn(channel, note.getMidiPitch(), note.getMidiVelocity());
 }

@@ -45,9 +45,9 @@ void SensorGraph::update(vector<sensor_frame_t> frames) {
         return;
     }
     float tickSize = (_size.x - _position.x) / frames.size();
-    for (long f = frames.size() - 1; f >= frames.size() ; --f) {
+    for (long f = 0; f < frames.size() ; f++) {
         sensor_frame_t frame = frames[f];
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 6; i++) {
             if (i < _paths.size()) {
                 float ypos = _size.y * .5f;
                 switch (i) {
@@ -70,8 +70,7 @@ void SensorGraph::update(vector<sensor_frame_t> frames) {
                         ypos = frame.acceleration.z * 2.f;
                         break;
                 }
-                _paths[i].lineTo(_position.x + (_size.x - (f - frames.size())) * tickSize,
-                        _position.y + _size.y * .5f + ypos);
+                _paths[i].lineTo(_position.x + f * tickSize, _position.y + _size.y * .5f + ypos);
             }
         }
     }

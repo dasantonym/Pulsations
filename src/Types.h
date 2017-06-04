@@ -72,6 +72,12 @@ struct sensor_source_t {
     sensor_stats_t stats;
 };
 
+struct remote_command_t {
+    uint8_t command;
+    bool boolValue;
+    float floatValue;
+};
+
 class Types {
 
 };

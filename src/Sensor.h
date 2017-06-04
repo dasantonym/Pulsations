@@ -22,6 +22,7 @@ public:
     void setCalibrationStatus(ofBuffer calibration);
     void setActive(bool active);
     void setGraph(ofPoint position, float width, float height);
+    void setBufferSizeMillis(uint64_t size);
 
     void update();
     void draw();
@@ -29,6 +30,8 @@ public:
     bool hasFrames();
 
     string getOSCAddress();
+    string getDataAsString();
+    string getTriggersAsString();
     string getCalibrationStatus();
     vector<sensor_frame_t> getFrameBuffer();
     sensor_frame_t getCurrentFrame();

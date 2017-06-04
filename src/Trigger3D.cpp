@@ -11,20 +11,22 @@
 
 Trigger3D::Trigger3D(float threshold) {
     setTrigger(threshold);
+    setFalloff(.0f);
 }
 
 Trigger3D::Trigger3D(ofVec3f threshold) {
     setTrigger(threshold);
+    setFalloff(.0f);
 }
 
 Trigger3D::Trigger3D(float threshold_low, float threshold_high) {
     setTrigger(threshold_low, threshold_high);
+    setFalloff(.0f);
 }
 
 Trigger3D::Trigger3D(ofVec3f threshold_low, ofVec3f threshold_high) {
-    _isRange = true;
-    _threshold_low = threshold_low;
-    _threshold_high = threshold_high;
+    setTrigger(threshold_low, threshold_high);
+    setFalloff(.0f);
 }
 
 //
@@ -33,9 +35,26 @@ Trigger3D::Trigger3D(ofVec3f threshold_low, ofVec3f threshold_high) {
 //
 
 void Trigger3D::update(ofVec3f value) {
-    _triggerValue.x = getTriggerValue(value.x, _threshold_low.x, _threshold_high.x, _trigger_mask.x);
-    _triggerValue.y = getTriggerValue(value.y, _threshold_low.y, _threshold_high.y, _trigger_mask.y);
-    _triggerValue.z = getTriggerValue(value.z, _threshold_low.z, _threshold_high.z, _trigger_mask.z);
+    ofVec3f newVal;
+    newVal.x = getTriggerValue(value.x, _threshold_low.x, _threshold_high.x, _trigger_mask.x);
+    newVal.y = getTriggerValue(value.y, _threshold_low.y, _threshold_high.y, _trigger_mask.y);
+    newVal.z = getTriggerValue(value.z, _threshold_low.z, _threshold_high.z, _trigger_mask.z);
+
+    if (newVal.x != .0f) {
+        _triggerValue.x = newVal.x;
+    } else if (_triggerValue.x != .0f) {
+        _triggerValue.x -= _triggerFalloff.x;
+    }
+    if (newVal.y != .0f) {
+        _triggerValue.y = newVal.y;
+    } else if (_triggerValue.y != .0f) {
+        _triggerValue.x -= _triggerFalloff.y;
+    }
+    if (newVal.z != .0f) {
+        _triggerValue.z = newVal.z;
+    } else if (_triggerValue.z != .0f) {
+        _triggerValue.z -= _triggerFalloff.z;
+    }
 }
 
 
@@ -68,6 +87,16 @@ void Trigger3D::setTrigger(ofVec3f lowThreshold, ofVec3f highThreshold) {
     _isRange = true;
     _threshold_low = lowThreshold;
     _threshold_high = highThreshold;
+}
+
+void Trigger3D::setFalloff(float falloff) {
+    _triggerFalloff.x = falloff;
+    _triggerFalloff.y = falloff;
+    _triggerFalloff.z = falloff;
+}
+
+void Trigger3D::setFalloff(ofVec3f falloff) {
+    _triggerFalloff = falloff;
 }
 
 void Trigger3D::setDebounce(float millis) {
@@ -113,6 +142,14 @@ bool Trigger3D::isTriggered() {
 
 ofVec3f Trigger3D::getTrigger() {
     return _triggerValue;
+}
+
+string Trigger3D::getTriggerAsString() {
+    string result = "";
+    result += ofToString(_triggerValue.x, 2, 7, ' ') + " ";
+    result += ofToString(_triggerValue.y, 2, 7, ' ') + " ";
+    result += ofToString(_triggerValue.z, 2, 7, ' ');
+    return result;
 }
 
 float Trigger3D::getTriggerMax() {

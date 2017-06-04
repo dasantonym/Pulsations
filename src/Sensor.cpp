@@ -130,6 +130,10 @@ void Sensor::setActive(bool active) {
     _status.active = active;
 }
 
+void Sensor::setBufferSizeMillis(uint64_t size) {
+    _bufferTimeMillis = size;
+}
+
 
 //
 //
@@ -143,6 +147,23 @@ bool Sensor::hasOSCAddress(string address) {
 
 string Sensor::getOSCAddress() {
     return "/" + _type + "/" + _id;
+}
+
+string Sensor::getDataAsString() {
+    string result = "";
+    result += getOSCAddress() + "   ";
+    result += getCalibrationStatus() + "   ";
+    if (hasFrames()) {
+        result += "Acc.: ";
+        result += ofToString(getCurrentFrame().acceleration.x, 2, 7, ' ') + " ";
+        result += ofToString(getCurrentFrame().acceleration.y, 2, 7, ' ') + " ";
+        result += ofToString(getCurrentFrame().acceleration.z, 2, 7, ' ') + "   ";
+        result += "Ort.: ";
+        result += ofToString(getCurrentFrame().orientation.x, 2, 7, ' ') + " ";
+        result += ofToString(getCurrentFrame().orientation.y, 2, 7, ' ') + " ";
+        result += ofToString(getCurrentFrame().orientation.z, 2, 7, ' ');
+    }
+    return result;
 }
 
 string Sensor::getCalibrationStatus() {

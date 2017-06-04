@@ -14,6 +14,8 @@ public:
     MidiOut();
 
     void openPort(uint8_t port);
+    void openPort(string port);
+    void openVirtualPort(string port);
     void noteOn(uint8_t channel, NoteEvent note);
     void noteOff(uint8_t channel, NoteEvent note);
 

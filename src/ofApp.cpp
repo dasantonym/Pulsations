@@ -18,6 +18,7 @@ void ofApp::setup(){
 
     _isRecordingLoop = false;
     _drawCurves = (bool) settings.getValue("ui:drawCurves", true);
+    _overdub = (bool) settings.getValue("record:overdub", true);
 
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
     gui->addHeader(":: PULSATIONS ::");
@@ -25,6 +26,7 @@ void ofApp::setup(){
     gui->addFRM();
 
     gui->addToggle("Draw curves", _drawCurves);
+    gui->addToggle("Overdub", _overdub);
 
     ofxDatGuiFolder *osc = gui->addFolder("OSC", ofColor::white);
     osc->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
@@ -32,37 +34,68 @@ void ofApp::setup(){
     osc->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
 
     for (int i = 0; i < layout.get().getValue("layout:sensorcount", 3); ++i) {
-        string valuePath = "sensor:sn" + ofToString(i+1);
+        string valuePath = "layout:sensor" + ofToString(i+1);
 
         ofxDatGuiFolder *sensorUI = gui->addFolder("BNO055 Sensor #" + ofToString(i + 1), ofColor::yellow);
-        sensorUI->addTextInput("Sensor ID #" + ofToString(i + 1), layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)));
+        sensorUI->addTextInput("Sensor ID #" + ofToString(i+1),
+                layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)));
+        sensorUI->addSlider("Buffer (ms) #" + ofToString(i+1), 10, 10000,
+                layout.get().getValue(valuePath + ":buffer", 1000));
+
         Sensor sensor = Sensor(
-                layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)), "BNO 055 IMU Fusion Sensor", "bno055");
+                layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)),
+                "BNO 055 IMU Fusion Sensor", "bno055");
 
         for (int t = 0; t < layout.get().getValue(valuePath + ":triggercount", 1); ++t) {
-            string tid = valuePath + ":trigger:tr" + ofToString(t+1);
+            string tid = valuePath + ":trigger:trigger" + ofToString(t+1);
             string target = layout.get().getValue(tid + ":target", "acceleration");
             string name = layout.get().getValue(tid + ":name", "abs" + ofToString(i+1));
             bool absolute = layout.get().getValue(tid + ":absolute", 1) == 1;
             bool range = layout.get().getValue(tid + ":range", 0) == 1;
-            int debounce = layout.get().getValue(tid + ":debounceMillis", 1000);
+            int debounce = layout.get().getValue(tid + ":debounce", 500);
+
+            ofxDatGuiFolder *triggerUI = gui->addFolder("Sensor #" + ofToString(i + 1) +
+                    " Trigger #" + ofToString(t+1), ofColor::yellow);
+
+            triggerUI->addToggle("Absolute", layout.get().getValue(tid + ":absolute", 1) == 1);
+            triggerUI->addSlider("Debounce (ms)", 0, 4000, layout.get().getValue(tid + ":debounce", 500));
+
+            float rangeMin = target == "acceleration" ? -20.f : -180.f;
+            float rangeMax = target == "acceleration" ? 20.f : 180.f;
 
             ofVec3f valueLow, valueHigh;;
             valueLow.x = (float) layout.get().getValue(tid + ":low:x", 6.8f);
+            triggerUI->addSlider("Low X",
+                    target == "orientation" ? 0.f : rangeMin,
+                    target == "orientation" ? 360.f : rangeMax,
+                    valueLow.x);
+
             valueLow.y = (float) layout.get().getValue(tid + ":low:y", 6.8f);
+            triggerUI->addSlider("Low Y", rangeMin, rangeMax, valueLow.y);
+
             valueLow.z = (float) layout.get().getValue(tid + ":low:z", 6.8f);
+            triggerUI->addSlider("Low Z", rangeMin, rangeMax, valueLow.z);
 
             if (range) {
                 valueHigh.x = (float) layout.get().getValue(tid + ":high:x", 6.8f);
+                triggerUI->addSlider("High X",
+                        target == "orientation" ? 0.f : rangeMin,
+                        target == "orientation" ? 360.f : rangeMax,
+                        valueHigh.x);
+
                 valueHigh.y = (float) layout.get().getValue(tid + ":high:y", 6.8f);
+                triggerUI->addSlider("High Y", rangeMin, rangeMax, valueHigh.y);
+
                 valueHigh.z = (float) layout.get().getValue(tid + ":high:z", 6.8f);
+                triggerUI->addSlider("High Z", rangeMin, rangeMax, valueHigh.z);
             }
 
             sensor.addTrigger(name, target, valueLow, valueHigh, absolute);
             sensor.getTriggers()[sensor.getTriggers().size() - 1].trigger->setDebounce(debounce);
         }
 
-        sensor.setGraph(ofPoint(40.f, 40.f + 120.f * i), ofGetWindowWidth() - 80.f, 100.f);
+        sensor.setGraph(ofPoint(200.f + 20.f, 40.f + 120.f * i), ofGetWindowWidth() - 240.f, 100.f);
+
         sensors.push_back(sensor);
     }
 
@@ -130,6 +163,26 @@ void ofApp::update(){
                 }
             }
         }
+
+        remote_command_t response = _remoteControl.parseCommand(msg);
+        if (response.command != RemoteControl::COM_UNKNOWN) {
+            ofxOscMessage res;
+            res.setAddress(msg.getAddress());
+            switch (response.command) {
+                case RemoteControl::COM_TOGGLE_RECORD_LOOP:
+                    res.addBoolArg(response.boolValue);
+                    bundle.addMessage(res);
+                    toggleLoop();
+                    break;
+                case RemoteControl::COM_TOGGLE_OVERDUB:
+                    res.addBoolArg(response.boolValue);
+                    bundle.addMessage(res);
+                    _overdub = response.boolValue;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     count = 0;
@@ -141,11 +194,11 @@ void ofApp::update(){
         sensor.update();
 
         uint8_t tcount = 0;
-        string sensorPath = "sensor" + ofToString(count + 1);
+        string sensorPath = "layout:sensor" + ofToString(count + 1);
 
         for (sensor_trigger_3d_t & trigger : sensor.getTriggers()) {
             if (trigger.trigger->isTriggered()) {
-                string triggerPath = sensorPath + ":trigger" + ofToString(tcount + 1);
+                string triggerPath = sensorPath + ":trigger:trigger" + ofToString(tcount + 1);
                 ofxOscMessage msgOut;
                 ofVec3f val = trigger.trigger->getTrigger();
                 msgOut.setAddress(sensor.getOSCAddress() + "/" + trigger.target + "/" + trigger.name);
@@ -236,21 +289,74 @@ void ofApp::draw(){
             sensor.draw();
         }
 
-        ofDrawBitmapString(sensor.getOSCAddress(), 40.f, 40.f + 120.f * count);
-        ofDrawBitmapString(sensor.getCalibrationStatus(), 160.f, 40.f + 120.f * count);
-
         if (sensor.hasFrames()) {
-            ofDrawBitmapString(ofToString(sensor.getCurrentFrame().acceleration), 220.f, 40.f + 120.f * count);
-            ofDrawBitmapString(ofToString(sensor.getCurrentFrame().orientation), 380.f, 40.f + 120.f * count);
+            ofDrawBitmapString(sensor.getDataAsString(), 40.f, 40.f + 120.f * count);
 
             uint32_t tc = 0;
             for (sensor_trigger_3d_t & trigger : sensor.getTriggers()) {
-                ofDrawBitmapString(ofToString(trigger.trigger->getTrigger()), 40.f + 160.f * tc, 60.f + 120.f * count);
+                ofDrawBitmapString(trigger.name + " " + trigger.trigger->getTriggerAsString() + "   ",
+                        40.f + 160.f * tc, 60.f + 120.f * count);
                 tc++;
             }
+
+            ofPushStyle();
+            ofFill();
+            ofSetColor(180, 0, 0);
+
+            ofPushMatrix();
+            ofTranslate(40.f + 30.f, 40.f + 120.f * count + 60.f);
+            ofRotate(sensor.getCurrentFrame().orientation.x);
+            ofDrawTriangle(-20.f, 20.f, 20.f, 20.f, .0f, -20.f);
+            ofPopMatrix();
+
+            ofSetColor(180, 180, 0);
+            ofPushMatrix();
+            ofTranslate(40.f + 30.f + 60.f, 40.f + 120.f * count + 60.f);
+            ofRotate(sensor.getCurrentFrame().orientation.y);
+            ofDrawTriangle(-20.f, 20.f, 20.f, 20.f, .0f, -20.f);
+            ofPopMatrix();
+
+            ofSetColor(0, 180, 180);
+            ofPushMatrix();
+            ofTranslate(40.f + 30.f + 60.f * 2.f, 40.f + 120.f * count + 60.f);
+            ofRotate(sensor.getCurrentFrame().orientation.z);
+            ofDrawTriangle(-20.f, 20.f, 20.f, 20.f, .0f, -20.f);
+            ofPopMatrix();
+
+            ofPopStyle();
+        }
+
+        if (_isRecordingLoop && _loops.size() == 0) {
+            ofPushStyle();
+            ofSetColor(255, 0, 0);
+            ofDrawBitmapString("REC LOOP", 40.f, ofGetWindowHeight() - 60.f);
+            ofPopStyle();
+        } else if (_loops.size() > 0) {
+            ofPushStyle();
+            ofSetColor(0, 255, 0);
+            ofDrawBitmapString("PLAY LOOP", 40.f, ofGetWindowHeight() - 60.f);
+            ofPopStyle();
+        } else if (_loops.size() > 0 && _isRecordingLoop) {
+            ofPushStyle();
+            ofSetColor(255, 180, 0);
+            ofDrawBitmapString("OVERDUB LOOP", 40.f, ofGetWindowHeight() - 60.f);
+            ofPopStyle();
         }
 
         count++;
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::toggleLoop(){
+    _isRecordingLoop = !_isRecordingLoop;
+    if (_isRecordingLoop) {
+        NoteLoop loop = NoteLoop();
+        loop.setMidiOut(midiOut);
+        loop.setRecord(true);
+        _loops.push_back(loop);
+    } else {
+        _loops[_loops.size() - 1].setRecord(false);
     }
 }
 
@@ -261,15 +367,7 @@ void ofApp::keyPressed(int key){
             ofToggleFullscreen();
             break;
         case ' ':
-            _isRecordingLoop = !_isRecordingLoop;
-            if (_isRecordingLoop) {
-                NoteLoop loop = NoteLoop();
-                loop.setMidiOut(midiOut);
-                loop.setRecord(true);
-                _loops.push_back(loop);
-            } else {
-                _loops[_loops.size() - 1].setRecord(false);
-            }
+            toggleLoop();
             break;
     }
 }
@@ -290,6 +388,9 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
     if (e.target->getLabel() == "Draw curves") {
         _drawCurves = !_drawCurves;
         settings.setValue("ui:drawCurves", _drawCurves);
+    } else if (e.target->getLabel() == "Overdub") {
+        _overdub = !_overdub;
+        settings.setValue("record:overdub", _overdub);
     }
 }
 
@@ -297,17 +398,17 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
 void ofApp::onSliderEvent(ofxDatGuiSliderEvent e) {
     sensor_trigger_3d_t trigger;
     int8_t id = -1;
-    if (e.target->getLabel() == "Trigger ACC #1") {
+
+    if (e.target->getLabel() == "Buffer (ms) #1") {
         id = 0;
-    } else if (e.target->getLabel() == "Trigger ACC #2") {
+    } else if (e.target->getLabel() == "Buffer (ms) #2") {
         id = 1;
-    } else if (e.target->getLabel() == "Trigger ACC #3") {
+    } else if (e.target->getLabel() == "Buffer (ms) #3") {
         id = 2;
     }
     if (id >= 0) {
-        sensors[id].getTriggers()[sensors[id]
-                .getTriggerIndexByName("acc" + ofToString(id + 1))].trigger->setTrigger((float) e.target->getValue());
-        // settings.setValue("sensor:id" + ofToString(id + 1) + ":accelerationThreshold", e.target->getValue());
+        sensors[id].setBufferSizeMillis((uint64_t) e.target->getValue());
+        // settings.setValue("layout:sensor1" + ofToString(id + 1) + ":buffer", e.target->getValue());
     }
 }
 
@@ -320,10 +421,10 @@ void ofApp::onTextInputEvent(ofxDatGuiTextInputEvent e) {
     } else if (e.target->getLabel() == "Forward port") {
         settings.setValue("osc:forwardPort", ofToInt(e.target->getText()));
     } else if (e.target->getLabel() == "Sensor ID #1") {
-        settings.setValue("sensor:sn1:sid", ofToInt(e.target->getText()));
+        settings.setValue("layout:sensor1:sid", ofToInt(e.target->getText()));
     } else if (e.target->getLabel() == "Sensor ID #2") {
-        settings.setValue("sensor:sn2:sid", ofToInt(e.target->getText()));
+        settings.setValue("layout:sensor2:sid", ofToInt(e.target->getText()));
     } else if (e.target->getLabel() == "Sensor ID #3") {
-        settings.setValue("sensor:sn3:sid", ofToInt(e.target->getText()));
+        settings.setValue("layout:sensor3:sid", ofToInt(e.target->getText()));
     }
 }

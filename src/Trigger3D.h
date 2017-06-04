@@ -21,6 +21,9 @@ public:
     void setTrigger(float lowThreshold, float highThreshold);
     void setTrigger(ofVec3f lowThreshold, ofVec3f highThreshold);
 
+    void setFalloff(float falloff);
+    void setFalloff(ofVec3f falloff);
+
     void setDebounce(float millis);
     void setDebounce(ofVec3f millis);
     void setMask(float mask);
@@ -29,6 +32,7 @@ public:
 
     bool isTriggered();
     ofVec3f getTrigger();
+    string getTriggerAsString();
     float getTriggerMax();
     float getTriggerMin();
     float getTriggerValue(float value, float threshold_high, float threshold_low, float mask);
@@ -37,6 +41,7 @@ private:
     bool _isRange;
     bool _isAbsolute;
     ofVec3f _triggerValue;
+    ofVec3f _triggerFalloff;
 
     ofVec3f _trigger_debounce;
     ofVec3f _trigger_mask;

@@ -8,6 +8,7 @@
 #include "Sensor.h"
 #include "NoteLoop.h"
 #include "Layout.h"
+#include "RemoteControl.h"
 
 class ofApp : public ofBaseApp{
 
@@ -16,6 +17,7 @@ public:
     void update();
     void draw();
 
+    void toggleLoop();
     void keyPressed(int key);
     void windowResized(int w, int h);
     void exit();
@@ -31,6 +33,7 @@ public:
     ofxOscReceiver receiver;
 
     MidiOut *midiOut;
+    RemoteControl _remoteControl;
 
     vector<sensor_source_t> sources;
     vector<Sensor> sensors;
@@ -39,4 +42,5 @@ public:
 
     bool _drawCurves;
     bool _isRecordingLoop;
+    bool _overdub;
 };

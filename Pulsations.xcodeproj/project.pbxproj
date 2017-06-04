@@ -13,6 +13,7 @@
 		4ADB88E2FB52E76A471065DE /* ofxOscParameterSync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AED834CE4DEC5260AF302A2 /* ofxOscParameterSync.cpp */; };
 		510CAFE035E576A4E1502D52 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6DEF695B88BA5FAACEAA937 /* UdpSocket.cpp */; };
 		5864AD82E20F15536D054EA3 /* ofxOscMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF49D76C45D5DB505A234880 /* ofxOscMessage.cpp */; };
+		58AAA2D14C6AACC260ABBE28 /* RemoteControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAAC53049022F2A3C6F9AF /* RemoteControl.cpp */; };
 		58AAA3B984314116C86E92F3 /* NoteEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAAA6C21C87A1F7C094060 /* NoteEvent.cpp */; };
 		58AAA3C36EEAC59C4BA0D81C /* MidiOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAABE16251AB43CC46FD14 /* MidiOut.cpp */; };
 		58AAA60671AF7D132CBF2A03 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58AAA4D5D207A1A004C6F9FD /* CoreMIDI.framework */; };
@@ -106,6 +107,7 @@
 		50DF87D612C5AAE17AAFA6C0 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxXmlSettings.cpp; path = ../../../addons/ofxXmlSettings/src/ofxXmlSettings.cpp; sourceTree = SOURCE_ROOT; };
 		51E7C79AF368893179194CBC /* RtMidi.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = RtMidi.h; path = ../../../addons/ofxMidi/libs/RtMidi.h; sourceTree = SOURCE_ROOT; };
 		545BBA6F6669BED2DA497BC6 /* ofxDatGuiScrollView.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiScrollView.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiScrollView.h; sourceTree = SOURCE_ROOT; };
+		58AAA20D66E391355EC3BAB2 /* RemoteControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteControl.h; sourceTree = "<group>"; };
 		58AAA2F50877FB6E43BA1CFA /* NoteEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoteEvent.h; sourceTree = "<group>"; };
 		58AAA4D5D207A1A004C6F9FD /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
 		58AAA832085FAF5644492C66 /* SensorGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorGraph.h; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 		58AAAA6C21C87A1F7C094060 /* NoteEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NoteEvent.cpp; sourceTree = "<group>"; };
 		58AAAB23CB37219001D33086 /* DumpFrames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumpFrames.h; sourceTree = "<group>"; };
 		58AAABE16251AB43CC46FD14 /* MidiOut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MidiOut.cpp; sourceTree = "<group>"; };
+		58AAAC53049022F2A3C6F9AF /* RemoteControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteControl.cpp; sourceTree = "<group>"; };
 		58AAAD664DEF3069F119CCB9 /* Layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Layout.h; sourceTree = "<group>"; };
 		58AAADE15990DDC5D3111015 /* Trigger3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Trigger3D.h; sourceTree = "<group>"; };
 		58AAAFFE352314350516F1D1 /* SensorGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SensorGraph.cpp; sourceTree = "<group>"; };
@@ -487,6 +490,8 @@
 				58AAA8D36EC211910CF51FA7 /* Layout.cpp */,
 				58AAAD664DEF3069F119CCB9 /* Layout.h */,
 				58AAAB23CB37219001D33086 /* DumpFrames.h */,
+				58AAAC53049022F2A3C6F9AF /* RemoteControl.cpp */,
+				58AAA20D66E391355EC3BAB2 /* RemoteControl.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -657,6 +662,7 @@
 				58AAAAAB779D6E246CEFA0D6 /* SensorGraph.cpp in Sources */,
 				58AAA3C36EEAC59C4BA0D81C /* MidiOut.cpp in Sources */,
 				58AAAB0FA59578EE836DEDDF /* Layout.cpp in Sources */,
+				58AAA2D14C6AACC260ABBE28 /* RemoteControl.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

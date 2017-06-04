@@ -14,20 +14,23 @@ void Layout::init(string name) {
     _layout.setValue("layout:sensorcount", 2);
 
     for (int i = 0; i < _layout.getValue("layout:sensorcount", 2); ++i) {
-        string valuePath = "sensor" + ofToString(i+1);
+        string valuePath = "layout:sensor" + ofToString(i+1);
 
         _layout.setValue(valuePath + ":sid", "10" + ofToString(i));
         _layout.setValue(valuePath + ":name", "BNO 055 IMU Fusion Sensor");
         _layout.setValue(valuePath + ":type", "bno055");
         _layout.setValue(valuePath + ":triggercount", 1);
 
-        for (int t = 0; t < _layout.getValue(valuePath + ":triggercount", 1); ++t) {
+        for (int t = 0; t < _layout.getValue(valuePath + ":trigger", 1); ++t) {
             string tid = valuePath + ":trigger" + ofToString(t+1);
             _layout.setValue(tid + ":target", "acceleration");
             _layout.setValue(tid + ":name", "abs" + ofToString(i+1));
             _layout.setValue(tid + ":range", i);
             _layout.setValue(tid + ":absolute", 1);
-            _layout.setValue(tid + ":debounceMillis", 500);
+            _layout.setValue(tid + ":debounce", 500);
+            _layout.setValue(tid + ":falloff:x", .0f);
+            _layout.setValue(tid + ":falloff:y", .0f);
+            _layout.setValue(tid + ":falloff:z", .0f);
 
             _layout.setValue(tid + ":low:x", 6.f);
             _layout.setValue(tid + ":midi:x:channel", 1 + t * 3);
