@@ -42,6 +42,7 @@ private:
     bool _isAbsolute;
     ofVec3f _triggerValue;
     ofVec3f _triggerFalloff;
+    ofVec3f _lastTriggerTime;
 
     ofVec3f _trigger_debounce;
     ofVec3f _trigger_mask;

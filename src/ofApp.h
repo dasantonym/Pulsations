@@ -5,6 +5,7 @@
 #include "ofxXmlSettings.h"
 #include "ofxDatGui.h"
 
+#include "Version.h"
 #include "Sensor.h"
 #include "NoteLoop.h"
 #include "Layout.h"
@@ -30,6 +31,7 @@ public:
     Layout layout;
     ofxDatGui* gui;
     ofxOscSender sender;
+    ofxOscSender uiResponder;
     ofxOscReceiver receiver;
 
     MidiOut *midiOut;

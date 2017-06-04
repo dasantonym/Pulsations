@@ -33,3 +33,8 @@ void MidiOut::noteOn(uint8_t channel, NoteEvent note) {
 void MidiOut::noteOff(uint8_t channel, NoteEvent note) {
     _midi.sendNoteOff(channel, note.getMidiPitch(), 0);
 }
+
+//--------------------------------------------------------------
+void MidiOut::sendController(uint8_t channel, ControllerEvent event) {
+    _midi.sendControlChange(channel, event.getController(), event.getMidiValue());
+}

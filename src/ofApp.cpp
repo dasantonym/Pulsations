@@ -20,8 +20,10 @@ void ofApp::setup(){
     _drawCurves = (bool) settings.getValue("ui:drawCurves", true);
     _overdub = (bool) settings.getValue("record:overdub", true);
 
+    string version = "v0.1.0";// + ofToString(Version::VERSION_MAJ) + "." + ofToString(Version::VERSION_MIN) +
+            // "." + ofToString(Version::VERSION_PATCH);
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
-    gui->addHeader(":: PULSATIONS ::");
+    gui->addHeader(":: PULSATIONS " + version + " ::");
 
     gui->addFRM();
 
@@ -32,6 +34,8 @@ void ofApp::setup(){
     osc->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
     osc->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
     osc->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
+    osc->addTextInput("Remote resp. IP", ofToString(settings.getValue("osc:responseIP", "192.168.0.255")));
+    osc->addTextInput("Remote resp. port", ofToString(settings.getValue("osc:responsePort", 7777)));
 
     for (int i = 0; i < layout.get().getValue("layout:sensorcount", 3); ++i) {
         string valuePath = "layout:sensor" + ofToString(i+1);
@@ -59,6 +63,10 @@ void ofApp::setup(){
 
             triggerUI->addToggle("Absolute", layout.get().getValue(tid + ":absolute", 1) == 1);
             triggerUI->addSlider("Debounce (ms)", 0, 4000, layout.get().getValue(tid + ":debounce", 500));
+
+            triggerUI->addSlider("Falloff X", 0.f, 1.f, layout.get().getValue(tid + ":falloff:x", 0.f));
+            triggerUI->addSlider("Falloff Y", 0.f, 1.f, layout.get().getValue(tid + ":falloff:y", 0.f));
+            triggerUI->addSlider("Falloff Z", 0.f, 1.f, layout.get().getValue(tid + ":falloff:z", 0.f));
 
             float rangeMin = target == "acceleration" ? -20.f : -180.f;
             float rangeMax = target == "acceleration" ? 20.f : 180.f;
@@ -106,8 +114,9 @@ void ofApp::setup(){
     midiOut = new MidiOut();
     midiOut->openPort(0);
 
-    sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
+    uiResponder.setup(settings.getValue("osc:responseIP", "192.168.0.2"), settings.getValue("osc:responsePort", 7777));
     receiver.setup(settings.getValue("osc:inputPort", 8888));
+    sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
 }
 
 //--------------------------------------------------------------
@@ -171,12 +180,13 @@ void ofApp::update(){
             switch (response.command) {
                 case RemoteControl::COM_TOGGLE_RECORD_LOOP:
                     res.addBoolArg(response.boolValue);
+                    uiResponder.sendMessage(res, true);
                     bundle.addMessage(res);
                     toggleLoop();
                     break;
                 case RemoteControl::COM_TOGGLE_OVERDUB:
                     res.addBoolArg(response.boolValue);
-                    bundle.addMessage(res);
+                    uiResponder.sendMessage(res, true);
                     _overdub = response.boolValue;
                     break;
                 default:
@@ -257,7 +267,7 @@ void ofApp::update(){
     while (_openNotes.size() > 0 && count < _openNotes.size()) {
         NoteEvent & note = _openNotes[0];
         if (note.getEndTime() <= ofGetElapsedTimeMillis()) {
-            midiOut->noteOff(count + 1, note);
+            midiOut->noteOff((uint8_t)(count + 1), note);
             _openNotes.erase(_openNotes.begin() + count, _openNotes.begin() + 1);
         } else {
             count++;
@@ -326,24 +336,24 @@ void ofApp::draw(){
             ofPopStyle();
         }
 
-        if (_isRecordingLoop && _loops.size() == 0) {
-            ofPushStyle();
-            ofSetColor(255, 0, 0);
-            ofDrawBitmapString("REC LOOP", 40.f, ofGetWindowHeight() - 60.f);
-            ofPopStyle();
-        } else if (_loops.size() > 0) {
-            ofPushStyle();
-            ofSetColor(0, 255, 0);
-            ofDrawBitmapString("PLAY LOOP", 40.f, ofGetWindowHeight() - 60.f);
-            ofPopStyle();
-        } else if (_loops.size() > 0 && _isRecordingLoop) {
-            ofPushStyle();
-            ofSetColor(255, 180, 0);
-            ofDrawBitmapString("OVERDUB LOOP", 40.f, ofGetWindowHeight() - 60.f);
-            ofPopStyle();
-        }
-
         count++;
+    }
+
+    if (_isRecordingLoop && _loops.size() == 0) {
+        ofPushStyle();
+        ofSetColor(255, 0, 0);
+        ofDrawBitmapString("REC LOOP", 40.f, ofGetWindowHeight() - 60.f);
+        ofPopStyle();
+    } else if (_loops.size() > 0) {
+        ofPushStyle();
+        ofSetColor(0, 255, 0);
+        ofDrawBitmapString("PLAY LOOP", 40.f, ofGetWindowHeight() - 60.f);
+        ofPopStyle();
+    } else if (_loops.size() > 0 && _isRecordingLoop) {
+        ofPushStyle();
+        ofSetColor(255, 180, 0);
+        ofDrawBitmapString("OVERDUB LOOP", 40.f, ofGetWindowHeight() - 60.f);
+        ofPopStyle();
     }
 }
 
