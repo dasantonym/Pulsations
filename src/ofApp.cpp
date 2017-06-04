@@ -6,247 +6,81 @@ void ofApp::setup(){
 
     settings.load("settings.xml");
 
-    isRecording = false;
-    isLoop = false;
-    drawCurves = (bool) settings.getValue("ui:drawCurves", true);
+    if (settings.getValue("layout", "empty") != "empty") {
+        layout.load(settings.getValue("layout", "empty"));
+    }
+    if (layout.get().getValue("layout:sensorcount", 0) == 0) {
+        string layoutName = "empty-" + ofGetTimestampString();
+        layout.init(layoutName);
+        layout.save();
+        settings.setValue("layout", layoutName);
+    }
+
+    _isRecordingLoop = false;
+    _drawCurves = (bool) settings.getValue("ui:drawCurves", true);
 
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
     gui->addHeader(":: PULSATIONS ::");
 
     gui->addFRM();
 
-    gui->addToggle("Draw curves", drawCurves);
-    gui->addToggle("Record data", false);
+    gui->addToggle("Draw curves", _drawCurves);
 
     ofxDatGuiFolder *osc = gui->addFolder("OSC", ofColor::white);
     osc->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
     osc->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
     osc->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
 
-    ofxDatGuiFolder *sensor1 = gui->addFolder("BNO055 Sensor 1", ofColor::yellow);
-    sensor1->addTextInput("Sensor ID 1", settings.getValue("sensor:id1:sid", "100"));
-    sensor1->addSlider("Trigger ACC 1", 0.f, 50.f, (float) settings.getValue("sensor:id1:accelerationThreshold", 6.f));
-    sensor1->addSlider("Avg 1s 1", -10.f, 10.f, 0.0);
-    // sensor1->addValuePlotter("Avg 1s 1", -10.f, 10.f)->setDrawMode(ofxDatGuiGraph::LINES);
+    for (int i = 0; i < layout.get().getValue("layout:sensorcount", 3); ++i) {
+        string valuePath = "sensor:sn" + ofToString(i+1);
 
-    ofxDatGuiFolder *sensor2 = gui->addFolder("BNO055 Sensor 2", ofColor::yellow);
-    sensor2->addTextInput("Sensor ID 2", settings.getValue("sensor:id2:sid", "101"));
-    sensor2->addSlider("Trigger ACC 2", 0.f, 50.f, (float) settings.getValue("sensor:id2:accelerationThreshold", 6.f));
-    sensor2->addSlider("Avg 1s 2", -10.f, 10.f, 0.f);
-    //sensor2->addValuePlotter("Avg 1s 2", -10.f, 10.f)->setDrawMode(ofxDatGuiGraph::LINES);
+        ofxDatGuiFolder *sensorUI = gui->addFolder("BNO055 Sensor #" + ofToString(i + 1), ofColor::yellow);
+        sensorUI->addTextInput("Sensor ID #" + ofToString(i + 1), layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)));
+        Sensor sensor = Sensor(
+                layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)), "BNO 055 IMU Fusion Sensor", "bno055");
 
-    ofxDatGuiFolder *sensor3 = gui->addFolder("BNO055 Sensor 3", ofColor::yellow);
-    sensor3->addTextInput("Sensor ID 3", settings.getValue("sensor:id3:sid", "102"));
-    sensor3->addSlider("Trigger ACC 3", 0.f, 50.f, (float) settings.getValue("sensor:id3:accelerationThreshold", 6.f));
-    sensor3->addSlider("Avg 1s 3", -10.f, 10.f, 0.0);
-    //sensor3->addValuePlotter("Avg 1s 3", -10.f, 10.f)->setDrawMode(ofxDatGuiGraph::LINES);
+        for (int t = 0; t < layout.get().getValue(valuePath + ":triggercount", 1); ++t) {
+            string tid = valuePath + ":trigger:tr" + ofToString(t+1);
+            string target = layout.get().getValue(tid + ":target", "acceleration");
+            string name = layout.get().getValue(tid + ":name", "abs" + ofToString(i+1));
+            bool absolute = layout.get().getValue(tid + ":absolute", 1) == 1;
+            bool range = layout.get().getValue(tid + ":range", 0) == 1;
+            int debounce = layout.get().getValue(tid + ":debounceMillis", 1000);
+
+            ofVec3f valueLow, valueHigh;;
+            valueLow.x = (float) layout.get().getValue(tid + ":low:x", 6.8f);
+            valueLow.y = (float) layout.get().getValue(tid + ":low:y", 6.8f);
+            valueLow.z = (float) layout.get().getValue(tid + ":low:z", 6.8f);
+
+            if (range) {
+                valueHigh.x = (float) layout.get().getValue(tid + ":high:x", 6.8f);
+                valueHigh.y = (float) layout.get().getValue(tid + ":high:y", 6.8f);
+                valueHigh.z = (float) layout.get().getValue(tid + ":high:z", 6.8f);
+            }
+
+            sensor.addTrigger(name, target, valueLow, valueHigh, absolute);
+            sensor.getTriggers()[sensor.getTriggers().size() - 1].trigger->setDebounce(debounce);
+        }
+
+        sensor.setGraph(ofPoint(40.f, 40.f + 120.f * i), ofGetWindowWidth() - 80.f, 100.f);
+        sensors.push_back(sensor);
+    }
 
     gui->onButtonEvent(this, &ofApp::onButtonEvent);
     gui->onSliderEvent(this, &ofApp::onSliderEvent);
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
+    midiOut = new MidiOut();
+    midiOut->openPort(0);
+
     sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
     receiver.setup(settings.getValue("osc:inputPort", 8888));
-
-#ifdef USE_VIDEO
-    videoGrabber.setDeviceID(0);
-    videoGrabber.setDesiredFrameRate(25);
-    videoGrabber.setup(1280, 720);
-
-    videoRecorder.setup(tstamp + ".mp4", 1280, 720, 25);
-    videoRecorder.start();
-#endif
-
-    for (int i = 0; i < 3; ++i) {
-        string valuePath = "sensor:id" + ofToString(i+1);
-        sensor_source_t source;
-        source.id = settings.getValue(valuePath + ":sid", "10" + ofToString(i));
-        source.type = "bno055";
-        source.name = "BNO 055 IMU Fusion Sensor";
-        source.startTime = 0;
-        source.settings.active = true;
-        source.settings.accelerationThreshold = (float) settings.getValue(valuePath + ":accelerationThreshold", 6.f);
-        for (int i = 0; i < 6; ++i) {
-            ofPath path;
-            path.setFilled(false);
-            path.setStrokeWidth(1.0f);
-            ofColor color;
-            switch (i) {
-                case 0:
-                    path.setStrokeColor(color.red);
-                    break;
-                case 1:
-                    path.setStrokeColor(color.green);
-                    break;
-                case 2:
-                    path.setStrokeColor(color.blue);
-                    break;
-                case 3:
-                    path.setStrokeColor(color.yellow);
-                    break;
-                case 4:
-                    path.setStrokeColor(color.cyan);
-                    break;
-                case 5:
-                    path.setStrokeColor(color.magenta);
-                    break;
-            }
-            source.paths.push_back(path);
-        }
-        sources.push_back(source);
-    }
-}
-
-void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
-    if (e.target->getLabel() == "Record data") {
-        isRecording = e.target->getEnabled();
-        if (isRecording) {
-            recordingStart = ofGetSystemTime();
-            recordingStartMicros = ofGetSystemTimeMicros();
-            tstamp = ofGetTimestampString();
-        } else {
-#ifdef USE_VIDEO
-            videoRecorder.close();
-#endif
-            for (sensor_source_t &source : sources) {
-                if (source.frames.size() == 0) {
-                    continue;
-                }
-                ofFile file;
-                file.open(source.type + source.id + tstamp + ".txt", ofFile::WriteOnly);
-                ofBuffer out;
-                out.append(ofToString(recordingStart) + " " + ofToString(recordingStartMicros) + "\n");
-                out.append(ofToString(source.startTime) + " " + ofToString(source.lastTime) + "\n");
-                for (sensor_frame_t &frame : source.frames) {
-                    out.append(ofToString(frame.time) + " ");
-                    for (float &val : frame.data) {
-                        out.append(ofToString(val) + " ");
-                    }
-                    string calibration = "";
-                    for (char &c : frame.calibration) {
-                        if (c == 0x1) {
-                            calibration += "1";
-                        } else if (c == 0x2) {
-                            calibration += "2";
-                        } else if (c == 0x3) {
-                            calibration += "3";
-                        } else {
-                            calibration += "0";
-                        }
-                    }
-                    out.append(calibration);
-                    out.append("\n");
-                }
-                file.writeFromBuffer(out);
-
-                out.clear();
-                source.startTime = 0;
-                source.lastTime = 0;
-                source.frames.clear();
-            }
-        }
-    } else if (e.target->getLabel() == "Draw curves") {
-        drawCurves = !drawCurves;
-        settings.setValue("ui:drawCurves", drawCurves);
-    }
-}
-
-void ofApp::onSliderEvent(ofxDatGuiSliderEvent e) {
-    if (e.target->getLabel() == "Trigger ACC 1") {
-        sources[0].settings.accelerationThreshold = (float) e.target->getValue();
-        settings.setValue("sensor:id1:accelerationThreshold", e.target->getValue());
-    } else if (e.target->getLabel() == "Trigger ACC 2") {
-        sources[1].settings.accelerationThreshold = (float) e.target->getValue();
-        settings.setValue("sensor:id2:accelerationThreshold", e.target->getValue());
-    } else if (e.target->getLabel() == "Trigger ACC 3") {
-        sources[2].settings.accelerationThreshold = (float) e.target->getValue();
-        settings.setValue("sensor:id3:accelerationThreshold", e.target->getValue());
-    }
-}
-
-void ofApp::onTextInputEvent(ofxDatGuiTextInputEvent e) {
-    if (e.target->getLabel() == "Input port") {
-        settings.setValue("osc:inputPort", ofToInt(e.target->getText()));
-    } else if (e.target->getLabel() == "Forward IP") {
-        settings.setValue("osc:forwardIP", e.target->getText());
-    } else if (e.target->getLabel() == "Forward port") {
-        settings.setValue("osc:forwardPort", ofToInt(e.target->getText()));
-    } else if (e.target->getLabel() == "Sensor ID 1") {
-        settings.setValue("sensor:id1:sid", ofToInt(e.target->getText()));
-    } else if (e.target->getLabel() == "Sensor ID 2") {
-        settings.setValue("sensor:id2:sid", ofToInt(e.target->getText()));
-    } else if (e.target->getLabel() == "Sensor ID 3") {
-        settings.setValue("sensor:id3:sid", ofToInt(e.target->getText()));
-    }
-}
-
-//--------------------------------------------------------------
-void ofApp::updateStats(uint8_t sourceId){
-    while (sources[sourceId].stats.accelerationValues.size() > 0 && ofGetElapsedTimeMillis() - sources[sourceId].stats.accelerationValues[0].w > sources[sourceId].stats.bufferTimeMillis) {
-        sources[sourceId].stats.accelerationValues.erase(sources[sourceId].stats.accelerationValues.begin(), sources[sourceId].stats.accelerationValues.begin() + 1);
-    }
-    while (sources[sourceId].stats.orientationValues.size() > 0 && ofGetElapsedTimeMillis() - sources[sourceId].stats.orientationValues[0].w > sources[sourceId].stats.bufferTimeMillis) {
-        sources[sourceId].stats.orientationValues.erase(sources[sourceId].stats.orientationValues.begin(), sources[sourceId].stats.orientationValues.begin() + 1);
-    }
-    for (ofVec4f & vec : sources[sourceId].stats.accelerationValues) {
-        sources[sourceId].stats.accelerationAvg.x += vec.x;
-        sources[sourceId].stats.accelerationAvg.y += vec.y;
-        sources[sourceId].stats.accelerationAvg.z += vec.z;
-        if (vec.x > sources[sourceId].stats.accelerationMax.x) {
-            sources[sourceId].stats.accelerationMax.x = vec.x;
-        }
-        if (vec.y > sources[sourceId].stats.accelerationMax.y) {
-            sources[sourceId].stats.accelerationMax.y = vec.y;
-        }
-        if (vec.z > sources[sourceId].stats.accelerationMax.z) {
-            sources[sourceId].stats.accelerationMax.z = vec.z;
-        }
-        if (vec.x < sources[sourceId].stats.accelerationMin.x) {
-            sources[sourceId].stats.accelerationMin.x = vec.x;
-        }
-        if (vec.y < sources[sourceId].stats.accelerationMin.y) {
-            sources[sourceId].stats.accelerationMin.y = vec.y;
-        }
-        if (vec.z < sources[sourceId].stats.accelerationMin.z) {
-            sources[sourceId].stats.accelerationMin.z = vec.z;
-        }
-    }
-
-    if (sources[sourceId].stats.accelerationMax.x > sources[sourceId].stats.accelerationMaxGlobal) {
-        sources[sourceId].stats.accelerationMaxGlobal = sources[sourceId].stats.accelerationMax.x;
-    }
-    if (sources[sourceId].stats.accelerationMax.y > sources[sourceId].stats.accelerationMaxGlobal) {
-        sources[sourceId].stats.accelerationMaxGlobal = sources[sourceId].stats.accelerationMax.y;
-    }
-    if (sources[sourceId].stats.accelerationMax.y > sources[sourceId].stats.accelerationMaxGlobal) {
-        sources[sourceId].stats.accelerationMaxGlobal = sources[sourceId].stats.accelerationMax.y;
-    }
-    if (sources[sourceId].stats.accelerationMin.x < sources[sourceId].stats.accelerationMinGlobal) {
-        sources[sourceId].stats.accelerationMinGlobal = sources[sourceId].stats.accelerationMin.x;
-    }
-    if (sources[sourceId].stats.accelerationMin.y > sources[sourceId].stats.accelerationMinGlobal) {
-        sources[sourceId].stats.accelerationMinGlobal = sources[sourceId].stats.accelerationMin.y;
-    }
-    if (sources[sourceId].stats.accelerationMin.y > sources[sourceId].stats.accelerationMinGlobal) {
-        sources[sourceId].stats.accelerationMinGlobal = sources[sourceId].stats.accelerationMin.y;
-    }
-
-    sources[sourceId].stats.accelerationAvg.x = sources[sourceId].stats.accelerationValues.size() ? sources[sourceId].stats.accelerationAvg.x / (float) sources[sourceId].stats.accelerationValues.size() : 0.f;
-    sources[sourceId].stats.accelerationAvg.y = sources[sourceId].stats.accelerationValues.size() ? sources[sourceId].stats.accelerationAvg.y / (float) sources[sourceId].stats.accelerationValues.size() : 0.f;
-    sources[sourceId].stats.accelerationAvg.z = sources[sourceId].stats.accelerationValues.size() ? sources[sourceId].stats.accelerationAvg.z / (float) sources[sourceId].stats.accelerationValues.size() : 0.f;
-
-    sources[sourceId].stats.accelerationAvgGlobal = ( sources[sourceId].stats.accelerationAvg.x + sources[sourceId].stats.accelerationAvg.y + sources[sourceId].stats.accelerationAvg.z) / 3.f;
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-#ifdef USE_VIDEO
-    videoGrabber.update();
-    if (videoGrabber.isFrameNew()) {
-        videoRecorder.addFrame(videoGrabber.getPixels());
-    }
-#endif
-
+    ofxOscBundle bundle;
+    uint8_t count = 0;
     uint64_t frame_time = ofGetElapsedTimeMillis();
 
     while (receiver.hasWaitingMessages()) {
@@ -254,16 +88,13 @@ void ofApp::update(){
         receiver.getNextMessage(msg);
         vector<string> address = ofSplitString(msg.getAddress(), "/", true, true);
         if (address.size() == 2 && address[0] == "bno055") {
-            bool sendFrame = false;
-            ofVec4f acceleration, orientation;
-            filteredMessage.clear();
-            filteredMessage.setAddress(msg.getAddress());
-            filteredMessage.addTimetagArg(frame_time);
-            for (sensor_source_t & source : sources) {
-                if (source.type == address[0] && source.id == address[1]) {
-                    // FIXME: timetags are not received properly...
-                    sendFrame = false;
-                    sensor_frame_t frame;
+            for (Sensor & sensor : sensors) {
+                if (!sensor.getStatus().active) {
+                    continue;
+                }
+                if (sensor.hasOSCAddress(msg.getAddress())) {
+                    uint64_t time = frame_time;
+                    ofVec3f acceleration, orientation;
                     for (int i = 1; i < msg.getNumArgs(); ++i) {
                         string type = msg.getArgTypeName(i);
                         if (type == "f") {
@@ -289,135 +120,137 @@ void ofApp::update(){
                                 default:
                                     break;
                             }
-                            if (i > 3 && i < 7) {
-                                if (fabs(msg.getArgAsFloat(i)) >= source.settings.accelerationThreshold) {
-                                    sendFrame = true;
-                                    filteredMessage.addFloatArg(msg.getArgAsFloat(i));
-                                }
-                                frame.data.push_back(msg.getArgAsFloat(i));
-                            } else {
-                                frame.data.push_back(msg.getArgAsFloat(i));
-                            }
                         } else if (type == "b") {
-                            frame.calibration = msg.getArgAsBlob(i);
-                        } else if (type == "T" || type == "t") {
-                            if (source.startTime == 0) {
-                                source.startTime = frame_time;
-                            }
-                            orientation.w = frame_time;
-                            acceleration.w = frame_time;
-                            source.lastTime = frame_time;
-                            frame.time = frame_time;
+                            sensor.getStatus().calibration = msg.getArgAsBlob(i);
+                        } else if (type == "t") {
+                            time = frame_time;
                         }
                     }
-                    source.stats.accelerationValues.push_back(acceleration);
-                    source.stats.orientationValues.push_back(orientation);
-                    source.frames.push_back(frame);
+                    sensor.addFrame(time, frame_time, acceleration, orientation);
                 }
-            }
-            if (sendFrame) {
-                if (isLoop && sendFrame) {
-                    _loop.messages.push_back(filteredMessage);
-                }
-                sender.sendMessage(filteredMessage, true);
             }
         }
     }
 
-    for (sensor_loop_t & loop : loops) {
-        if (!loop.active || loop.messages.size() == 0) {
+    count = 0;
+    for (Sensor & sensor : sensors) {
+        if (!sensor.getStatus().active) {
             continue;
         }
-        int64_t time_diff = loop.messages[loop.message_index].getArgAsTimetag(0) - loop.time_record;
-        int64_t time_rel = frame_time - loop.time_start;
-        while (time_diff <= time_rel) {
-            sender.sendMessage(loop.messages[loop.message_index], true);
-            loop.message_index += 1;
-            if (loop.message_index == loop.messages.size()) {
-                loop.message_index =  0;
-                loop.time_start = frame_time;
+
+        sensor.update();
+
+        uint8_t tcount = 0;
+        string sensorPath = "sensor" + ofToString(count + 1);
+
+        for (sensor_trigger_3d_t & trigger : sensor.getTriggers()) {
+            if (trigger.trigger->isTriggered()) {
+                string triggerPath = sensorPath + ":trigger" + ofToString(tcount + 1);
+                ofxOscMessage msgOut;
+                ofVec3f val = trigger.trigger->getTrigger();
+                msgOut.setAddress(sensor.getOSCAddress() + "/" + trigger.target + "/" + trigger.name);
+                msgOut.addFloatArg(val.x);
+                msgOut.addFloatArg(val.y);
+                msgOut.addFloatArg(val.z);
+                bundle.addMessage(msgOut);
+
+                if (val.x > 0.f) {
+                    NoteEvent noteX = NoteEvent(
+                            frame_time,
+                            (uint64_t)layout.get().getValue(triggerPath + ":midi:x:duration", 250),
+                            layout.get().getValue(triggerPath + ":midi:x:pitch", 64),
+                            layout.get().getValue(triggerPath + ":midi:x:velocity", 128)
+                    );
+                    midiOut->noteOn((uint8_t)layout.get().getValue(triggerPath + ":midi:x:channel", 1), noteX);
+                    _openNotes.push_back(noteX);
+                    if (_isRecordingLoop) {
+                        _loops[_loops.size() - 1].addNote(noteX);
+                    }
+                }
+
+                if (val.y > 0.f) {
+                    NoteEvent noteY = NoteEvent(
+                            frame_time,
+                            (uint64_t)layout.get().getValue(triggerPath + ":midi:y:duration", 250),
+                            layout.get().getValue(triggerPath + ":midi:y:pitch", 64),
+                            layout.get().getValue(triggerPath + ":midi:y:velocity", 128)
+                    );
+                    midiOut->noteOn((uint8_t)layout.get().getValue(triggerPath + ":midi:y:channel", 1), noteY);
+                    _openNotes.push_back(noteY);
+                    if (_isRecordingLoop) {
+                        _loops[_loops.size() - 1].addNote(noteY);
+                    }
+                }
+
+                if (val.z > 0.f) {
+                    NoteEvent noteZ = NoteEvent(
+                            frame_time,
+                            (uint64_t)layout.get().getValue(triggerPath + ":midi:z:duration", 250),
+                            layout.get().getValue(triggerPath + ":midi:z:pitch", 64),
+                            layout.get().getValue(triggerPath + ":midi:z:velocity", 128)
+                    );
+                    midiOut->noteOn((uint8_t)layout.get().getValue(triggerPath + ":midi:z:channel", 1), noteZ);
+                    _openNotes.push_back(noteZ);
+                    if (_isRecordingLoop) {
+                        _loops[_loops.size() - 1].addNote(noteZ);
+                    }
+                }
+
             }
-            time_rel = frame_time - loop.time_start;
-            time_diff = loop.messages[loop.message_index].getArgAsTimetag(0) - loop.time_record;
         }
     }
 
-    uint8_t count = 0;
-    float xoffset = 40.f;
-    for (sensor_source_t & source : sources) {
-        updateStats(count);
+    count = 0;
+    while (_openNotes.size() > 0 && count < _openNotes.size()) {
+        NoteEvent & note = _openNotes[0];
+        if (note.getEndTime() <= ofGetElapsedTimeMillis()) {
+            midiOut->noteOff(count + 1, note);
+            _openNotes.erase(_openNotes.begin() + count, _openNotes.begin() + 1);
+        } else {
+            count++;
+        }
+    }
 
-        //gui->getValuePlotter("Avg 1s " + ofToString(count + 1))->setValue(source.stats.accelerationAvgGlobal);
-        gui->getSlider("Avg 1s " + ofToString(count + 1))->setValue(source.stats.accelerationAvgGlobal);
-
-        if (!isRecording && source.frames.size() > 600) {
-            source.frames.erase(source.frames.begin(), source.frames.begin() + source.frames.size() - 600);
+    for (NoteLoop & loop : _loops) {
+        if (loop.isMuted() || loop.getDuration() == 0) {
+            continue;
         }
 
-        if (drawCurves) {
-            float yoffset = 40.f + 180.f * count;
-            long frameCount = source.frames.size() > 600 ? source.frames.size() - 600 : 0;
-            float tickSize = (ofGetWindowWidth() - 2.f * xoffset) / 600.f;
-            for (long f = source.frames.size() - 1; f >= frameCount ; --f) {
-                sensor_frame_t frame = source.frames[f];
-                for (int i = 0; i < frame.data.size(); ++i) {
-                    if (i < source.paths.size()) {
-                        float ypos;
-                        if (i == 0) {
-                            ypos = 80.f * (frame.data[i] / 360.f) - 40.f;
-                        } else if (i > 0 && i < 3) {
-                            ypos = 40.f * frame.data[i] / 180.f;
-                        } else {
-                            ypos = frame.data[i] * 2.f;
-                        }
-                        source.paths[i].lineTo(xoffset + (600 - (f - frameCount)) * tickSize,
-                                yoffset + 70.f + ypos);
-                    }
-                }
-            }
-        }
-        ++count;
+        loop.update();
+    }
+
+    if (bundle.getMessageCount() > 0) {
+        sender.sendBundle(bundle);
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-#ifdef USE_VIDEO
-    videoGrabber.draw(20.0, 20.0);
-#endif
-
     uint8_t count = 0;
-    for (sensor_source_t & source : sources) {
-        float xoffset = 40.f;
-        float yoffset = 40.f + 200.f * count;
-        ofDrawBitmapString("/" + source.type + "/" + source.id, xoffset, yoffset);
-        string data = "";
-        if (source.frames.size() > 0) {
-            for (float &f : source.frames[source.frames.size() - 1].data) {
-                data += ofToString(f, 2, 6, ' ') + " ";
-            }
-            data += " ";
-            for (char &c : source.frames[source.frames.size() - 1].calibration) {
-                if (c == 0x1) {
-                    data += "1";
-                } else if (c == 0x2) {
-                    data += "2";
-                } else if (c == 0x3) {
-                    data += "3";
-                } else {
-                    data += "0";
-                }
-            }
-            ofDrawBitmapString(data, xoffset + 100.f, yoffset);
+    for (Sensor & sensor : sensors) {
+        if (!sensor.getStatus().active) {
+            continue;
+        }
 
-            if (drawCurves) {
-                for (ofPath & path : source.paths) {
-                    path.draw();
-                    path.clear();
-                }
+        if (_drawCurves) {
+            sensor.draw();
+        }
+
+        ofDrawBitmapString(sensor.getOSCAddress(), 40.f, 40.f + 120.f * count);
+        ofDrawBitmapString(sensor.getCalibrationStatus(), 160.f, 40.f + 120.f * count);
+
+        if (sensor.hasFrames()) {
+            ofDrawBitmapString(ofToString(sensor.getCurrentFrame().acceleration), 220.f, 40.f + 120.f * count);
+            ofDrawBitmapString(ofToString(sensor.getCurrentFrame().orientation), 380.f, 40.f + 120.f * count);
+
+            uint32_t tc = 0;
+            for (sensor_trigger_3d_t & trigger : sensor.getTriggers()) {
+                ofDrawBitmapString(ofToString(trigger.trigger->getTrigger()), 40.f + 160.f * tc, 60.f + 120.f * count);
+                tc++;
             }
         }
-        ++count;
+
+        count++;
     }
 }
 
@@ -428,20 +261,14 @@ void ofApp::keyPressed(int key){
             ofToggleFullscreen();
             break;
         case ' ':
-            isLoop = !isLoop;
-            if (isLoop) {
-                _loop.message_index = 0;
-                _loop.messages.clear();
-                _loop.time_record = ofGetElapsedTimeMillis();
+            _isRecordingLoop = !_isRecordingLoop;
+            if (_isRecordingLoop) {
+                NoteLoop loop = NoteLoop();
+                loop.setMidiOut(midiOut);
+                loop.setRecord(true);
+                _loops.push_back(loop);
             } else {
-                sensor_loop_t loop;
-                loop.time_record = _loop.time_record;
-                loop.time_start = ofGetElapsedTimeMillis();
-                loop.duration = loop.time_start - loop.time_record;
-                loop.messages = _loop.messages;
-                loop.message_index = 0;
-                loop.active = true;
-                loops.push_back(loop);
+                _loops[_loops.size() - 1].setRecord(false);
             }
             break;
     }
@@ -455,5 +282,48 @@ void ofApp::windowResized(int w, int h){
 //--------------------------------------------------------------
 void ofApp::exit() {
     settings.save("settings.xml");
+    layout.save();
 }
 
+//--------------------------------------------------------------
+void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
+    if (e.target->getLabel() == "Draw curves") {
+        _drawCurves = !_drawCurves;
+        settings.setValue("ui:drawCurves", _drawCurves);
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::onSliderEvent(ofxDatGuiSliderEvent e) {
+    sensor_trigger_3d_t trigger;
+    int8_t id = -1;
+    if (e.target->getLabel() == "Trigger ACC #1") {
+        id = 0;
+    } else if (e.target->getLabel() == "Trigger ACC #2") {
+        id = 1;
+    } else if (e.target->getLabel() == "Trigger ACC #3") {
+        id = 2;
+    }
+    if (id >= 0) {
+        sensors[id].getTriggers()[sensors[id]
+                .getTriggerIndexByName("acc" + ofToString(id + 1))].trigger->setTrigger((float) e.target->getValue());
+        // settings.setValue("sensor:id" + ofToString(id + 1) + ":accelerationThreshold", e.target->getValue());
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::onTextInputEvent(ofxDatGuiTextInputEvent e) {
+    if (e.target->getLabel() == "Input port") {
+        settings.setValue("osc:inputPort", ofToInt(e.target->getText()));
+    } else if (e.target->getLabel() == "Forward IP") {
+        settings.setValue("osc:forwardIP", e.target->getText());
+    } else if (e.target->getLabel() == "Forward port") {
+        settings.setValue("osc:forwardPort", ofToInt(e.target->getText()));
+    } else if (e.target->getLabel() == "Sensor ID #1") {
+        settings.setValue("sensor:sn1:sid", ofToInt(e.target->getText()));
+    } else if (e.target->getLabel() == "Sensor ID #2") {
+        settings.setValue("sensor:sn2:sid", ofToInt(e.target->getText()));
+    } else if (e.target->getLabel() == "Sensor ID #3") {
+        settings.setValue("sensor:sn3:sid", ofToInt(e.target->getText()));
+    }
+}

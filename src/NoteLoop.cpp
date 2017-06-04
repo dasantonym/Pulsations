@@ -1,0 +1,101 @@
+//
+// Created by anton on 04/06/17.
+//
+
+#include "NoteLoop.h"
+
+
+//
+//
+// Constructors
+//
+
+NoteLoop::NoteLoop() {
+    _recording = false;
+    _muted = true;
+    _duration = 0;
+    _position = 0;
+}
+
+
+//
+//
+// Main
+//
+
+void NoteLoop::update() {
+    if (_position >= _notes.size() * 2) {
+        _playback_start = ofGetElapsedTimeMillis();
+        _position = 0;
+    }
+    uint32_t index = (uint32_t) floorf((float)_position * .5f);
+    if (_position % 2 == 0) {
+        if (_notes[index].getTime() + _playback_start <= ofGetElapsedTimeMillis()) {
+            _midiOut->noteOn(1, _notes[index]);
+            _position++;
+        }
+    } else {
+        if (_notes[index].getEndTime() + _playback_start <= ofGetElapsedTimeMillis()) {
+            _midiOut->noteOff(1, _notes[index]);
+            _position++;
+        }
+    }
+}
+
+void NoteLoop::addNote(NoteEvent note) {
+    _notes.push_back(note);
+}
+
+void NoteLoop::addNote(uint64_t duration, float pitch, float velocity) {
+    if (_recording) {
+        NoteEvent note = NoteEvent(ofGetElapsedTimeMillis() - _recording_start, duration, pitch, velocity);
+        _notes.push_back(note);
+    }
+}
+
+
+//
+//
+// Setters
+//
+
+void NoteLoop::setMidiOut(MidiOut *midiOut) {
+    _midiOut = midiOut;
+}
+
+void NoteLoop::setMute(bool mute) {
+    _muted = mute;
+}
+
+void NoteLoop::setRecord(bool record) {
+    if (record) {
+        _notes.clear();
+        _position = 0;
+        _muted = true;
+        _recording = true;
+        _recording_start = ofGetElapsedTimeMillis();
+    } else {
+        _recording = false;
+        _muted = false;
+        _playback_start = ofGetElapsedTimeMillis();
+        _duration = _playback_start - _recording_start;
+    }
+}
+
+
+//
+//
+// Getters
+//
+
+bool NoteLoop::isMuted() {
+    return _muted;
+}
+
+bool NoteLoop::isRecording() {
+    return _recording;
+}
+
+uint64_t NoteLoop::getDuration() {
+    return _duration;
+}
