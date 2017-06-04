@@ -36,31 +36,31 @@ void NoteLoop::update() {
     uint32_t index = (uint32_t) floorf((float)_position * .5f);
     if (_position % 2 == 0) {
         if (_notes[index].getTime() + _playback_start <= ofGetElapsedTimeMillis()) {
-            _midiOut->noteOn(1, _notes[index]);
+            _midiOut->noteOn(_notes[index].getChannel(), _notes[index]);
             _position++;
         }
     } else {
         if (_notes[index].getEndTime() + _playback_start <= ofGetElapsedTimeMillis()) {
-            _midiOut->noteOff(1, _notes[index]);
+            _midiOut->noteOff(_notes[index].getChannel(), _notes[index]);
             _position++;
         }
     }
     if (_positionController < _controllerEvents.size()) {
-        _midiOut->sendController(1, _controllerEvents[_positionController]);
+        _midiOut->sendController(_notes[index].getChannel(), _controllerEvents[_positionController]);
         _positionController++;
     }
 }
 
 void NoteLoop::addNote(NoteEvent note) {
     if (_recording) {
-        NoteEvent noteAdd = NoteEvent(note.getTime(), note.getEndTime() - note.getTime(), note.getPitch(), note.getVelocity());
+        NoteEvent noteAdd = NoteEvent(note.getTime(), note.getEndTime() - note.getTime(), note.getPitch(), note.getVelocity(), note.getChannel());
         _notes.push_back(noteAdd);
     }
 }
 
-void NoteLoop::addNote(uint64_t duration, float pitch, float velocity) {
+void NoteLoop::addNote(uint64_t duration, float pitch, float velocity, uint8_t channel) {
     if (_recording) {
-        NoteEvent note = NoteEvent(ofGetElapsedTimeMillis() - _recording_start, duration, pitch, velocity);
+        NoteEvent note = NoteEvent(ofGetElapsedTimeMillis() - _recording_start, duration, pitch, velocity, channel);
         addNote(note);
     }
 }

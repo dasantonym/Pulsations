@@ -9,11 +9,12 @@
 
 class NoteEvent {
 public:
-    NoteEvent(uint64_t time, uint64_t duration, float pitch, float velocity);
+    NoteEvent(uint64_t time, uint64_t duration, float pitch, float velocity, uint8_t channel);
 
     uint64_t getTime();
     uint64_t getEndTime();
     uint64_t getDuration();
+    uint8_t getChannel();
     float getPitch();
     uint8_t getMidiPitch();
     float getVelocity();
@@ -22,6 +23,7 @@ public:
 private:
     uint64_t _time;
     uint64_t _duration;
+    uint8_t _channel;
     float _pitch;
     float _velocity;
 };

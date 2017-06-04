@@ -22,7 +22,7 @@ public:
     void setMute(bool mute);
 
     void addNote(NoteEvent note);
-    void addNote(uint64_t duration, float pitch, float velocity);
+    void addNote(uint64_t duration, float pitch, float velocity, uint8_t channel);
 
     void addControllerEvent(ControllerEvent event);
     void addControllerEvent(uint8_t controller, float value);

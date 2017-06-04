@@ -4,11 +4,12 @@
 
 #include "NoteEvent.h"
 
-NoteEvent::NoteEvent(uint64_t time, uint64_t duration, float pitch, float velocity) {
+NoteEvent::NoteEvent(uint64_t time, uint64_t duration, float pitch, float velocity, uint8_t channel = 1) {
     _time = time;
     _duration = duration;
     _pitch = pitch;
     _velocity = velocity;
+    _channel = channel;
 }
 
 uint64_t NoteEvent::getTime() {
@@ -25,6 +26,10 @@ uint64_t NoteEvent::getDuration() {
 
 float NoteEvent::getPitch() {
     return _pitch;
+}
+
+uint8_t NoteEvent::getChannel() {
+    return _channel;
 }
 
 uint8_t NoteEvent::getMidiPitch() {

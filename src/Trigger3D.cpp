@@ -45,9 +45,11 @@ void Trigger3D::update(ofVec3f value) {
             _lastTriggerTime.x = time;
         }
     } else if (_triggerValue.x != .0f) {
-        bool isPos = _triggerValue.x > 0;
+        bool isPos = _triggerValue.x > .0f;
         _triggerValue.x -= _triggerFalloff.x == .0f ? _triggerValue.x : _triggerFalloff.x;
         if (isPos && _triggerValue.x <= .0f) {
+            _triggerValue.x = .0f;
+        } else if (!isPos && _triggerValue.x >= .0f) {
             _triggerValue.x = .0f;
         }
     }
@@ -62,6 +64,8 @@ void Trigger3D::update(ofVec3f value) {
         _triggerValue.y -= _triggerFalloff.y == .0f ? _triggerValue.y : _triggerFalloff.y;
         if (isPos && _triggerValue.y <= .0f) {
             _triggerValue.y = .0f;
+        } else if (!isPos && _triggerValue.y >= .0f) {
+            _triggerValue.y = .0f;
         }
     }
     if (time - _lastTriggerTime.z > _trigger_debounce.z) {
@@ -75,6 +79,8 @@ void Trigger3D::update(ofVec3f value) {
         _triggerValue.z -= _triggerFalloff.z == .0f ? _triggerValue.z : _triggerFalloff.z;
         if (isPos && _triggerValue.z <= .0f) {
             _triggerValue.z = .0f;
+        } else if (!isPos && _triggerValue.z >= .0f) {
+             _triggerValue.z = .0f;
         }
     }
 }
@@ -164,6 +170,21 @@ bool Trigger3D::isTriggered() {
 
 ofVec3f Trigger3D::getTrigger() {
     return _triggerValue;
+}
+
+ofVec3f Trigger3D::getDebounceStatus() {
+    ofVec3f status = { .0f, .0f, .0f };
+    uint64_t time = ofGetElapsedTimeMillis();
+    if (time - _lastTriggerTime.x > _trigger_debounce.x) {
+        status.x = 1.f;
+    }
+    if (time - _lastTriggerTime.y > _trigger_debounce.y) {
+        status.y = 1.f;
+    }
+    if (time - _lastTriggerTime.z > _trigger_debounce.z) {
+        status.z = 1.f;
+    }
+    return status;
 }
 
 string Trigger3D::getTriggerAsString() {

@@ -32,6 +32,7 @@ public:
 
     bool isTriggered();
     ofVec3f getTrigger();
+    ofVec3f getDebounceStatus();
     string getTriggerAsString();
     float getTriggerMax();
     float getTriggerMin();

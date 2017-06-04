@@ -39,7 +39,7 @@ void ofApp::setup(){
     osc->addTextInput("Remote resp. IP", ofToString(settings.getValue("osc:responseIP", "192.168.0.255")));
     osc->addTextInput("Remote resp. port", ofToString(settings.getValue("osc:responsePort", 7777)));
 
-    for (int i = 0; i < layout.get().getValue("layout:sensorcount", 3); ++i) {
+    for (int i = 0; i < layout.get().getValue("layout:sensorcount", 3); i++) {
         string valuePath = "layout:sensor" + ofToString(i+1);
 
         ofxDatGuiFolder *sensorUI = gui->addFolder("BNO055 Sensor #" + ofToString(i + 1), ofColor::yellow);
@@ -50,14 +50,15 @@ void ofApp::setup(){
 
         Sensor sensor = Sensor(
                 layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)),
-                "BNO 055 IMU Fusion Sensor", "bno055");
+                layout.get().getValue(valuePath + ":name", "BNO055 IMU Fusion Sensor"),
+                layout.get().getValue(valuePath + ":type", "bno055"));
 
-        for (int t = 0; t < layout.get().getValue(valuePath + ":triggercount", 1); ++t) {
+        for (int t = 0; t < layout.get().getValue(valuePath + ":triggercount", 1); t++) {
             string tid = valuePath + ":trigger" + ofToString(t+1);
             string target = layout.get().getValue(tid + ":target", "acceleration");
             string name = layout.get().getValue(tid + ":name", "abs" + ofToString(i+1));
-            bool absolute = layout.get().getValue(tid + ":absolute", 1) == 1;
-            bool range = layout.get().getValue(tid + ":range", 0) == 1;
+            bool absolute = (layout.get().getValue(tid + ":absolute", 1) == 1);
+            bool range = (layout.get().getValue(tid + ":range", 0) == 1);
             int debounce = layout.get().getValue(tid + ":debounce", 500);
             
             ofVec3f mask = ofVec3f(layout.get().getValue(tid + ":mask:x", 0.f),
@@ -240,57 +241,66 @@ void ofApp::update(){
 
         for (sensor_trigger_3d_t & trigger : sensor.getTriggers()) {
             if (trigger.trigger->isTriggered()) {
+                bool sendosc = false;
                 string triggerPath = sensorPath + ":trigger" + ofToString(tcount + 1);
-                ofxOscMessage msgOut;
                 ofVec3f val = trigger.trigger->getTrigger();
-                msgOut.setAddress(sensor.getOSCAddress() + "/" + trigger.target + "/" + trigger.name);
-                msgOut.addFloatArg(val.x);
-                msgOut.addFloatArg(val.y);
-                msgOut.addFloatArg(val.z);
-                bundle.addMessage(msgOut);
 
-                if (val.x > 0.f) {
+                if (val.x > 0.f && trigger.trigger->getDebounceStatus().x == 1.f) {
+                    sendosc = true;
                     NoteEvent noteX = NoteEvent(
                             frame_time,
                             (uint64_t)layout.get().getValue(triggerPath + ":midi:x:duration", 250),
                             layout.get().getValue(triggerPath + ":midi:x:pitch", .5f),
-                            layout.get().getValue(triggerPath + ":midi:x:velocity", .8f)
+                            layout.get().getValue(triggerPath + ":midi:x:velocity", .8f),
+                            layout.get().getValue(triggerPath + ":midi:x:channel", 1)
                     );
-                    midiOut->noteOn((uint8_t)layout.get().getValue(triggerPath + ":midi:x:channel", 1), noteX);
+                    midiOut->noteOn(noteX.getChannel(), noteX);
                     _openNotes.push_back(noteX);
                     if (_isRecordingLoop) {
                         _loops[_loops.size() - 1].addNote(noteX);
                     }
                 }
 
-                if (val.y > 0.f) {
+                if (val.y > 0.f && trigger.trigger->getDebounceStatus().y == 1.f) {
+                    sendosc = true;
                     NoteEvent noteY = NoteEvent(
                             frame_time,
                             (uint64_t)layout.get().getValue(triggerPath + ":midi:y:duration", 250),
                             layout.get().getValue(triggerPath + ":midi:y:pitch", .5f),
-                            layout.get().getValue(triggerPath + ":midi:y:velocity", .8f)
+                            layout.get().getValue(triggerPath + ":midi:y:velocity", .8f),
+                            layout.get().getValue(triggerPath + ":midi:y:channel", 1)
                     );
-                    midiOut->noteOn((uint8_t)layout.get().getValue(triggerPath + ":midi:y:channel", 1), noteY);
+                    midiOut->noteOn(noteY.getChannel(), noteY);
                     _openNotes.push_back(noteY);
                     if (_isRecordingLoop) {
                         _loops[_loops.size() - 1].addNote(noteY);
                     }
                 }
 
-                if (val.z > 0.f) {
+                if (val.z > 0.f && trigger.trigger->getDebounceStatus().z == 1.f) {
+                    sendosc = true;
                     NoteEvent noteZ = NoteEvent(
                             frame_time,
                             (uint64_t)layout.get().getValue(triggerPath + ":midi:z:duration", 250),
                             layout.get().getValue(triggerPath + ":midi:z:pitch", .5f),
-                            layout.get().getValue(triggerPath + ":midi:z:velocity", .8f)
+                            layout.get().getValue(triggerPath + ":midi:z:velocity", .8f),
+                            layout.get().getValue(triggerPath + ":midi:z:channel", 1)
                     );
-                    midiOut->noteOn((uint8_t)layout.get().getValue(triggerPath + ":midi:z:channel", 1), noteZ);
+                    midiOut->noteOn(noteZ.getChannel(), noteZ);
                     _openNotes.push_back(noteZ);
                     if (_isRecordingLoop) {
                         _loops[_loops.size() - 1].addNote(noteZ);
                     }
                 }
-
+                
+                if (sendosc) {
+                    ofxOscMessage msgOut;
+                    msgOut.setAddress(sensor.getOSCAddress() + "/" + trigger.target + "/" + trigger.name);
+                    msgOut.addFloatArg(val.x);
+                    msgOut.addFloatArg(val.y);
+                    msgOut.addFloatArg(val.z);
+                    bundle.addMessage(msgOut);
+                }
             }
         }
     }
@@ -299,7 +309,7 @@ void ofApp::update(){
     while (_openNotes.size() > 0 && count < _openNotes.size()) {
         NoteEvent & note = _openNotes[0];
         if (note.getEndTime() <= ofGetElapsedTimeMillis()) {
-            midiOut->noteOff((uint8_t)(count + 1), note);
+            midiOut->noteOff(note.getChannel(), note);
             _openNotes.erase(_openNotes.begin() + count, _openNotes.begin() + 1);
         } else {
             count++;
