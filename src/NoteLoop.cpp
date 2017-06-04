@@ -25,6 +25,9 @@ NoteLoop::NoteLoop() {
 //
 
 void NoteLoop::update() {
+    if (_recording || _muted || _notes.size() == 0) {
+        return;
+    }
     if (_position >= _notes.size() * 2) {
         _playback_start = ofGetElapsedTimeMillis();
         _position = 0;
@@ -50,7 +53,8 @@ void NoteLoop::update() {
 
 void NoteLoop::addNote(NoteEvent note) {
     if (_recording) {
-        _notes.push_back(note);
+        NoteEvent noteAdd = NoteEvent(note.getTime(), note.getEndTime() - note.getTime(), note.getPitch(), note.getVelocity());
+        _notes.push_back(noteAdd);
     }
 }
 

@@ -34,17 +34,17 @@ void Layout::init(string name) {
 
             _layout.setValue(tid + ":low:x", 6.f);
             _layout.setValue(tid + ":midi:x:channel", 1 + t * 3);
-            _layout.setValue(tid + ":midi:x:pitch", 74 + t * 3);
+            _layout.setValue(tid + ":midi:x:pitch", .5f);
             _layout.setValue(tid + ":midi:x:duration", 250);
 
             _layout.setValue(tid + ":low:y", 6.f);
             _layout.setValue(tid + ":midi:y:channel", 2 + t * 3);
-            _layout.setValue(tid + ":midi:y:pitch", 80 + t * 3);
+            _layout.setValue(tid + ":midi:y:pitch", .5f);
             _layout.setValue(tid + ":midi:y:duration", 250);
 
             _layout.setValue(tid + ":low:z", 6.f);
             _layout.setValue(tid + ":midi:z:channel", 3 + t * 3);
-            _layout.setValue(tid + ":midi:z:pitch", 86 + t * 3);
+            _layout.setValue(tid + ":midi:z:pitch", .5f);
             _layout.setValue(tid + ":midi:z:duration", 250);
 
             if (_layout.getValue(tid + ":range", 0)) {

@@ -19,10 +19,24 @@ uint64_t NoteEvent::getEndTime() {
     return _time + _duration;
 }
 
+uint64_t NoteEvent::getDuration() {
+    return _duration;
+}
+
+float NoteEvent::getPitch() {
+    return _pitch;
+}
+
 uint8_t NoteEvent::getMidiPitch() {
-    return (uint8_t)roundf(_pitch * 128.f);
+    uint32_t pitch = roundf(fabs(_pitch) * 127.f);
+    return (uint8_t)(pitch > 127 ? 127 : pitch);
+}
+
+float NoteEvent::getVelocity() {
+    return _velocity;
 }
 
 uint8_t NoteEvent::getMidiVelocity() {
-    return (uint8_t)roundf(_velocity * 128.f);
+    uint32_t velocity = roundf(fabs(_velocity) * 127.f);
+    return (uint8_t)(velocity > 127 ? 127 : velocity);
 }

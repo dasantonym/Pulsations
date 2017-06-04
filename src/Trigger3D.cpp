@@ -38,27 +38,44 @@ void Trigger3D::update(ofVec3f value) {
     ofVec3f newVal;
     uint64_t time = ofGetElapsedTimeMillis();
 
-    newVal.x = getTriggerValue(value.x, _threshold_low.x, _threshold_high.x, _trigger_mask.x);
-    newVal.y = getTriggerValue(value.y, _threshold_low.y, _threshold_high.y, _trigger_mask.y);
-    newVal.z = getTriggerValue(value.z, _threshold_low.z, _threshold_high.z, _trigger_mask.z);
-
-    if (newVal.x != .0f && time - _lastTriggerTime.x > _trigger_debounce.x) {
-        _triggerValue.x = newVal.x;
-        _lastTriggerTime.x = time;
+    if (time - _lastTriggerTime.x > _trigger_debounce.x) {
+        newVal.x = getTriggerValue(value.x, _threshold_low.x, _threshold_high.x, _trigger_mask.x);
+        if (newVal.x != .0f) {
+            _triggerValue.x = newVal.x;
+            _lastTriggerTime.x = time;
+        }
     } else if (_triggerValue.x != .0f) {
-        _triggerValue.x -= _triggerFalloff.x;
+        bool isPos = _triggerValue.x > 0;
+        _triggerValue.x -= _triggerFalloff.x == .0f ? _triggerValue.x : _triggerFalloff.x;
+        if (isPos && _triggerValue.x <= .0f) {
+            _triggerValue.x = .0f;
+        }
     }
-    if (newVal.y != .0f && time - _lastTriggerTime.y > _trigger_debounce.y) {
-        _triggerValue.y = newVal.y;
-        _lastTriggerTime.y = time;
+    if (time - _lastTriggerTime.y > _trigger_debounce.y) {
+        newVal.y = getTriggerValue(value.y, _threshold_low.y, _threshold_high.y, _trigger_mask.y);
+        if (newVal.y != .0f) {
+            _triggerValue.y = newVal.y;
+            _lastTriggerTime.y = time;
+        }
     } else if (_triggerValue.y != .0f) {
-        _triggerValue.y -= _triggerFalloff.y;
+        bool isPos = _triggerValue.y > 0;
+        _triggerValue.y -= _triggerFalloff.y == .0f ? _triggerValue.y : _triggerFalloff.y;
+        if (isPos && _triggerValue.y <= .0f) {
+            _triggerValue.y = .0f;
+        }
     }
-    if (newVal.z != .0f && time - _lastTriggerTime.z > _trigger_debounce.z) {
-        _triggerValue.z = newVal.z;
-        _lastTriggerTime.z = time;
+    if (time - _lastTriggerTime.z > _trigger_debounce.z) {
+        newVal.z = getTriggerValue(value.z, _threshold_low.z, _threshold_high.z, _trigger_mask.z);
+        if (newVal.z != .0f) {
+            _triggerValue.z = newVal.z;
+            _lastTriggerTime.z = time;
+        }
     } else if (_triggerValue.z != .0f) {
-        _triggerValue.z -= _triggerFalloff.z;
+        bool isPos = _triggerValue.z > 0;
+        _triggerValue.z -= _triggerFalloff.z == .0f ? _triggerValue.z : _triggerFalloff.z;
+        if (isPos && _triggerValue.z <= .0f) {
+            _triggerValue.z = .0f;
+        }
     }
 }
 

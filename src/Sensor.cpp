@@ -67,6 +67,7 @@ void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleratio
     if (count > 0) {
         _frames.erase(_frames.begin(), _frames.begin() + count);
     }
+    update();
 }
 
 

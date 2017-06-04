@@ -18,7 +18,7 @@ public:
     void update();
     void draw();
 
-    void toggleLoop();
+    void toggleLoop(bool loop);
     void keyPressed(int key);
     void windowResized(int w, int h);
     void exit();
@@ -45,4 +45,6 @@ public:
     bool _drawCurves;
     bool _isRecordingLoop;
     bool _overdub;
+    
+    uint64_t frameCount;
 };

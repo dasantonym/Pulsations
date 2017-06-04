@@ -13,7 +13,10 @@ public:
 
     uint64_t getTime();
     uint64_t getEndTime();
+    uint64_t getDuration();
+    float getPitch();
     uint8_t getMidiPitch();
+    float getVelocity();
     uint8_t getMidiVelocity();
 
 private:
