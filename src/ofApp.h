@@ -6,8 +6,13 @@
 #include "ofxDatGui.h"
 
 #include "Version.h"
+#include "DataInput.h"
+#include "DataTriggers.h"
+#include "MidiPlayback.h"
+#include "TimeKeeper.h"
 #include "Sensor.h"
 #include "NoteLoop.h"
+#include "NoteGenerator.h"
 #include "Layout.h"
 #include "RemoteControl.h"
 
@@ -34,8 +39,15 @@ public:
     ofxOscSender uiResponder;
     ofxOscReceiver receiver;
 
+    TimeKeeper time;
+    DataInput *dataIn;
+    DataTriggers *dataTrigger;
+    MidiPlayback *midiPlayback;
     MidiOut *midiOut;
+    NoteGenerator *noteGenerator;
     RemoteControl _remoteControl;
+
+    vector<sensor_trigger_3d_t*> _triggers;
 
     vector<sensor_source_t> sources;
     vector<Sensor> sensors;

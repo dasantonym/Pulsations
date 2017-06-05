@@ -6,6 +6,7 @@
 #define PULSATIONS_TRIGGER3D_H
 
 #include "ofMain.h"
+#include "TimeKeeper.h"
 
 class Trigger3D {
 public:
@@ -29,11 +30,13 @@ public:
     void setMask(float mask);
     void setMask(ofVec3f mask);
     void setAbsolute(bool isAbsolute);
+    void setSensorInfo(uint8_t index);
 
     bool isTriggered();
     ofVec3f getTrigger();
     ofVec3f getDebounceStatus();
     string getTriggerAsString();
+    uint8_t getSensorIndex();
     float getTriggerMax();
     float getTriggerMin();
     float getTriggerValue(float value, float threshold_high, float threshold_low, float mask);
@@ -41,6 +44,9 @@ public:
 private:
     bool _isRange;
     bool _isAbsolute;
+
+    uint8_t _sensor_index;
+
     ofVec3f _triggerValue;
     ofVec3f _triggerFalloff;
     ofVec3f _lastTriggerTime;
@@ -49,6 +55,8 @@ private:
     ofVec3f _trigger_mask;
     ofVec3f _threshold_low;
     ofVec3f _threshold_high;
+
+    TimeKeeper time;
 };
 
 

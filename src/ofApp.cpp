@@ -22,8 +22,8 @@ void ofApp::setup(){
     _drawCurves = (bool) settings.getValue("ui:drawCurves", true);
     _overdub = (bool) settings.getValue("record:overdub", true);
 
-    string version = "v0.1.0";// + ofToString(Version::VERSION_MAJ) + "." + ofToString(Version::VERSION_MIN) +
-            // "." + ofToString(Version::VERSION_PATCH);
+    string version = "v0.1.0";
+
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
     gui->addHeader(":: PULSATIONS " + version + " ::");
 
@@ -39,8 +39,25 @@ void ofApp::setup(){
     osc->addTextInput("Remote resp. IP", ofToString(settings.getValue("osc:responseIP", "192.168.0.255")));
     osc->addTextInput("Remote resp. port", ofToString(settings.getValue("osc:responsePort", 7777)));
 
+    midiPlayback = new MidiPlayback();
+    midiPlayback->setMidi(0);
+
+    noteGenerator = new NoteGenerator();
+
+    ofxDatGuiFolder *midi = gui->addFolder("MIDI", ofColor::blue);
+    for (int i = 0; i < midiPlayback->getPorts().size(); i++) {
+        midi->addToggle(midiPlayback->getPorts()[i], i == 0);
+    }
+
+    dataIn = new DataInput((uint32_t) settings.getValue("osc:inputPort", 8888));
+    dataTrigger = new DataTriggers();
+
     for (int i = 0; i < layout.get().getValue("layout:sensorcount", 3); i++) {
         string valuePath = "layout:sensor" + ofToString(i+1);
+
+        Sensor *sensor = dataIn->addBNO055Source(layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)),
+                layout.get().getValue(valuePath + ":name", "BNO055 IMU Fusion Sensor"),
+                layout.get().getValue(valuePath + ":type", "bno055"), i+1);
 
         ofxDatGuiFolder *sensorUI = gui->addFolder("BNO055 Sensor #" + ofToString(i + 1), ofColor::yellow);
         sensorUI->addTextInput("Sensor ID #" + ofToString(i+1),
@@ -48,12 +65,9 @@ void ofApp::setup(){
         sensorUI->addSlider("Buffer (ms) #" + ofToString(i+1), 10, 10000,
                 layout.get().getValue(valuePath + ":buffer", 1000));
 
-        Sensor sensor = Sensor(
-                layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)),
-                layout.get().getValue(valuePath + ":name", "BNO055 IMU Fusion Sensor"),
-                layout.get().getValue(valuePath + ":type", "bno055"));
-
         for (int t = 0; t < layout.get().getValue(valuePath + ":triggercount", 1); t++) {
+            sensor_trigger_3d_t trigger;
+
             string tid = valuePath + ":trigger" + ofToString(t+1);
             string target = layout.get().getValue(tid + ":target", "acceleration");
             string name = layout.get().getValue(tid + ":name", "abs" + ofToString(i+1));
@@ -61,13 +75,13 @@ void ofApp::setup(){
             bool range = (layout.get().getValue(tid + ":range", 0) == 1);
             int debounce = layout.get().getValue(tid + ":debounce", 500);
             
-            ofVec3f mask = ofVec3f(layout.get().getValue(tid + ":mask:x", 0.f),
-                                   layout.get().getValue(tid + ":mask:y", 0.f),
-                                   layout.get().getValue(tid + ":mask:z", 0.f));
+            ofVec3f mask = ofVec3f((float)layout.get().getValue(tid + ":mask:x", 0.f),
+                    (float)layout.get().getValue(tid + ":mask:y", 0.f),
+                    (float)layout.get().getValue(tid + ":mask:z", 0.f));
             
-            ofVec3f falloff = ofVec3f(layout.get().getValue(tid + ":falloff:x", 0.f),
-                                      layout.get().getValue(tid + ":falloff:y", 0.f),
-                                      layout.get().getValue(tid + ":falloff:z", 0.f));
+            ofVec3f falloff = ofVec3f((float)layout.get().getValue(tid + ":falloff:x", 0.f),
+                    (float)layout.get().getValue(tid + ":falloff:y", 0.f),
+                    (float)layout.get().getValue(tid + ":falloff:z", 0.f));
 
             ofxDatGuiFolder *triggerUI = gui->addFolder("Sensor #" + ofToString(i + 1) +
                     " Trigger #" + ofToString(t+1), ofColor::yellow);
@@ -111,88 +125,58 @@ void ofApp::setup(){
 
                 valueHigh.z = (float) layout.get().getValue(tid + ":high:z", 6.8f);
                 triggerUI->addSlider("High Z", rangeMin, rangeMax, valueHigh.z);
-                
-                sensor.addTrigger(name, target, valueLow, valueHigh, absolute);
+
+                trigger = dataTrigger->addTrigger(name, target,
+                        layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)), valueLow, valueHigh, absolute);
             } else {
-                sensor.addTrigger(name, target, valueLow, absolute);
+                trigger = dataTrigger->addTrigger(name, target,
+                        layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)), valueLow, absolute);
             }
-            
-            sensor.getTriggers()[sensor.getTriggers().size() - 1].trigger->setDebounce(debounce);
-            sensor.getTriggers()[sensor.getTriggers().size() - 1].trigger->setMask(mask);
-            sensor.getTriggers()[sensor.getTriggers().size() - 1].trigger->setFalloff(falloff);
+
+            trigger.trigger->setDebounce(debounce);
+            trigger.trigger->setMask(mask);
+            trigger.trigger->setFalloff(falloff);
+            trigger.trigger->setSensorInfo(i+1);
         }
 
-        sensor.setGraph(ofPoint(240.f + 20.f, 40.f + 90.f * i), ofGetWindowWidth() - 40.f, 100.f);
+        sensor->setGraph(ofPoint(240.f + 20.f, 40.f + 90.f * i), ofGetWindowWidth() - 40.f, 100.f);
 
-        sensors.push_back(sensor);
+        //sensors.push_back(sensor);
     }
 
     gui->onButtonEvent(this, &ofApp::onButtonEvent);
     gui->onSliderEvent(this, &ofApp::onSliderEvent);
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
-    midiOut = new MidiOut();
-    midiOut->openPort(0);
-
     uiResponder.setup(settings.getValue("osc:responseIP", "192.168.0.255"),
                       settings.getValue("osc:responsePort", 7777));
-    receiver.setup(settings.getValue("osc:inputPort", 8888));
+    receiver.setup(settings.getValue("osc:inputPort", 8989));
     sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
+
+    dataIn->startThread(true);
+    dataTrigger->startThread(true);
+    midiPlayback->startThread(true);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     ofxOscBundle bundle;
     uint8_t count = 0;
-    uint64_t frame_time = ofGetElapsedTimeMillis();
+    uint64_t frame_time = time.getTimeMillis();
+
+    for (sensor_trigger_3d_result_t & result : dataTrigger->getAllTriggerResults()) {
+        vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(result);
+            for (NoteEvent & noteEvent : notes) {
+                if (_isRecordingLoop) {
+                    _loops[_loops.size() - 1].addNote(noteEvent);
+                }
+                midiPlayback->addNote(noteEvent);
+            }
+    }
 
     while (receiver.hasWaitingMessages()) {
         ofxOscMessage msg;
         receiver.getNextMessage(msg);
-        vector<string> address = ofSplitString(msg.getAddress(), "/", true, true);
-        if (address.size() == 2 && address[0] == "bno055") {
-            for (Sensor & sensor : sensors) {
-                if (!sensor.getStatus().active) {
-                    continue;
-                }
-                if (sensor.hasOSCAddress(msg.getAddress())) {
-                    uint64_t time = frame_time;
-                    ofVec3f acceleration, orientation;
-                    for (int i = 1; i < msg.getNumArgs(); ++i) {
-                        string type = msg.getArgTypeName(i);
-                        if (type == "f") {
-                            switch (i) {
-                                case 1:
-                                    orientation.x = msg.getArgAsFloat(i);
-                                    break;
-                                case 2:
-                                    orientation.y = msg.getArgAsFloat(i);
-                                    break;
-                                case 3:
-                                    orientation.z = msg.getArgAsFloat(i);
-                                    break;
-                                case 4:
-                                    acceleration.x = msg.getArgAsFloat(i);
-                                    break;
-                                case 5:
-                                    acceleration.y = msg.getArgAsFloat(i);
-                                    break;
-                                case 6:
-                                    acceleration.z = msg.getArgAsFloat(i);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        } else if (type == "b") {
-                            sensor.getStatus().calibration = msg.getArgAsBlob(i);
-                        } else if (type == "t") {
-                            time = frame_time;
-                        }
-                    }
-                    sensor.addFrame(time, frame_time, acceleration, orientation);
-                }
-            }
-        }
 
         remote_command_t response = _remoteControl.parseCommand(msg);
         if (response.command != RemoteControl::COM_UNKNOWN) {
@@ -228,94 +212,6 @@ void ofApp::update(){
         frameCount = 0;
     }
 
-    count = 0;
-    for (Sensor & sensor : sensors) {
-        if (!sensor.getStatus().active) {
-            continue;
-        }
-
-        sensor.update();
-
-        uint8_t tcount = 0;
-        string sensorPath = "layout:sensor" + ofToString(count + 1);
-
-        for (sensor_trigger_3d_t & trigger : sensor.getTriggers()) {
-            if (trigger.trigger->isTriggered()) {
-                bool sendosc = false;
-                string triggerPath = sensorPath + ":trigger" + ofToString(tcount + 1);
-                ofVec3f val = trigger.trigger->getTrigger();
-
-                if (val.x > 0.f && trigger.trigger->getDebounceStatus().x == 1.f) {
-                    sendosc = true;
-                    NoteEvent noteX = NoteEvent(
-                            frame_time,
-                            (uint64_t)layout.get().getValue(triggerPath + ":midi:x:duration", 250),
-                            layout.get().getValue(triggerPath + ":midi:x:pitch", .5f),
-                            layout.get().getValue(triggerPath + ":midi:x:velocity", .8f),
-                            layout.get().getValue(triggerPath + ":midi:x:channel", 1)
-                    );
-                    midiOut->noteOn(noteX.getChannel(), noteX);
-                    _openNotes.push_back(noteX);
-                    if (_isRecordingLoop) {
-                        _loops[_loops.size() - 1].addNote(noteX);
-                    }
-                }
-
-                if (val.y > 0.f && trigger.trigger->getDebounceStatus().y == 1.f) {
-                    sendosc = true;
-                    NoteEvent noteY = NoteEvent(
-                            frame_time,
-                            (uint64_t)layout.get().getValue(triggerPath + ":midi:y:duration", 250),
-                            layout.get().getValue(triggerPath + ":midi:y:pitch", .5f),
-                            layout.get().getValue(triggerPath + ":midi:y:velocity", .8f),
-                            layout.get().getValue(triggerPath + ":midi:y:channel", 1)
-                    );
-                    midiOut->noteOn(noteY.getChannel(), noteY);
-                    _openNotes.push_back(noteY);
-                    if (_isRecordingLoop) {
-                        _loops[_loops.size() - 1].addNote(noteY);
-                    }
-                }
-
-                if (val.z > 0.f && trigger.trigger->getDebounceStatus().z == 1.f) {
-                    sendosc = true;
-                    NoteEvent noteZ = NoteEvent(
-                            frame_time,
-                            (uint64_t)layout.get().getValue(triggerPath + ":midi:z:duration", 250),
-                            layout.get().getValue(triggerPath + ":midi:z:pitch", .5f),
-                            layout.get().getValue(triggerPath + ":midi:z:velocity", .8f),
-                            layout.get().getValue(triggerPath + ":midi:z:channel", 1)
-                    );
-                    midiOut->noteOn(noteZ.getChannel(), noteZ);
-                    _openNotes.push_back(noteZ);
-                    if (_isRecordingLoop) {
-                        _loops[_loops.size() - 1].addNote(noteZ);
-                    }
-                }
-                
-                if (sendosc) {
-                    ofxOscMessage msgOut;
-                    msgOut.setAddress(sensor.getOSCAddress() + "/" + trigger.target + "/" + trigger.name);
-                    msgOut.addFloatArg(val.x);
-                    msgOut.addFloatArg(val.y);
-                    msgOut.addFloatArg(val.z);
-                    bundle.addMessage(msgOut);
-                }
-            }
-        }
-    }
-
-    count = 0;
-    while (_openNotes.size() > 0 && count < _openNotes.size()) {
-        NoteEvent & note = _openNotes[0];
-        if (note.getEndTime() <= ofGetElapsedTimeMillis()) {
-            midiOut->noteOff(note.getChannel(), note);
-            _openNotes.erase(_openNotes.begin() + count, _openNotes.begin() + 1);
-        } else {
-            count++;
-        }
-    }
-
     for (NoteLoop & loop : _loops) {
         if (loop.isMuted() || loop.getDuration() == 0) {
             continue;
@@ -333,58 +229,8 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    uint8_t count = 0;
-    for (Sensor & sensor : sensors) {
-        if (!sensor.getStatus().active) {
-            continue;
-        }
-
-        if (_drawCurves) {
-            sensor.draw();
-        }
-
-        if (sensor.hasFrames()) {
-            ofDrawBitmapString(sensor.getDataAsString(), 40.f, 40.f + 90.f * count);
-
-            uint32_t tc = 0;
-            for (sensor_trigger_3d_t & trigger : sensor.getTriggers()) {
-                ofDrawBitmapString(trigger.name + " " + trigger.trigger->getTriggerAsString() + "   ",
-                        40.f + 160.f * tc, 40.f + 90.f * (count+1) - 70.f);
-                tc++;
-            }
-            
-            ofPoint x1 = ofPoint(-20.f, 25.f);
-            ofPoint x2 = ofPoint(20.f, 25.f);
-            ofPoint y1 = ofPoint(.0f, -25.f);
-
-            ofPushStyle();
-            ofFill();
-            ofSetColor(180, 0, 0);
-
-            ofPushMatrix();
-            ofTranslate(40.f + 35.f, 40.f + 100.f * (count+1) - 40.f);
-            ofRotate(sensor.getCurrentFrame().orientation.x);
-            ofDrawTriangle(x1, x2, y1);
-            ofPopMatrix();
-
-            ofSetColor(180, 180, 0);
-            ofPushMatrix();
-            ofTranslate(40.f + 35.f + 70.f, 40.f + 100.f * (count+1) - 40.f);
-            ofRotate(sensor.getCurrentFrame().orientation.y);
-            ofDrawTriangle(x1, x2, y1);
-            ofPopMatrix();
-
-            ofSetColor(0, 180, 180);
-            ofPushMatrix();
-            ofTranslate(40.f + 35.f + 70.f * 2.f, 40.f + 100.f * (count+1) - 40.f);
-            ofRotate((sensor.getCurrentFrame().orientation.z * -1.f) + 90.f);
-            ofDrawTriangle(x1, x2, y1);
-            ofPopMatrix();
-
-            ofPopStyle();
-        }
-
-        count++;
+    if (_drawCurves) {
+        dataIn->draw();
     }
 
     if (_isRecordingLoop && _loops.size() == 0) {

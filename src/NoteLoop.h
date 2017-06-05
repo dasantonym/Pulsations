@@ -6,6 +6,7 @@
 #define PULSATIONS_NOTELOOP_H
 
 #include "ofMain.h"
+#include "TimeKeeper.h"
 #include "MidiOut.h"
 
 #include "NoteEvent.h"
@@ -34,6 +35,7 @@ public:
 
 private:
     MidiOut *_midiOut;
+    TimeKeeper time;
 
     vector<NoteEvent> _notes;
     vector<ControllerEvent> _controllerEvents;

@@ -25,8 +25,21 @@ struct sensor_status_t {
 
 struct sensor_trigger_3d_t {
     string target;
+    string target_sid;
+    uint8_t sensor_index;
     string name;
     Trigger3D *trigger;
+};
+
+struct sensor_trigger_3d_result_t {
+    string target;
+    string target_sid;
+    string name;
+    ofVec3f triggerValue;
+    ofVec3f debounceStatus;
+    bool isTriggered;
+    uint8_t index;
+    uint8_t sensor_index;
 };
 
 struct sensor_settings_t {

@@ -20,12 +20,17 @@ public:
     float getVelocity();
     uint8_t getMidiVelocity();
 
+    bool isNoteOff();
+    void setNoteOff(bool off);
+
 private:
     uint64_t _time;
     uint64_t _duration;
     uint8_t _channel;
     float _pitch;
     float _velocity;
+
+    bool _isOff;
 };
 
 

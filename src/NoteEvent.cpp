@@ -5,6 +5,8 @@
 #include "NoteEvent.h"
 
 NoteEvent::NoteEvent(uint64_t time, uint64_t duration, float pitch, float velocity, uint8_t channel = 1) {
+    _isOff = false;
+
     _time = time;
     _duration = duration;
     _pitch = pitch;
@@ -44,4 +46,12 @@ float NoteEvent::getVelocity() {
 uint8_t NoteEvent::getMidiVelocity() {
     uint32_t velocity = roundf(fabs(_velocity) * 127.f);
     return (uint8_t)(velocity > 127 ? 127 : velocity);
+}
+
+bool NoteEvent::isNoteOff() {
+    return _isOff;
+}
+
+void NoteEvent::setNoteOff(bool off) {
+    _isOff = off;
 }
