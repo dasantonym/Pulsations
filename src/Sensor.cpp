@@ -126,6 +126,7 @@ void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleratio
     frame.time = time;
     frame.acceleration = acceleration;
     frame.orientation = orientation;
+    frame.sensor_id = _id;
     _frames.push_back(frame);
 
     uint32_t count = 0;

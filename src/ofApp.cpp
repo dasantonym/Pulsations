@@ -66,7 +66,7 @@ void ofApp::setup(){
                 layout.get().getValue(valuePath + ":buffer", 1000));
 
         for (int t = 0; t < layout.get().getValue(valuePath + ":triggercount", 1); t++) {
-            sensor_trigger_3d_t trigger;
+            Trigger3D* trigger;
 
             string tid = valuePath + ":trigger" + ofToString(t+1);
             string target = layout.get().getValue(tid + ":target", "acceleration");
@@ -133,10 +133,10 @@ void ofApp::setup(){
                         layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)), valueLow, absolute);
             }
 
-            trigger.trigger->setDebounce(debounce);
-            trigger.trigger->setMask(mask);
-            trigger.trigger->setFalloff(falloff);
-            trigger.trigger->setSensorInfo(i+1);
+            trigger->setDebounce(debounce);
+            trigger->setMask(mask);
+            trigger->setFalloff(falloff);
+            trigger->setSensorInfo(i+1);
         }
 
         sensor->setGraph(ofPoint(40.f, 40.f + 160.f * i), ofGetWindowWidth() - 80.f, 140.f);

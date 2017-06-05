@@ -7,6 +7,7 @@
 
 #include "ofMain.h"
 #include "TimeKeeper.h"
+#include "Types.h"
 
 class Trigger3D {
 public:
@@ -40,6 +41,9 @@ public:
     float getTriggerMax();
     float getTriggerMin();
     float getTriggerValue(float value, float threshold_high, float threshold_low, float mask);
+
+    sensor_trigger_3d_t* trigger;
+    ofFastEvent<sensor_trigger_3d_result_t> triggerValueEvent;
 
 private:
     bool _isRange;

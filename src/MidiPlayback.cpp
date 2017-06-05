@@ -49,7 +49,7 @@ void MidiPlayback::threadedFunction() {
             unlock();
         }
 
-        milliseconds slt(1);
+        milliseconds slt(5);
         std::this_thread::sleep_for(slt);
     }
     ofLogNotice() << "MidiPlayback exited" << endl;

@@ -7,7 +7,6 @@
 
 #include "ofMain.h"
 #include "ofxOscMessage.h"
-#include "Trigger3D.h"
 
 struct sensor_frame_t {
     uint64_t time;
@@ -16,6 +15,7 @@ struct sensor_frame_t {
     ofVec3f orientation;
     vector<float> data;
     ofBuffer calibration;
+    string sensor_id;
 };
 
 struct sensor_status_t {
@@ -28,7 +28,6 @@ struct sensor_trigger_3d_t {
     string target_sid;
     uint8_t sensor_index;
     string name;
-    Trigger3D *trigger;
 };
 
 struct sensor_trigger_3d_result_t {

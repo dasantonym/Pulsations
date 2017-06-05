@@ -6,16 +6,17 @@
 #define PULSATIONS_DATATRIGGERS_H
 
 #include "ofMain.h"
+#include "Trigger3D.h"
 #include "Types.h"
 
 class DataTriggers : public ofThread {
 public:
     DataTriggers();
 
-    sensor_trigger_3d_t addTrigger(string name, string target, string targetSensorId, float threshold, bool absolute);
-    sensor_trigger_3d_t addTrigger(string name, string target, string targetSensorId, float lowThreshold, float highThreshold, bool absolute);
-    sensor_trigger_3d_t addTrigger(string name, string target, string targetSensorId, ofVec3f threshold, bool absolute);
-    sensor_trigger_3d_t addTrigger(string name, string target, string targetSensorId, ofVec3f lowThreshold, ofVec3f highThreshold, bool absolute);
+    Trigger3D* addTrigger(string name, string target, string targetSensorId, float threshold, bool absolute);
+    Trigger3D* addTrigger(string name, string target, string targetSensorId, float lowThreshold, float highThreshold, bool absolute);
+    Trigger3D* addTrigger(string name, string target, string targetSensorId, ofVec3f threshold, bool absolute);
+    Trigger3D* addTrigger(string name, string target, string targetSensorId, ofVec3f lowThreshold, ofVec3f highThreshold, bool absolute);
 
     void draw();
     void addFrame(sensor_frame_t inputFrame);
@@ -27,7 +28,7 @@ public:
     void threadedFunction();
 
 private:
-    vector<sensor_trigger_3d_t> _triggers;
+    vector<Trigger3D*> _triggers;
     vector<sensor_frame_t> _frames;
 };
 

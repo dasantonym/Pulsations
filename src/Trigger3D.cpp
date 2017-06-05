@@ -12,21 +12,25 @@
 Trigger3D::Trigger3D(float threshold) {
     setTrigger(threshold);
     setFalloff(.0f);
+    trigger = new sensor_trigger_3d_t();
 }
 
 Trigger3D::Trigger3D(ofVec3f threshold) {
     setTrigger(threshold);
     setFalloff(.0f);
+    trigger = new sensor_trigger_3d_t();
 }
 
 Trigger3D::Trigger3D(float threshold_low, float threshold_high) {
     setTrigger(threshold_low, threshold_high);
     setFalloff(.0f);
+    trigger = new sensor_trigger_3d_t();
 }
 
 Trigger3D::Trigger3D(ofVec3f threshold_low, ofVec3f threshold_high) {
     setTrigger(threshold_low, threshold_high);
     setFalloff(.0f);
+    trigger = new sensor_trigger_3d_t();
 }
 
 //
@@ -46,27 +50,46 @@ void Trigger3D::update(ofVec3f value) {
             getTriggerValue(value.z, _threshold_low.z, _threshold_high.z, _trigger_mask.z) : .0f;
 
     _triggerValueLastMax.x = triggerValue.x > _triggerValueLastMax.x ? triggerValue.x : _triggerValueLastMax.x;
-    _triggerValueLastMax.y = triggerValue.y > _triggerValueLastMax.y ? triggerValue.x : _triggerValueLastMax.y;
-    _triggerValueLastMax.z = triggerValue.z > _triggerValueLastMax.z ? triggerValue.x : _triggerValueLastMax.z;
+    _triggerValueLastMax.y = triggerValue.y > _triggerValueLastMax.y ? triggerValue.y : _triggerValueLastMax.y;
+    _triggerValueLastMax.z = triggerValue.z > _triggerValueLastMax.z ? triggerValue.z : _triggerValueLastMax.z;
 
     if (time.getTimeMillis() - _lastUpdate >= 40) {
         _lastUpdate = time.getTimeMillis();
-        _triggerValue = _triggerValueLastMax;
-        _triggerValueLastMax = { .0f, .0f, .0f };
+        bool send = false;
 
-        if (_triggerValue.x != .0f) {
+        if (t - _lastTriggerTime.x > _trigger_debounce.x && _triggerValue.x != .0f && _triggerValueLastMax.x > _triggerValue.x) {
+            _triggerValue.x = _triggerValue.x < _triggerValueLastMax.x ? triggerValue.x : _triggerValueLastMax.x;
             _lastTriggerTime.x = _lastUpdate;
+            send = true;
         }
-        if (_triggerValue.y != .0f) {
+        if (t - _lastTriggerTime.y > _trigger_debounce.y && _triggerValue.y != .0f) {
+            _triggerValue.y = _triggerValue.y < _triggerValueLastMax.y ? triggerValue.y : _triggerValueLastMax.y;
             _lastTriggerTime.y = _lastUpdate;
+            send = true;
         }
-        if (_triggerValue.z != .0f) {
+        if (t - _lastTriggerTime.z > _trigger_debounce.z && _triggerValue.z != .0f) {
+            _triggerValue.z = _triggerValue.z < _triggerValueLastMax.z ? triggerValue.z : _triggerValueLastMax.z;
             _lastTriggerTime.z = _lastUpdate;
+            send = true;
         }
+
+        if (send) {
+            sensor_trigger_3d_result_t result;
+            result.target_sid = trigger->target_sid;
+            result.target = trigger->target;
+            result.name = trigger->name;
+            result.debounceStatus = getDebounceStatus();
+            result.isTriggered = isTriggered();
+            result.index = _sensor_index;
+            result.triggerValue = _triggerValue;
+            ofNotifyEvent(triggerValueEvent, result);
+        }
+
+        _triggerValueLastMax = { .0f, .0f, .0f };
     } else {
-        _triggerValue.x *= _triggerFalloff.x == .0f ? _triggerValue.x : _triggerFalloff.x;
-        _triggerValue.y *= _triggerFalloff.y == .0f ? _triggerValue.y : _triggerFalloff.y;
-        _triggerValue.z *= _triggerFalloff.z == .0f ? _triggerValue.z : _triggerFalloff.z;
+        _triggerValue.x *= _triggerFalloff.x == .0f ? 1.f : _triggerFalloff.x;
+        _triggerValue.y *= _triggerFalloff.y == .0f ? 1.f : _triggerFalloff.y;
+        _triggerValue.z *= _triggerFalloff.z == .0f ? 1.f : _triggerFalloff.z;
     }
 }
 
