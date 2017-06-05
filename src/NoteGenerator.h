@@ -6,11 +6,12 @@
 #define PULSATIONS_NOTEGENERATOR_H
 
 #include "ofMain.h"
+
 #include "ofxXmlSettings.h"
 #include "Layout.h"
+
 #include "Types.h"
-#include "NoteEvent.h"
-#include "TimeKeeper.h"
+#include "NoteLoop.h"
 
 class NoteGenerator {
 public:

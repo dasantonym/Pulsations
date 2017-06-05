@@ -6,8 +6,8 @@
 #define PULSATIONS_MIDIPLAYBACK_H
 
 #include "ofMain.h"
-#include "MidiOut.h"
 #include "TimeKeeper.h"
+#include "MidiOut.h"
 
 class MidiPlayback : public ofThread {
 public:

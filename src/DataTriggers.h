@@ -6,7 +6,6 @@
 #define PULSATIONS_DATATRIGGERS_H
 
 #include "ofMain.h"
-#include "Trigger3D.h"
 #include "Types.h"
 
 class DataTriggers : public ofThread {

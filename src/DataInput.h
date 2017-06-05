@@ -8,7 +8,6 @@
 #include "ofMain.h"
 #include "ofxOscReceiver.h"
 #include "Sensor.h"
-#include "TimeKeeper.h"
 
 class DataInput : public ofThread {
 public:

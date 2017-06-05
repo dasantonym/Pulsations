@@ -6,7 +6,6 @@
 #define PULSATIONS_REMOTECONTROL_H
 
 #include "ofMain.h"
-#include "ofxOscMessage.h"
 #include "Types.h"
 
 class RemoteControl {

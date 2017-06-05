@@ -6,9 +6,7 @@
 #define PULSATIONS_SENSOR_H
 
 #include "ofMain.h"
-#include "Types.h"
 #include "TimeKeeper.h"
-#include "Trigger3D.h"
 #include "SensorGraph.h"
 
 class Sensor {

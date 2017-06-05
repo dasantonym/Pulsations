@@ -1,19 +1,14 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxOsc.h"
-#include "ofxXmlSettings.h"
 #include "ofxDatGui.h"
+#include "ofxOscSender.h"
 
 #include "Version.h"
 #include "DataInput.h"
 #include "DataTriggers.h"
 #include "MidiPlayback.h"
-#include "TimeKeeper.h"
-#include "Sensor.h"
-#include "NoteLoop.h"
 #include "NoteGenerator.h"
-#include "Layout.h"
 #include "RemoteControl.h"
 
 class ofApp : public ofBaseApp{
