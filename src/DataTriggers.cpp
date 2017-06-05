@@ -73,22 +73,31 @@ void DataTriggers::addFrame(sensor_frame_t inputFrame) {
 void DataTriggers::threadedFunction() {
     while (isThreadRunning()) {
         while (_frames.size() > 0) {
+            lock();
             for (sensor_trigger_3d_t &trigger : _triggers) {
                 if (trigger.target == "acceleration") {
-                    lock();
                     trigger.trigger->update(_frames[0].acceleration);
-                    unlock();
                 }
                 if (trigger.target == "orientation") {
-                    lock();
                     trigger.trigger->update(_frames[0].orientation);
-                    unlock();
                 }
             }
             _frames.erase(_frames.begin(), _frames.begin() + 1);
+            unlock();
         }
         milliseconds slt(1);
         std::this_thread::sleep_for(slt);
+    }
+}
+
+void DataTriggers::draw() {
+    uint32_t tc = 0;
+    for (sensor_trigger_3d_t & trigger : _triggers) {
+        if (trigger.trigger->getSensorIndex() > 0) {
+            ofDrawBitmapString(trigger.name + " " + trigger.trigger->getTriggerAsString() + "   ",
+                    40.f, 40.f + 100.f * (tc + 1) - 80.f);
+        }
+        tc++;
     }
 }
 
@@ -110,20 +119,28 @@ vector<sensor_trigger_3d_result_t> DataTriggers::getAllTriggerResults() {
     uint8_t count = 0;
 
     for (sensor_trigger_3d_t & trigger : _triggers) {
-        if (trigger.trigger->isTriggered()) {
-            sensor_trigger_3d_result_t res;
-            res.triggerValue = trigger.trigger->getTrigger();
-            res.index = count;
-            res.target_sid = trigger.target_sid;
-            res.target = trigger.target;
-            res.name = trigger.name;
-            res.isTriggered = trigger.trigger->isTriggered();
-            res.debounceStatus = trigger.trigger->getDebounceStatus();
-            res.sensor_index = trigger.trigger->getSensorIndex();
+        sensor_trigger_3d_result_t res = getTriggerResult(count);
+        if (res.isTriggered) {
+            results.push_back(res);
         }
-
         count++;
     }
 
     return results;
+}
+
+sensor_trigger_3d_result_t DataTriggers::getTriggerResult(uint8_t index) {
+    sensor_trigger_3d_result_t res;
+    sensor_trigger_3d_t & trigger = _triggers[index];
+    if (trigger.trigger->isTriggered()) {
+        res.triggerValue = trigger.trigger->getTrigger();
+        res.index = index;
+        res.target_sid = trigger.target_sid;
+        res.target = trigger.target;
+        res.name = trigger.name;
+        res.isTriggered = trigger.trigger->isTriggered();
+        res.debounceStatus = trigger.trigger->getDebounceStatus();
+        res.sensor_index = trigger.trigger->getSensorIndex();
+    }
+    return res;
 }

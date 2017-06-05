@@ -139,7 +139,7 @@ void ofApp::setup(){
             trigger.trigger->setSensorInfo(i+1);
         }
 
-        sensor->setGraph(ofPoint(240.f + 20.f, 40.f + 90.f * i), ofGetWindowWidth() - 40.f, 100.f);
+        sensor->setGraph(ofPoint(40.f, 40.f + 100.f * i), ofGetWindowWidth() - 40.f, 100.f);
 
         //sensors.push_back(sensor);
     }
@@ -164,14 +164,19 @@ void ofApp::update(){
     uint8_t count = 0;
     uint64_t frame_time = time.getTimeMillis();
 
-    for (sensor_trigger_3d_result_t & result : dataTrigger->getAllTriggerResults()) {
-        vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(result);
+    for (uint16_t i = 0; i < dataIn->sourceCount(); i++) {
+        if (dataIn->sourceHasFrames(i)) {
+            sensor_frame_t frame = dataIn->getNextFrameFromSource(i);
+            dataTrigger->addFrame(frame);
+            sensor_trigger_3d_result_t triggerResult = dataTrigger->getTriggerResult((uint8_t)i);
+            vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult);
             for (NoteEvent & noteEvent : notes) {
                 if (_isRecordingLoop) {
                     _loops[_loops.size() - 1].addNote(noteEvent);
                 }
                 midiPlayback->addNote(noteEvent);
             }
+        }
     }
 
     while (receiver.hasWaitingMessages()) {
@@ -232,6 +237,8 @@ void ofApp::draw(){
     if (_drawCurves) {
         dataIn->draw();
     }
+
+    dataTrigger->draw();
 
     if (_isRecordingLoop && _loops.size() == 0) {
         ofPushStyle();

@@ -17,8 +17,11 @@ public:
     sensor_trigger_3d_t addTrigger(string name, string target, string targetSensorId, ofVec3f threshold, bool absolute);
     sensor_trigger_3d_t addTrigger(string name, string target, string targetSensorId, ofVec3f lowThreshold, ofVec3f highThreshold, bool absolute);
 
+    void draw();
     void addFrame(sensor_frame_t inputFrame);
     int getTriggerIndexByName(string name);
+
+    sensor_trigger_3d_result_t getTriggerResult(uint8_t index);
     vector<sensor_trigger_3d_result_t> getAllTriggerResults();
 
     void threadedFunction();

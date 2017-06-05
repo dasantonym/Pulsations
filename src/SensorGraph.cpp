@@ -13,6 +13,7 @@ SensorGraph::SensorGraph(ofPoint position, float width, float height) {
         ofPath path;
         path.setFilled(false);
         path.setStrokeWidth(1.0f);
+        path.setMode(ofPath::Mode::COMMANDS);
         ofColor color;
         switch (i) {
             case 0:

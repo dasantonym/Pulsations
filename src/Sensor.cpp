@@ -47,17 +47,6 @@ void Sensor::draw() {
     if (hasFrames()) {
         ofDrawBitmapString(getDataAsString(), 40.f, 40.f + 90.f * (_index - 1));
 
-        /*
-        uint32_t tc = 0;
-        for (sensor_trigger_3d_t * trigger : _triggers) {
-            if (trigger->target_sid == getSensorID()) {
-                ofDrawBitmapString(trigger->name + " " + trigger->trigger->getTriggerAsString() + "   ",
-                        40.f + 160.f * tc, 40.f + 90.f * (count + 1) - 70.f);
-                tc++;
-            }
-        }
-         */
-
         ofPoint x1 = ofPoint(-20.f, 25.f);
         ofPoint x2 = ofPoint(20.f, 25.f);
         ofPoint y1 = ofPoint(.0f, -25.f);
@@ -67,21 +56,21 @@ void Sensor::draw() {
         ofSetColor(180, 0, 0);
 
         ofPushMatrix();
-        ofTranslate(40.f + 35.f, 40.f + 100.f * _index - 40.f);
+        ofTranslate(40.f + 35.f, 40.f + 100.f * _index - 35.f);
         ofRotate(getCurrentFrame().orientation.x);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
 
         ofSetColor(180, 180, 0);
         ofPushMatrix();
-        ofTranslate(40.f + 35.f + 70.f, 40.f + 100.f * _index - 40.f);
+        ofTranslate(40.f + 35.f + 70.f, 40.f + 100.f * _index - 35.f);
         ofRotate(getCurrentFrame().orientation.y);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
 
         ofSetColor(0, 180, 180);
         ofPushMatrix();
-        ofTranslate(40.f + 35.f + 70.f * 2.f, 40.f + 100.f * _index - 40.f);
+        ofTranslate(40.f + 35.f + 70.f * 2.f, 40.f + 100.f * _index - 35.f);
         ofRotate((getCurrentFrame().orientation.z * -1.f) + 90.f);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
@@ -131,6 +120,7 @@ void Sensor::parseOSCMessage(ofxOscMessage &msg) {
 
 void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleration, ofVec3f orientation) {
     _lastTime = time_received;
+
     sensor_frame_t frame;
     frame.time_received = time_received;
     frame.time = time;
@@ -145,6 +135,7 @@ void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleratio
     if (count > 0) {
         _frames.erase(_frames.begin(), _frames.begin() + count);
     }
+
     update();
 }
 

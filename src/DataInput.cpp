@@ -14,6 +14,7 @@ Sensor* DataInput::addBNO055Source(string id, string name = "BNO055 IMU Fusion S
     lock();
     _sources.push_back(source);
     unlock();
+    return source;
 }
 
 uint64_t DataInput::sourceCount() {
