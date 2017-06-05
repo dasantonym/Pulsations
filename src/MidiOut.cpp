@@ -32,10 +32,10 @@ void MidiOut::openVirtualPort(string port) {
 
 //--------------------------------------------------------------
 void MidiOut::noteOn(uint8_t channel, NoteEvent note) {
-    _midi->sendNoteOn(channel, note.getMidiPitch(), note.getMidiVelocity());
+    _midi->sendNoteOn((int) channel, (int) note.getMidiPitch(), (int) note.getMidiVelocity());
 }
 
 //--------------------------------------------------------------
 void MidiOut::noteOff(uint8_t channel, NoteEvent note) {
-    _midi->sendNoteOff(channel, note.getMidiPitch(), 0);
+    _midi->sendNoteOff((int) channel, (int) note.getMidiPitch(), 0);
 }

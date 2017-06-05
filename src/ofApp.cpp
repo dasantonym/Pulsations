@@ -169,7 +169,7 @@ void ofApp::update(){
             sensor_frame_t frame = dataIn->getNextFrameFromSource(i);
             dataTrigger->addFrame(frame);
             sensor_trigger_3d_result_t triggerResult = dataTrigger->getTriggerResult((uint8_t)i);
-            vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult);
+            vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult, true);
             for (NoteEvent & noteEvent : notes) {
                 if (_isRecordingLoop) {
                     _loops[_loops.size() - 1].addNote(noteEvent);

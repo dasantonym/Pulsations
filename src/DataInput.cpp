@@ -59,6 +59,7 @@ void DataInput::threadedFunction() {
         milliseconds slt(1);
         std::this_thread::sleep_for(slt);
     }
+    ofLogNotice() << "DataInput exited" << endl;
 }
 
 void DataInput::draw() {

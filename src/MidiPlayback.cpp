@@ -17,6 +17,7 @@ void MidiPlayback::addNote(NoteEvent inputNote) {
     _notes.push_back(inputNote);
     NoteEvent offNote = NoteEvent(inputNote.getEndTime(), 0,
             inputNote.getPitch(), inputNote.getVelocity(), inputNote.getChannel());
+    offNote.setNoteOff(true);
     _notes.push_back(offNote);
     unlock();
 }
@@ -51,6 +52,7 @@ void MidiPlayback::threadedFunction() {
         milliseconds slt(1);
         std::this_thread::sleep_for(slt);
     }
+    ofLogNotice() << "MidiPlayback exited" << endl;
 }
 
 vector<string> MidiPlayback::getPorts() {

@@ -88,6 +88,7 @@ void DataTriggers::threadedFunction() {
         milliseconds slt(1);
         std::this_thread::sleep_for(slt);
     }
+    ofLogNotice() << "DataTriggers exited" << endl;
 }
 
 void DataTriggers::draw() {

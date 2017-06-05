@@ -46,7 +46,9 @@ private:
     bool _isAbsolute;
 
     uint8_t _sensor_index;
+    uint64_t _lastUpdate;
 
+    ofVec3f _triggerValueLastMax;
     ofVec3f _triggerValue;
     ofVec3f _triggerFalloff;
     ofVec3f _lastTriggerTime;

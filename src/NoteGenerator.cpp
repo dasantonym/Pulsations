@@ -7,18 +7,26 @@
 NoteGenerator::NoteGenerator() {
     settings.load("settings.xml");
     layout.load(settings.getValue("layout", "empty"));
+
+    _sender.setup(
+            settings.getValue("osc:forwardIP", "127.0.0.1"),
+            settings.getValue("osc:forwardPort", 9999));
 }
 
-vector<NoteEvent> NoteGenerator::evaluateTriggerResult(sensor_trigger_3d_result_t triggerResult) {
+vector<NoteEvent> NoteGenerator::evaluateTriggerResult(sensor_trigger_3d_result_t triggerResult, bool sendOsc = true) {
     vector<NoteEvent> notes;
-    string sensorPath = "layout:sensor" + ofToString(triggerResult.sensor_index);
+    ofxOscBundle oscBundle;
+    string sensorPath = "layout:sensor" + ofToString((uint64_t)triggerResult.sensor_index);
     if (triggerResult.isTriggered) {
-        //bool sendosc = false;
-        string triggerPath = sensorPath + ":trigger" + ofToString(triggerResult.index);
+        string triggerPath = sensorPath + ":trigger" + ofToString((uint64_t)triggerResult.index);
         ofVec3f val = triggerResult.triggerValue;
 
         if (val.x > 0.f && triggerResult.debounceStatus.x == 1.f) {
-            //sendosc = true;
+            ofxOscMessage msgOut;
+            msgOut.setAddress("/" + triggerResult.name + "/" + triggerResult.target_sid + "/x");
+            msgOut.addFloatArg(val.x);
+            oscBundle.addMessage(msgOut);
+
             NoteEvent noteX = NoteEvent(
                     _time.getTimeMillis(),
                     (uint64_t)layout.get().getValue(triggerPath + ":midi:x:duration", 250),
@@ -27,15 +35,14 @@ vector<NoteEvent> NoteGenerator::evaluateTriggerResult(sensor_trigger_3d_result_
                     (uint8_t) layout.get().getValue(triggerPath + ":midi:x:channel", 1)
             );
             notes.push_back(noteX);
-            /*
-            if (_isRecordingLoop) {
-                _loops[_loops.size() - 1].addNote(noteX);
-            }
-             */
         }
 
         if (val.y > 0.f && triggerResult.debounceStatus.y == 1.f) {
-            //sendosc = true;
+            ofxOscMessage msgOut;
+            msgOut.setAddress("/" + triggerResult.name + "/" + triggerResult.target_sid + "/y");
+            msgOut.addFloatArg(val.y);
+            oscBundle.addMessage(msgOut);
+
             NoteEvent noteY = NoteEvent(
                     _time.getTimeMillis(),
                     (uint64_t)layout.get().getValue(triggerPath + ":midi:y:duration", 250),
@@ -47,7 +54,11 @@ vector<NoteEvent> NoteGenerator::evaluateTriggerResult(sensor_trigger_3d_result_
         }
 
         if (val.z > 0.f && triggerResult.debounceStatus.z == 1.f) {
-            //sendosc = true;
+            ofxOscMessage msgOut;
+            msgOut.setAddress("/" + triggerResult.name + "/" + triggerResult.target_sid + "/z");
+            msgOut.addFloatArg(val.z);
+            oscBundle.addMessage(msgOut);
+
             NoteEvent noteZ = NoteEvent(
                     _time.getTimeMillis(),
                     (uint64_t)layout.get().getValue(triggerPath + ":midi:z:duration", 250),
@@ -58,16 +69,9 @@ vector<NoteEvent> NoteGenerator::evaluateTriggerResult(sensor_trigger_3d_result_
             notes.push_back(noteZ);
         }
 
-        /*
-        if (sendosc) {
-            ofxOscMessage msgOut;
-            msgOut.setAddress(sensor.getOSCAddress() + "/" + trigger->target + "/" + trigger->name);
-            msgOut.addFloatArg(val.x);
-            msgOut.addFloatArg(val.y);
-            msgOut.addFloatArg(val.z);
-            bundle.addMessage(msgOut);
+        if (sendOsc && oscBundle.getMessageCount() > 0) {
+            _sender.sendBundle(oscBundle);
         }
-         */
 
         return notes;
     }

@@ -7,6 +7,7 @@
 
 #include "ofMain.h"
 
+#include "ofxOsc.h"
 #include "ofxXmlSettings.h"
 #include "Layout.h"
 
@@ -17,10 +18,11 @@ class NoteGenerator {
 public:
     NoteGenerator();
 
-    vector<NoteEvent> evaluateTriggerResult(sensor_trigger_3d_result_t triggerResult);
+    vector<NoteEvent> evaluateTriggerResult(sensor_trigger_3d_result_t triggerResult, bool sendOsc);
 
 private:
     TimeKeeper _time;
+    ofxOscSender _sender;
     ofxXmlSettings settings;
     Layout layout;
 };
