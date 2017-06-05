@@ -139,7 +139,7 @@ void ofApp::setup(){
             trigger.trigger->setSensorInfo(i+1);
         }
 
-        sensor->setGraph(ofPoint(40.f, 40.f + 100.f * i), ofGetWindowWidth() - 40.f, 100.f);
+        sensor->setGraph(ofPoint(40.f, 40.f + 160.f * i), ofGetWindowWidth() - 80.f, 140.f);
 
         //sensors.push_back(sensor);
     }

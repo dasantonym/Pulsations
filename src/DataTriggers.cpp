@@ -95,7 +95,7 @@ void DataTriggers::draw() {
     for (sensor_trigger_3d_t & trigger : _triggers) {
         if (trigger.trigger->getSensorIndex() > 0) {
             ofDrawBitmapString(trigger.name + " " + trigger.trigger->getTriggerAsString() + "   ",
-                    40.f, 40.f + 100.f * (tc + 1) - 80.f);
+                    40.f, 40.f + 160.f * (tc + 1) - 140.f);
         }
         tc++;
     }

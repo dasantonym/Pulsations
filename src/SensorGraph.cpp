@@ -13,7 +13,6 @@ SensorGraph::SensorGraph(ofPoint position, float width, float height) {
         ofPath path;
         path.setFilled(false);
         path.setStrokeWidth(1.0f);
-        path.setMode(ofPath::Mode::COMMANDS);
         ofColor color;
         switch (i) {
             case 0:
@@ -46,34 +45,38 @@ void SensorGraph::update(vector<sensor_frame_t> frames) {
         return;
     }
     float tickSize = (_size.x - _position.x) / frames.size();
+    for (int i = 0; i < _paths.size(); i++) {
+        _paths[i].lineTo(_position.x, _position.y + _size.y * .5f);
+    }
     for (long f = 0; f < frames.size() ; f++) {
         sensor_frame_t frame = frames[f];
-        for (int i = 0; i < 6; i++) {
-            if (i < _paths.size()) {
-                float ypos = _size.y * .5f;
-                switch (i) {
-                    case 0:
-                        ypos = _size.y * (frame.orientation.x / 360.f) - _size.y * .5f;
-                        break;
-                    case 1:
-                        ypos = _size.y * .5f / frame.orientation.y / 180.f;
-                        break;
-                    case 2:
-                        ypos = _size.y * .5f / frame.orientation.z / 180.f;
-                        break;
-                    case 3:
-                        ypos = frame.acceleration.x * 2.f;
-                        break;
-                    case 4:
-                        ypos = frame.acceleration.y * 2.f;
-                        break;
-                    case 5:
-                        ypos = frame.acceleration.z * 2.f;
-                        break;
-                }
-                _paths[i].lineTo(_position.x + f * tickSize, _position.y + _size.y * .5f + ypos);
+        for (int i = 0; i < _paths.size(); i++) {
+            float ypos = _size.y * .5f;
+            switch (i) {
+                case 0:
+                    ypos = _size.y * (frame.orientation.x / 360.f) - _size.y * .5f;
+                    break;
+                case 1:
+                    ypos = _size.y * .5f / frame.orientation.y / 180.f;
+                    break;
+                case 2:
+                    ypos = _size.y * .5f / frame.orientation.z / 180.f;
+                    break;
+                case 3:
+                    ypos = frame.acceleration.x * 2.f;
+                    break;
+                case 4:
+                    ypos = frame.acceleration.y * 2.f;
+                    break;
+                case 5:
+                    ypos = frame.acceleration.z * 2.f;
+                    break;
             }
+            _paths[i].lineTo(_position.x + f * tickSize, _position.y + _size.y * .5f + ypos);
         }
+    }
+    for (int i = 0; i < _paths.size(); i++) {
+        _paths[i].lineTo(_position.x + _size.x, _position.y + _size.y * .5f);
     }
 }
 
