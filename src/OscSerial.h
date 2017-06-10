@@ -6,8 +6,6 @@
 #define PULSATIONS_OSCSERIAL_H
 
 #include "ofMain.h"
-#include "ofxIO.h"
-#include "ofxUDPManager.h"
 #include "ofxOscReceiver.h"
 #include "ofxOscSender.h"
 #include "Types.h"
@@ -19,7 +17,6 @@ public:
 
     bool setup(string deviceName, uint32_t baud);
     bool hasFrames();
-    sensor_frame_t getNextFrame();
     vector<sensor_frame_t> getFrames();
     sensor_status_t getStatus(uint8_t id);
 
@@ -30,12 +27,8 @@ public:
     const uint8_t SLIP_ESC_END = 220;
     const uint8_t SLIP_ESC_ESC = 221;
 
-    static const uint16_t KEEP_FRAMES = 500;
-
 private:
-    ofxOscReceiver _osc;
     ofxOscSender _oscOut;
-    ofxUDPManager _udp;
     ofSerial _serial;
     vector<uint8_t> _buffer;
     vector <ofSerialDeviceInfo> _deviceList;

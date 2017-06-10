@@ -34,14 +34,6 @@ bool OscSerial::hasFrames() {
     return hasFrames;
 }
 
-sensor_frame_t OscSerial::getNextFrame() {
-    lock();
-    sensor_frame_t frame = _frames[0];
-    _frames.erase(_frames.begin(), _frames.begin() + 1);
-    unlock();
-    return frame;
-}
-
 vector<sensor_frame_t> OscSerial::getFrames() {
     vector<sensor_frame_t> frames;
     lock();
@@ -71,7 +63,6 @@ void OscSerial::threadedFunction() {
                     ofLogNotice() << "Error reading serial";
                 } else if (read != OF_SERIAL_NO_DATA) {
                     if (read == EOT) {
-                        //try {
                         if (_buffer.size() >= 3) {
                             if (_buffer[0] == 1 && _buffer.size() == 27) {
                                 sensor_frame_t frame;
@@ -86,23 +77,23 @@ void OscSerial::threadedFunction() {
 
                                 fl = (float *) &data[i];
                                 frame.orientation.x = *fl;
-                                i += 4;//sizeof(float);
+                                i += sizeof(float);
                                 fl = (float *) &data[i];
                                 frame.orientation.y = *fl;
-                                i += 4;
+                                i += sizeof(float);
                                 fl = (float *) &data[i];
                                 frame.orientation.z = *fl;
-                                i += 4;
+                                i += sizeof(float);
 
                                 fl = (float *) &data[i];
                                 frame.acceleration.x = *fl;
-                                i += 4;
+                                i += sizeof(float);
                                 fl = (float *) &data[i];
                                 frame.acceleration.y = *fl;
-                                i += 4;
+                                i += sizeof(float);
                                 fl = (float *) &data[i];
                                 frame.acceleration.z = *fl;
-                                i += 4;
+                                i += sizeof(float);
 
                                 if (size == 27) {
                                     lock();
@@ -126,12 +117,6 @@ void OscSerial::threadedFunction() {
                                     _status[id].calibration.getData()[3] = data[6];
                                 }
                             }
-                            //_osc.ProcessPacket((const char *) _buffer.data(), (int) _buffer.size(), _endpoint);
-                            /*
-                            } catch (...) {
-
-                            }
-                        */
                         }
                         _buffer.clear();
                     } else if (_lastRead == SLIP_ESC) {
@@ -146,34 +131,6 @@ void OscSerial::threadedFunction() {
                     _lastRead = read;
                 }
             }
-            /*
-            ofxOscBundle bundle;
-            while (_osc.hasWaitingMessages()) {
-                ofxOscMessage msg;
-                _osc.getNextMessage(msg);
-                vector<string> addr = ofSplitString(msg.getAddress(), "/", true, true);
-                if (addr.size() == 2 && addr[0] == "u" && msg.getNumArgs() == 7) {
-                    msg.setAddress("/bno/10" + addr[1]);
-                    bundle.addMessage(msg);
-                    sensor_frame_t frame;
-                    frame.sensor_id = addr[1];
-                    frame.time = (uint64_t)msg.getArgAsTimetag(0);
-                    frame.time_received = _time.getTimeMillis();
-                    frame.orientation.x = msg.getArgAsFloat(1);
-                    frame.orientation.y = msg.getArgAsFloat(2);
-                    frame.orientation.z = msg.getArgAsFloat(3);
-                    frame.acceleration.x = msg.getArgAsFloat(4);
-                    frame.acceleration.y = msg.getArgAsFloat(5);
-                    frame.acceleration.z = msg.getArgAsFloat(6);
-                    lock();
-                    _frames.push_back(frame);
-                    unlock();
-                }
-            }
-            if (bundle.getMessageCount() != 0) {
-                _oscOut.sendBundle(bundle);
-            }
-             */
         }
         milliseconds slt(1);
         std::this_thread::sleep_for(slt);

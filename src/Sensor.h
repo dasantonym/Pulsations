@@ -14,7 +14,6 @@ class Sensor {
 public:
     Sensor(string id, string name, string type, uint8_t index);
 
-    void parseOSCMessage(ofxOscMessage &msg);
     void addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleration, ofVec3f orientation);
 
     Trigger3D* addTrigger(string name, string target, float threshold, bool absolute);

@@ -27,14 +27,20 @@ void ofApp::setup(){
 
     gui->addToggle("Draw curves", _drawCurves);
 
+    ofxDatGuiFolder *xbee = gui->addFolder("XBee", ofColor::blue);
+    xbee->addTextInput("Device name", ofToString(settings.getValue("xbee:serial:deviceName", "cu.usbserial-DN02N1QK")));
+    xbee->addTextInput("Baud", ofToString(settings.getValue("xbee:serial:baud", 57600)));
+
     ofxDatGuiFolder *osc = gui->addFolder("OSC", ofColor::white);
     osc->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
     osc->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
     osc->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
 
     oscSerial = new OscSerial();
-    bool hasSerialOsc = oscSerial->setup("cu.usbserial-DN02N1QK", 57600);
-    if (hasSerialOsc) {
+    if (oscSerial->setup(
+            settings.getValue("xbee:serial:deviceName", "cu.usbserial-DN02N1QK"),
+            (uint32_t)settings.getValue("xbee:serial:baud", 57600)
+    )) {
         oscSerial->startThread(true);
     }
 

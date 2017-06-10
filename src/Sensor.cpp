@@ -84,45 +84,6 @@ void Sensor::draw() {
     }
 }
 
-void Sensor::parseOSCMessage(ofxOscMessage &msg) {
-    uint64_t timetag = time.getTimeMillis();
-    if (hasOSCAddress(msg.getAddress())) {
-        ofVec3f acceleration, orientation;
-        for (int i = 1; i < msg.getNumArgs(); ++i) {
-            string type = msg.getArgTypeName(i);
-            if (type == "f") {
-                switch (i) {
-                    case 1:
-                        orientation.x = msg.getArgAsFloat(i);
-                        break;
-                    case 2:
-                        orientation.y = msg.getArgAsFloat(i);
-                        break;
-                    case 3:
-                        orientation.z = msg.getArgAsFloat(i);
-                        break;
-                    case 4:
-                        acceleration.x = msg.getArgAsFloat(i);
-                        break;
-                    case 5:
-                        acceleration.y = msg.getArgAsFloat(i);
-                        break;
-                    case 6:
-                        acceleration.z = msg.getArgAsFloat(i);
-                        break;
-                    default:
-                        break;
-                }
-            } else if (type == "b") {
-                getStatus().calibration = msg.getArgAsBlob(i);
-            } else if (type == "t") {
-                timetag = time.getTimeMillis();
-            }
-        }
-        addFrame(timetag, time.getTimeMillis(), acceleration, orientation);
-    }
-}
-
 void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleration, ofVec3f orientation) {
     sensor_frame_t frame;
     frame.time_received = time_received;
@@ -222,7 +183,7 @@ void Sensor::setCalibrationStatus(ofBuffer calibration) {
 }
 
 void Sensor::setBufferSizeMillis(uint64_t size) {
-    //_bufferTimeMillis = size;
+    _bufferTimeMillis = size;
 }
 
 
