@@ -172,7 +172,7 @@ void ofApp::update(){
         for (Trigger3D * trigger : sensor->getTriggers()) {
             sensor_trigger_3d_result_t triggerResult = trigger->getTriggerResult();
             if (triggerResult.isTriggered) {
-                vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult, false);
+                vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult);
                 for (NoteEvent & noteEvent : notes) {
                     midiPlayback->addNote(noteEvent);
                 }
