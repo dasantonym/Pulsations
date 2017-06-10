@@ -28,17 +28,17 @@ struct sensor_trigger_3d_t {
     string target_sid;
     uint8_t sensor_index;
     string name;
+    int trigger_index;
 };
 
 struct sensor_trigger_3d_result_t {
     string target;
     string target_sid;
+    int trigger_index;
     string name;
     ofVec3f triggerValue;
     ofVec3f debounceStatus;
     bool isTriggered;
-    uint8_t index;
-    uint8_t sensor_index;
 };
 
 struct sensor_settings_t {
@@ -88,6 +88,12 @@ struct remote_command_t {
     uint8_t command;
     bool boolValue;
     float floatValue;
+};
+
+struct trigger_time_3d_t {
+    int64_t x;
+    int64_t y;
+    int64_t z;
 };
 
 class Types {

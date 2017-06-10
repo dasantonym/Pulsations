@@ -8,6 +8,7 @@
 #include "ofMain.h"
 #include "TimeKeeper.h"
 #include "SensorGraph.h"
+#include "Trigger3D.h"
 
 class Sensor {
 public:
@@ -15,14 +16,13 @@ public:
 
     void parseOSCMessage(ofxOscMessage &msg);
     void addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleration, ofVec3f orientation);
-    /*
-    void addTrigger(string name, string target, float threshold, bool absolute);
-    void addTrigger(string name, string target, float lowThreshold, float highThreshold, bool absolute);
-    void addTrigger(string name, string target, ofVec3f threshold, bool absolute);
-    void addTrigger(string name, string target, ofVec3f lowThreshold, ofVec3f highThreshold, bool absolute);
-     */
+
+    Trigger3D* addTrigger(string name, string target, float threshold, bool absolute);
+    Trigger3D* addTrigger(string name, string target, float lowThreshold, float highThreshold, bool absolute);
+    Trigger3D* addTrigger(string name, string target, ofVec3f threshold, bool absolute);
+    Trigger3D* addTrigger(string name, string target, ofVec3f lowThreshold, ofVec3f highThreshold, bool absolute);
+
     void setCalibrationStatus(ofBuffer calibration);
-    void setActive(bool active);
     void setGraph(ofPoint position, float width, float height);
     void setBufferSizeMillis(uint64_t size);
 
@@ -34,12 +34,11 @@ public:
     string getSensorID();
     string getOSCAddress();
     string getDataAsString();
-    // string getTriggersAsString();
     string getCalibrationStatus();
+
     vector<sensor_frame_t> getFrameBuffer();
     sensor_frame_t getCurrentFrame();
-    //vector<sensor_trigger_3d_t> getTriggers();
-    //int getTriggerIndexByName(string name);
+    vector<Trigger3D *> getTriggers();
     sensor_status_t getStatus();
 
 private:
@@ -49,15 +48,12 @@ private:
     uint8_t _index;
 
     sensor_status_t _status;
-    bool _active;
     bool _hasGraph;
-    ofBuffer _calibration;
 
-    uint64_t  _bufferTimeMillis;
-    uint64_t _lastTime;
+    uint64_t _bufferTimeMillis;
 
     vector<sensor_frame_t> _frames;
-    // vector<sensor_trigger_3d_t> _triggers;
+    vector<Trigger3D *> _triggers;
     SensorGraph *_graph;
     TimeKeeper time;
 };

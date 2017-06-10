@@ -34,6 +34,7 @@ void Sensor::update() {
     if (!hasFrames()) {
         return;
     }
+
     if (_hasGraph) {
         _graph->update(getFrameBuffer());
     }
@@ -46,6 +47,10 @@ void Sensor::draw() {
 
     if (hasFrames()) {
         ofDrawBitmapString(getDataAsString(), 40.f, 40.f + 90.f * _index);
+        for (Trigger3D * trigger : _triggers) {
+            ofDrawBitmapString(trigger->getTriggerAsString(),
+                    40.f, 40.f + 90.f * _index + 20.f * (trigger->trigger->trigger_index + 1));
+        }
 
         ofPoint x1 = ofPoint(-20.f, 25.f);
         ofPoint x2 = ofPoint(20.f, 25.f);
@@ -119,8 +124,6 @@ void Sensor::parseOSCMessage(ofxOscMessage &msg) {
 }
 
 void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleration, ofVec3f orientation) {
-    _lastTime = time_received;
-
     sensor_frame_t frame;
     frame.time_received = time_received;
     frame.time = time;
@@ -128,6 +131,15 @@ void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleratio
     frame.orientation = orientation;
     frame.sensor_id = _id;
     _frames.push_back(frame);
+
+    for (Trigger3D * trigger : _triggers) {
+        if (trigger->trigger->target == "orientation") {
+            trigger->update(orientation);
+        }
+        if (trigger->trigger->target == "acceleration") {
+            trigger->update(acceleration);
+        }
+    }
 
     uint32_t count = 0;
     while (count < _frames.size() && time_received - _frames[count].time_received > _bufferTimeMillis) {
@@ -138,6 +150,58 @@ void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleratio
         _frames.erase(_frames.begin(), _frames.begin() + count - 1);
     }
 }
+
+
+
+//
+//
+// Adding triggers
+//
+
+Trigger3D* Sensor::addTrigger(string name, string target, float threshold, bool absolute = false) {
+    Trigger3D* trigger = new Trigger3D(threshold);
+    trigger->trigger->name = name;
+    trigger->trigger->target = target;
+    trigger->trigger->target_sid = _id;
+    trigger->trigger->trigger_index = (int)_triggers.size();
+    trigger->setAbsolute(absolute);
+    _triggers.push_back(trigger);
+    return trigger;
+}
+
+Trigger3D* Sensor::addTrigger(string name, string target, float lowThreshold, float highThreshold, bool absolute = false) {
+    Trigger3D* trigger = new Trigger3D(lowThreshold, highThreshold);
+    trigger->trigger->name = name;
+    trigger->trigger->target = target;
+    trigger->trigger->target_sid = _id;
+    trigger->trigger->trigger_index = (int)_triggers.size();
+    trigger->setAbsolute(absolute);
+    _triggers.push_back(trigger);
+    return trigger;
+}
+
+Trigger3D* Sensor::addTrigger(string name, string target, ofVec3f threshold, bool absolute = false) {
+    Trigger3D* trigger = new Trigger3D(threshold);
+    trigger->trigger->name = name;
+    trigger->trigger->target = target;
+    trigger->trigger->target_sid = _id;
+    trigger->trigger->trigger_index = (int)_triggers.size();
+    trigger->setAbsolute(absolute);
+    _triggers.push_back(trigger);
+    return trigger;
+}
+
+Trigger3D* Sensor::addTrigger(string name, string target, ofVec3f lowThreshold, ofVec3f highThreshold, bool absolute = false) {
+    Trigger3D* trigger = new Trigger3D(lowThreshold, highThreshold);
+    trigger->trigger->name = name;
+    trigger->trigger->target = target;
+    trigger->trigger->target_sid = _id;
+    trigger->trigger->trigger_index = (int)_triggers.size();
+    trigger->setAbsolute(absolute);
+    _triggers.push_back(trigger);
+    return trigger;
+}
+
 
 
 //
@@ -155,10 +219,6 @@ void Sensor::setCalibrationStatus(ofBuffer calibration) {
     _status.calibration.getData()[1] = calibration.getData()[1];
     _status.calibration.getData()[2] = calibration.getData()[2];
     _status.calibration.getData()[3] = calibration.getData()[3];
-}
-
-void Sensor::setActive(bool active) {
-    _status.active = active;
 }
 
 void Sensor::setBufferSizeMillis(uint64_t size) {
@@ -236,4 +296,8 @@ sensor_frame_t Sensor::getCurrentFrame() {
 
 sensor_status_t Sensor::getStatus() {
     return _status;
+}
+
+vector<Trigger3D *> Sensor::getTriggers() {
+    return _triggers;
 }

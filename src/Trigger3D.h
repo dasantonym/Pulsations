@@ -41,6 +41,7 @@ public:
     float getTriggerMax();
     float getTriggerMin();
     float getTriggerValue(float value, float threshold_high, float threshold_low, float mask);
+    sensor_trigger_3d_result_t getTriggerResult();
 
     sensor_trigger_3d_t* trigger;
     ofFastEvent<sensor_trigger_3d_result_t> triggerValueEvent;
@@ -49,13 +50,15 @@ private:
     bool _isRange;
     bool _isAbsolute;
 
+    bool _isActive;
+
     uint8_t _sensor_index;
     uint64_t _lastUpdate;
 
     ofVec3f _triggerValueLastMax;
     ofVec3f _triggerValue;
     ofVec3f _triggerFalloff;
-    ofVec3f _lastTriggerTime;
+    trigger_time_3d_t _lastTriggerTime;
 
     ofVec3f _trigger_debounce;
     ofVec3f _trigger_mask;

@@ -60,7 +60,6 @@ void DataTriggers::addFrame(sensor_frame_t inputFrame) {
     frame.acceleration = inputFrame.acceleration;
     frame.time_received = inputFrame.time_received;
     frame.time = inputFrame.time;
-    frame.data = inputFrame.data;
     frame.sensor_id = inputFrame.sensor_id;
     lock();
     _frames.push_back(frame);
@@ -131,16 +130,16 @@ vector<sensor_trigger_3d_result_t> DataTriggers::getAllTriggerResults() {
 
 sensor_trigger_3d_result_t DataTriggers::getTriggerResult(uint8_t index) {
     sensor_trigger_3d_result_t res;
-    Trigger3D *trigger = _triggers[index];
-    if (trigger->isTriggered()) {
+    if (index < _triggers.size()) {
+        Trigger3D *trigger = _triggers[index];
         res.triggerValue = trigger->getTrigger();
-        res.index = index;
+        res.trigger_index = 0;
         res.target_sid = trigger->trigger->target_sid;
         res.target = trigger->trigger->target;
         res.name = trigger->trigger->name;
         res.isTriggered = trigger->isTriggered();
         res.debounceStatus = trigger->getDebounceStatus();
-        res.sensor_index = trigger->getSensorIndex();
+        //res.sensor_index = trigger->getSensorIndex();
     }
     return res;
 }

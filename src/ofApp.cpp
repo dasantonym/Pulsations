@@ -3,8 +3,6 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofBackground(0);
-    
-    frameCount = 0;
 
     settings.load("settings.xml");
 
@@ -18,11 +16,9 @@ void ofApp::setup(){
         settings.setValue("layout", layoutName);
     }
 
-    _isRecordingLoop = false;
     _drawCurves = (bool) settings.getValue("ui:drawCurves", true);
-    _overdub = (bool) settings.getValue("record:overdub", true);
 
-    string version = "v0.1.0";
+    string version = "v0.2.0";
 
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
     gui->addHeader(":: PULSATIONS " + version + " ::");
@@ -30,14 +26,11 @@ void ofApp::setup(){
     gui->addFRM();
 
     gui->addToggle("Draw curves", _drawCurves);
-    gui->addToggle("Overdub", _overdub);
 
     ofxDatGuiFolder *osc = gui->addFolder("OSC", ofColor::white);
     osc->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
     osc->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
     osc->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
-    osc->addTextInput("Remote resp. IP", ofToString(settings.getValue("osc:responseIP", "192.168.0.255")));
-    osc->addTextInput("Remote resp. port", ofToString(settings.getValue("osc:responsePort", 7777)));
 
     oscSerial = new OscSerial();
     bool hasSerialOsc = oscSerial->setup("cu.usbserial-DN02N1QK", 57600);
@@ -55,10 +48,6 @@ void ofApp::setup(){
         midi->addToggle(midiPlayback->getPorts()[i], i == 0);
     }
 
-    // dataIn = new DataInput((uint32_t) settings.getValue("osc:inputPort", 8888));
-
-    dataTrigger = new DataTriggers();
-
     for (int i = 0; i < layout.get().getValue("layout:sensorcount", 3); i++) {
         string valuePath = "layout:sensor" + ofToString(i+1);
 
@@ -73,8 +62,6 @@ void ofApp::setup(){
                 layout.get().getValue(valuePath + ":buffer", 1000));
 
         for (int t = 0; t < layout.get().getValue(valuePath + ":triggercount", 1); t++) {
-            Trigger3D* trigger;
-
             string tid = valuePath + ":trigger" + ofToString(t+1);
             string target = layout.get().getValue(tid + ":target", "acceleration");
             string name = layout.get().getValue(tid + ":name", "abs" + ofToString(i+1));
@@ -120,6 +107,7 @@ void ofApp::setup(){
             valueLow.z = (float) layout.get().getValue(tid + ":low:z", 6.8f);
             triggerUI->addSlider("Low Z", rangeMin, rangeMax, valueLow.z);
 
+            Trigger3D* trigger;
             if (range) {
                 valueHigh.x = (float) layout.get().getValue(tid + ":high:x", 6.8f);
                 triggerUI->addSlider("High X",
@@ -133,17 +121,14 @@ void ofApp::setup(){
                 valueHigh.z = (float) layout.get().getValue(tid + ":high:z", 6.8f);
                 triggerUI->addSlider("High Z", rangeMin, rangeMax, valueHigh.z);
 
-                trigger = dataTrigger->addTrigger(name, target,
-                        layout.get().getValue(valuePath + ":sid", ofToString(i+1)), valueLow, valueHigh, absolute);
+                trigger = sensor->addTrigger(name, target, valueLow, valueHigh, absolute);
             } else {
-                trigger = dataTrigger->addTrigger(name, target,
-                        layout.get().getValue(valuePath + ":sid", ofToString(i+1)), valueLow, absolute);
+                trigger = sensor->addTrigger(name, target, valueLow, absolute);
             }
 
             trigger->setDebounce(debounce);
             trigger->setMask(mask);
             trigger->setFalloff(falloff);
-            trigger->setSensorInfo((uint8_t)i);
         }
 
         sensor->setGraph(ofPoint(40.f, 40.f + 160.f * i), ofGetWindowWidth() - 80.f, 140.f);
@@ -155,14 +140,10 @@ void ofApp::setup(){
     gui->onSliderEvent(this, &ofApp::onSliderEvent);
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
-    uiResponder.setup(settings.getValue("osc:responseIP", "192.168.0.255"), settings.getValue("osc:responsePort", 7777));
-    receiver.setup(settings.getValue("osc:inputPort", 8989));
+    receiver.setup(settings.getValue("osc:inputPort", 8888));
     sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
 
-    dataTrigger->startThread(true);
     midiPlayback->startThread(true);
-
-    // dataIn->startThread(true);
 }
 
 //--------------------------------------------------------------
@@ -170,7 +151,6 @@ void ofApp::update(){
     while (oscSerial->hasFrames()) {
         vector<sensor_frame_t> frames = oscSerial->getFrames();
         for (sensor_frame_t & frame : frames) {
-            dataTrigger->addFrame(frame);
             uint8_t idx = (uint8_t)(ofToInt(frame.sensor_id) - 1);
             if (idx >= 0 && idx < sensors.size()) {
                 sensors[idx]->addFrame(frame.time, frame.time_received, frame.acceleration, frame.orientation);
@@ -183,93 +163,17 @@ void ofApp::update(){
         sensor->setCalibrationStatus(status.calibration);
         sensor->update();
 
-        sensor_trigger_3d_result_t triggerResult = dataTrigger->getTriggerResult((uint8_t)(ofToInt(sensor->getSensorID())-1));
-        if (triggerResult.isTriggered) {
-            ofLogNotice() << "TRIGGER" << endl;
-            vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult, true);
-            for (NoteEvent & noteEvent : notes) {
-                if (_isRecordingLoop) {
-                    _loops[_loops.size() - 1].addNote(noteEvent);
+        for (Trigger3D * trigger : sensor->getTriggers()) {
+            sensor_trigger_3d_result_t triggerResult = trigger->getTriggerResult();
+            if (triggerResult.isTriggered) {
+                vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult, false);
+                for (NoteEvent & noteEvent : notes) {
+                    midiPlayback->addNote(noteEvent);
                 }
-                midiPlayback->addNote(noteEvent);
             }
         }
+
     }
-
-
-
-    /*
-    ofxOscBundle bundle;
-    uint8_t count = 0;
-    uint64_t frame_time = time.getTimeMillis();
-
-    for (uint16_t i = 0; i < dataIn->sourceCount(); i++) {
-        if (dataIn->sourceHasFrames(i)) {
-            sensor_frame_t frame = dataIn->getNextFrameFromSource(i);
-            dataTrigger->addFrame(frame);
-            sensor_trigger_3d_result_t triggerResult = dataTrigger->getTriggerResult((uint8_t)i);
-            vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult, true);
-            for (NoteEvent & noteEvent : notes) {
-                if (_isRecordingLoop) {
-                    _loops[_loops.size() - 1].addNote(noteEvent);
-                }
-                midiPlayback->addNote(noteEvent);
-            }
-        }
-    }
-
-    while (receiver.hasWaitingMessages()) {
-        ofxOscMessage msg;
-        receiver.getNextMessage(msg);
-
-        remote_command_t response = _remoteControl.parseCommand(msg);
-        if (response.command != RemoteControl::COM_UNKNOWN) {
-            ofxOscMessage res;
-            res.setAddress(msg.getAddress());
-            switch (response.command) {
-                case RemoteControl::COM_TOGGLE_RECORD_LOOP:
-                    toggleLoop((msg.getArgAsInt(0) == 1));
-                    res.addBoolArg(_isRecordingLoop);
-                    uiResponder.sendMessage(res, true);
-                    break;
-                case RemoteControl::COM_TOGGLE_OVERDUB:
-                    _overdub = (msg.getArgAsInt(0) == 1);
-                    res.addBoolArg(_overdub);
-                    uiResponder.sendMessage(res, true);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    
-    if (frameCount >= 200) {
-        ofxOscMessage res;
-        res.setAddress("/com/0");
-        res.addIntArg(_isRecordingLoop);
-        uiResponder.sendMessage(res, true);
-        res.clear();
-        res.setAddress("/com/1");
-        res.addIntArg(_overdub);
-        uiResponder.sendMessage(res, true);
-        
-        frameCount = 0;
-    }
-
-    for (NoteLoop & loop : _loops) {
-        if (loop.isMuted() || loop.getDuration() == 0) {
-            continue;
-        }
-
-        loop.update();
-    }
-
-    if (bundle.getMessageCount() > 0) {
-        sender.sendBundle(bundle);
-    }
-    
-    frameCount += 1;
-     */
 }
 
 //--------------------------------------------------------------
@@ -279,41 +183,6 @@ void ofApp::draw(){
             sensor->draw();
         }
     }
-
-    dataTrigger->draw();
-/*
-    if (_isRecordingLoop && _loops.size() == 0) {
-        ofPushStyle();
-        ofSetColor(255, 0, 0);
-        ofDrawBitmapString("REC LOOP", 40.f, ofGetWindowHeight() - 60.f);
-        ofPopStyle();
-    } else if (_loops.size() > 0 && !_isRecordingLoop) {
-        ofPushStyle();
-        ofSetColor(0, 255, 0);
-        ofDrawBitmapString("PLAY LOOP", 40.f, ofGetWindowHeight() - 60.f);
-        ofPopStyle();
-    } else if (_loops.size() > 0 && _isRecordingLoop) {
-        ofPushStyle();
-        ofSetColor(255, 180, 0);
-        ofDrawBitmapString("OVERDUB LOOP", 40.f, ofGetWindowHeight() - 60.f);
-        ofPopStyle();
-    }
-     */
-}
-
-//--------------------------------------------------------------
-void ofApp::toggleLoop(bool loop){
-    _isRecordingLoop = loop;
-    /*
-    if (_isRecordingLoop) {
-        NoteLoop loop = NoteLoop();
-        loop.setMidiOut(midiOut);
-        loop.setRecord(true);
-        _loops.push_back(loop);
-    } else {
-        _loops[_loops.size() - 1].setRecord(false);
-    }
-     */
 }
 
 //--------------------------------------------------------------
@@ -322,8 +191,7 @@ void ofApp::keyPressed(int key){
         case 'f':
             ofToggleFullscreen();
             break;
-        case ' ':
-            toggleLoop(!_isRecordingLoop);
+        default:
             break;
     }
 }
@@ -344,9 +212,6 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
     if (e.target->getLabel() == "Draw curves") {
         _drawCurves = !_drawCurves;
         settings.setValue("ui:drawCurves", _drawCurves);
-    } else if (e.target->getLabel() == "Overdub") {
-        _overdub = !_overdub;
-        settings.setValue("record:overdub", _overdub);
     }
 }
 

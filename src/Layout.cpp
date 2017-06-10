@@ -32,6 +32,10 @@ void Layout::init(string name) {
             _layout.setValue(tid + ":falloff:y", .0f);
             _layout.setValue(tid + ":falloff:z", .0f);
 
+            _layout.setValue(tid + ":mask:x", .0f);
+            _layout.setValue(tid + ":mask:y", .0f);
+            _layout.setValue(tid + ":mask:z", .0f);
+
             _layout.setValue(tid + ":low:x", 6.f);
             _layout.setValue(tid + ":midi:x:channel", 1 + t * 3);
             _layout.setValue(tid + ":midi:x:pitch", .5f);
