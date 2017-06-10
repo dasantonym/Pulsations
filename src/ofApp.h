@@ -3,13 +3,17 @@
 #include "ofMain.h"
 #include "ofxDatGui.h"
 #include "ofxOscSender.h"
+#include "ofxOscReceiver.h"
+#include "ofxXmlSettings.h"
 
 #include "Version.h"
-#include "DataInput.h"
+#include "Layout.h"
+#include "Sensor.h"
 #include "DataTriggers.h"
 #include "MidiPlayback.h"
 #include "NoteGenerator.h"
 #include "RemoteControl.h"
+#include "OscSerial.h"
 
 class ofApp : public ofBaseApp{
 
@@ -33,9 +37,9 @@ public:
     ofxOscSender sender;
     ofxOscSender uiResponder;
     ofxOscReceiver receiver;
+    OscSerial *oscSerial;
 
     TimeKeeper time;
-    DataInput *dataIn;
     DataTriggers *dataTrigger;
     MidiPlayback *midiPlayback;
     MidiOut *midiOut;
@@ -45,7 +49,7 @@ public:
     vector<sensor_trigger_3d_t*> _triggers;
 
     vector<sensor_source_t> sources;
-    vector<Sensor> sensors;
+    vector<Sensor *> sensors;
     vector<NoteLoop> _loops;
     vector<NoteEvent> _openNotes;
 

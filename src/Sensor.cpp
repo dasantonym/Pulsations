@@ -16,7 +16,7 @@ Sensor::Sensor(string id, string name, string type, uint8_t index) {
     _type = type;
     _index = index;
 
-    _bufferTimeMillis = 1000;
+    _bufferTimeMillis = 2000;
 
     _status.active = true;
     _status.calibration = { 0x00, 0x00, 0x00, 0x00 };
@@ -45,7 +45,7 @@ void Sensor::draw() {
     }
 
     if (hasFrames()) {
-        ofDrawBitmapString(getDataAsString(), 40.f, 40.f + 90.f * (_index - 1));
+        ofDrawBitmapString(getDataAsString(), 40.f, 40.f + 90.f * _index);
 
         ofPoint x1 = ofPoint(-20.f, 25.f);
         ofPoint x2 = ofPoint(20.f, 25.f);
@@ -56,21 +56,21 @@ void Sensor::draw() {
         ofSetColor(180, 0, 0);
 
         ofPushMatrix();
-        ofTranslate(40.f + 35.f, 40.f + 100.f * _index - 35.f);
+        ofTranslate(40.f + 35.f, 40.f + 100.f * (_index+1) - 35.f);
         ofRotate(getCurrentFrame().orientation.x);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
 
         ofSetColor(180, 180, 0);
         ofPushMatrix();
-        ofTranslate(40.f + 35.f + 70.f, 40.f + 100.f * _index - 35.f);
+        ofTranslate(40.f + 35.f + 70.f, 40.f + 100.f * (_index+1) - 35.f);
         ofRotate(getCurrentFrame().orientation.y);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
 
         ofSetColor(0, 180, 180);
         ofPushMatrix();
-        ofTranslate(40.f + 35.f + 70.f * 2.f, 40.f + 100.f * _index - 35.f);
+        ofTranslate(40.f + 35.f + 70.f * 2.f, 40.f + 100.f * (_index+1) - 35.f);
         ofRotate((getCurrentFrame().orientation.z * -1.f) + 90.f);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
@@ -130,14 +130,13 @@ void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleratio
     _frames.push_back(frame);
 
     uint32_t count = 0;
-    while (count < _frames.size() && time_received - _frames[count].time > _bufferTimeMillis) {
+    while (count < _frames.size() && time_received - _frames[count].time_received > _bufferTimeMillis) {
         count++;
     }
-    if (count > 0) {
-        _frames.erase(_frames.begin(), _frames.begin() + count);
-    }
 
-    update();
+    if (count) {
+        _frames.erase(_frames.begin(), _frames.begin() + count - 1);
+    }
 }
 
 
@@ -152,7 +151,10 @@ void Sensor::setGraph(ofPoint position, float width, float height) {
 }
 
 void Sensor::setCalibrationStatus(ofBuffer calibration) {
-    _status.calibration = calibration;
+    _status.calibration.getData()[0] = calibration.getData()[0];
+    _status.calibration.getData()[1] = calibration.getData()[1];
+    _status.calibration.getData()[2] = calibration.getData()[2];
+    _status.calibration.getData()[3] = calibration.getData()[3];
 }
 
 void Sensor::setActive(bool active) {
@@ -160,7 +162,7 @@ void Sensor::setActive(bool active) {
 }
 
 void Sensor::setBufferSizeMillis(uint64_t size) {
-    _bufferTimeMillis = size;
+    //_bufferTimeMillis = size;
 }
 
 
@@ -201,16 +203,21 @@ string Sensor::getDataAsString() {
 
 string Sensor::getCalibrationStatus() {
     string result = "";
+    uint8_t i = 0;
     for (char &c : _status.calibration) {
-        if (c == 0x1) {
+        if (i > 3) {
+            continue;
+        }
+        if (c == 0x01) {
             result += "1";
-        } else if (c == 0x2) {
+        } else if (c == 0x02) {
             result += "2";
-        } else if (c == 0x3) {
+        } else if (c == 0x03) {
             result += "3";
         } else {
             result += "0";
         }
+        i++;
     }
     return result;
 }

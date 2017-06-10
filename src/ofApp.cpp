@@ -39,6 +39,12 @@ void ofApp::setup(){
     osc->addTextInput("Remote resp. IP", ofToString(settings.getValue("osc:responseIP", "192.168.0.255")));
     osc->addTextInput("Remote resp. port", ofToString(settings.getValue("osc:responsePort", 7777)));
 
+    oscSerial = new OscSerial();
+    bool hasSerialOsc = oscSerial->setup("cu.usbserial-DN02N1QK", 57600);
+    if (hasSerialOsc) {
+        oscSerial->startThread(true);
+    }
+
     midiPlayback = new MidiPlayback();
     midiPlayback->setMidi(0);
 
@@ -49,19 +55,20 @@ void ofApp::setup(){
         midi->addToggle(midiPlayback->getPorts()[i], i == 0);
     }
 
-    dataIn = new DataInput((uint32_t) settings.getValue("osc:inputPort", 8888));
+    // dataIn = new DataInput((uint32_t) settings.getValue("osc:inputPort", 8888));
+
     dataTrigger = new DataTriggers();
 
     for (int i = 0; i < layout.get().getValue("layout:sensorcount", 3); i++) {
         string valuePath = "layout:sensor" + ofToString(i+1);
 
-        Sensor *sensor = dataIn->addBNO055Source(layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)),
+        Sensor *sensor = new Sensor(layout.get().getValue(valuePath + ":sid", ofToString(i+1)),
                 layout.get().getValue(valuePath + ":name", "BNO055 IMU Fusion Sensor"),
-                layout.get().getValue(valuePath + ":type", "bno055"), i+1);
+                layout.get().getValue(valuePath + ":type", "u"), i);
 
         ofxDatGuiFolder *sensorUI = gui->addFolder("BNO055 Sensor #" + ofToString(i + 1), ofColor::yellow);
         sensorUI->addTextInput("Sensor ID #" + ofToString(i+1),
-                layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)));
+                layout.get().getValue(valuePath + ":sid", ofToString(i+1)));
         sensorUI->addSlider("Buffer (ms) #" + ofToString(i+1), 10, 10000,
                 layout.get().getValue(valuePath + ":buffer", 1000));
 
@@ -127,39 +134,71 @@ void ofApp::setup(){
                 triggerUI->addSlider("High Z", rangeMin, rangeMax, valueHigh.z);
 
                 trigger = dataTrigger->addTrigger(name, target,
-                        layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)), valueLow, valueHigh, absolute);
+                        layout.get().getValue(valuePath + ":sid", ofToString(i+1)), valueLow, valueHigh, absolute);
             } else {
                 trigger = dataTrigger->addTrigger(name, target,
-                        layout.get().getValue(valuePath + ":sid", "10" + ofToString(i)), valueLow, absolute);
+                        layout.get().getValue(valuePath + ":sid", ofToString(i+1)), valueLow, absolute);
             }
 
             trigger->setDebounce(debounce);
             trigger->setMask(mask);
             trigger->setFalloff(falloff);
-            trigger->setSensorInfo(i+1);
+            trigger->setSensorInfo((uint8_t)i);
         }
 
         sensor->setGraph(ofPoint(40.f, 40.f + 160.f * i), ofGetWindowWidth() - 80.f, 140.f);
 
-        //sensors.push_back(sensor);
+        sensors.push_back(sensor);
     }
 
     gui->onButtonEvent(this, &ofApp::onButtonEvent);
     gui->onSliderEvent(this, &ofApp::onSliderEvent);
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
-    uiResponder.setup(settings.getValue("osc:responseIP", "192.168.0.255"),
-                      settings.getValue("osc:responsePort", 7777));
+    uiResponder.setup(settings.getValue("osc:responseIP", "192.168.0.255"), settings.getValue("osc:responsePort", 7777));
     receiver.setup(settings.getValue("osc:inputPort", 8989));
     sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
 
-    dataIn->startThread(true);
     dataTrigger->startThread(true);
     midiPlayback->startThread(true);
+
+    // dataIn->startThread(true);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    while (oscSerial->hasFrames()) {
+        vector<sensor_frame_t> frames = oscSerial->getFrames();
+        for (sensor_frame_t & frame : frames) {
+            dataTrigger->addFrame(frame);
+            uint8_t idx = (uint8_t)(ofToInt(frame.sensor_id) - 1);
+            if (idx >= 0 && idx < sensors.size()) {
+                sensors[idx]->addFrame(frame.time, frame.time_received, frame.acceleration, frame.orientation);
+            }
+        }
+    }
+
+    for (Sensor * sensor : sensors) {
+        sensor_status_t status = oscSerial->getStatus((uint8_t)(ofToInt(sensor->getSensorID())-1));
+        sensor->setCalibrationStatus(status.calibration);
+        sensor->update();
+
+        sensor_trigger_3d_result_t triggerResult = dataTrigger->getTriggerResult((uint8_t)(ofToInt(sensor->getSensorID())-1));
+        if (triggerResult.isTriggered) {
+            ofLogNotice() << "TRIGGER" << endl;
+            vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult, true);
+            for (NoteEvent & noteEvent : notes) {
+                if (_isRecordingLoop) {
+                    _loops[_loops.size() - 1].addNote(noteEvent);
+                }
+                midiPlayback->addNote(noteEvent);
+            }
+        }
+    }
+
+
+
+    /*
     ofxOscBundle bundle;
     uint8_t count = 0;
     uint64_t frame_time = time.getTimeMillis();
@@ -230,16 +269,19 @@ void ofApp::update(){
     }
     
     frameCount += 1;
+     */
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     if (_drawCurves) {
-        dataIn->draw();
+        for (Sensor * sensor : sensors) {
+            sensor->draw();
+        }
     }
 
     dataTrigger->draw();
-
+/*
     if (_isRecordingLoop && _loops.size() == 0) {
         ofPushStyle();
         ofSetColor(255, 0, 0);
@@ -256,11 +298,13 @@ void ofApp::draw(){
         ofDrawBitmapString("OVERDUB LOOP", 40.f, ofGetWindowHeight() - 60.f);
         ofPopStyle();
     }
+     */
 }
 
 //--------------------------------------------------------------
 void ofApp::toggleLoop(bool loop){
     _isRecordingLoop = loop;
+    /*
     if (_isRecordingLoop) {
         NoteLoop loop = NoteLoop();
         loop.setMidiOut(midiOut);
@@ -269,6 +313,7 @@ void ofApp::toggleLoop(bool loop){
     } else {
         _loops[_loops.size() - 1].setRecord(false);
     }
+     */
 }
 
 //--------------------------------------------------------------
@@ -318,7 +363,7 @@ void ofApp::onSliderEvent(ofxDatGuiSliderEvent e) {
         id = 2;
     }
     if (id >= 0) {
-        sensors[id].setBufferSizeMillis((uint64_t) e.target->getValue());
+        //sensors[id].setBufferSizeMillis((uint64_t) e.target->getValue());
         // settings.setValue("layout:sensor1" + ofToString(id + 1) + ":buffer", e.target->getValue());
     }
 }

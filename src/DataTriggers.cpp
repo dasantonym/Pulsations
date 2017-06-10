@@ -69,8 +69,8 @@ void DataTriggers::addFrame(sensor_frame_t inputFrame) {
 
 void DataTriggers::threadedFunction() {
     while (isThreadRunning()) {
+        lock();
         while (_frames.size() > 0) {
-            lock();
             for (Trigger3D *trigger : _triggers) {
                 if (trigger->trigger->target == "acceleration" && trigger->trigger->target_sid == _frames[0].sensor_id) {
                     trigger->update(_frames[0].acceleration);
@@ -80,9 +80,9 @@ void DataTriggers::threadedFunction() {
                 }
             }
             _frames.erase(_frames.begin(), _frames.begin() + 1);
-            unlock();
         }
-        milliseconds slt(10);
+        unlock();
+        milliseconds slt(1);
         std::this_thread::sleep_for(slt);
     }
     ofLogNotice() << "DataTriggers exited" << endl;

@@ -16,9 +16,9 @@ void Layout::init(string name) {
     for (int i = 0; i < _layout.getValue("layout:sensorcount", 2); ++i) {
         string valuePath = "layout:sensor" + ofToString(i+1);
 
-        _layout.setValue(valuePath + ":sid", "10" + ofToString(i));
+        _layout.setValue(valuePath + ":sid", ofToString(i+1));
         _layout.setValue(valuePath + ":name", "BNO 055 IMU Fusion Sensor");
-        _layout.setValue(valuePath + ":type", "bno055");
+        _layout.setValue(valuePath + ":type", "u");
         _layout.setValue(valuePath + ":triggercount", 1);
 
         for (int t = 0; t < _layout.getValue(valuePath + ":trigger", 1); ++t) {

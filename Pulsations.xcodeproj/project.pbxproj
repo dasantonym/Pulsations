@@ -7,44 +7,77 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0220BA19066C88339369ED4D /* NoteEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F08C45FA7A03BD20520721B /* NoteEvent.cpp */; };
 		0546D1A38E13BD319CC9755B /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BF3AA0D4FAA89D0F8A0E545 /* OscReceivedElements.cpp */; };
 		0BFC9C20FD7E3C8D5873AA97 /* ofxMidiIn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DD359247F3ED1550D8BB5C9 /* ofxMidiIn.cpp */; };
+		125506CD3E5F428AAFE5CC65 /* ofxTCPManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F399B91E98DC31CDA6DDACB4 /* ofxTCPManager.cpp */; };
+		1298066D39CE7EC3DA60256A /* snappy-stubs-internal.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2FB74FF42B08FC378F74B2B7 /* snappy-stubs-internal.cc */; };
+		1CC07C1A616F29EB8EEC3D21 /* SearchPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8D76B424A6DF4D70AACCDBAE /* SearchPath.cpp */; };
+		1DE95F1A222E13F46E13BBF5 /* RemoteControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EA1A0F72ECDF1CE6BAA35AB /* RemoteControl.cpp */; };
+		21AE5ED8548D14CB92D6223F /* NoteGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CB4852DC14A6B6FE1304C2F /* NoteGenerator.cpp */; };
 		21CDB58613992D2404983D3F /* RtMidi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 202FDD3A01CBDDCFE807CCEE /* RtMidi.cpp */; };
+		2F34054252AB0F064B7883F5 /* Layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01DA24B272F55E10A90B946D /* Layout.cpp */; };
+		347D67CCF4C7C7725118DD59 /* ByteBufferStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6C68D431AF8FD1A9E2DCFF2 /* ByteBufferStream.cpp */; };
+		3BFC7CF50BEB0307821B90A6 /* lz4.c in Sources */ = {isa = PBXBuildFile; fileRef = 7913239832BBBF6B56ED2600 /* lz4.c */; };
+		3C9A355A55D68A8E882FEF85 /* RegexPathFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13D68F0C2CAE7809D621924C /* RegexPathFilter.cpp */; };
+		494950167FFB212CEB9ECD0A /* ByteBufferWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C9BE77ADAEF79E623523E9D9 /* ByteBufferWriter.cpp */; };
 		4ADB88E2FB52E76A471065DE /* ofxOscParameterSync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0AED834CE4DEC5260AF302A2 /* ofxOscParameterSync.cpp */; };
 		510CAFE035E576A4E1502D52 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6DEF695B88BA5FAACEAA937 /* UdpSocket.cpp */; };
 		5864AD82E20F15536D054EA3 /* ofxOscMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF49D76C45D5DB505A234880 /* ofxOscMessage.cpp */; };
-		58AAA10A316F680076FC0002 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58AAA0CA209626B2C020D1E7 /* CoreMIDI.framework */; };
-		58AAA1E5F92C968E1E512269 /* Layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAA54BA76D2C723F09082F /* Layout.cpp */; };
-		58AAA3C16E09A7650C471593 /* Trigger3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAAE3803E39282D5306C12 /* Trigger3D.cpp */; };
-		58AAA76A942458E5DADFB4D5 /* MidiOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAA3E6EE7CF4B263237E1A /* MidiOut.cpp */; };
-		58AAA8E8B8D04B25F346F7B3 /* SensorGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAA01720839841899D00BA /* SensorGraph.cpp */; };
-		58AAA9E0FE3840D0F96D24A1 /* MidiPlayback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAA22388E56AD791D2660B /* MidiPlayback.cpp */; };
-		58AAAA427EFA2166EEBF3C28 /* DataInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAA8B1A6AB18EC13864723 /* DataInput.cpp */; };
-		58AAAA64F045CE1E6968856D /* DataTriggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAAEF7CE58F782A027BFFB /* DataTriggers.cpp */; };
-		58AAAA9DE31DBB6316CB27DA /* NoteLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAA3C3732C06BB13EFEE9A /* NoteLoop.cpp */; };
-		58AAAD30E0E3D17CC9CCF9FB /* NoteGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAA9CE54DBE714CAF0FA10 /* NoteGenerator.cpp */; };
-		58AAAE21328E8D622635F231 /* RemoteControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAAD8E6F5077477D67FF6A /* RemoteControl.cpp */; };
-		58AAAE356CB2A33F18DB93E0 /* NoteEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAA6849C02360632FCE842 /* NoteEvent.cpp */; };
-		58AAAFC44EC22BCB6D63AB77 /* Sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58AAA404FB18D64E711FBA42 /* Sensor.cpp */; };
+		58AAA42E65EB3437FEDECA4E /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58AAAEB7FF464A0A1EA45797 /* CoreMIDI.framework */; };
 		5A4349E9754D6FA14C0F2A3A /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FC5DA1C87211D4F6377DA719 /* tinyxmlparser.cpp */; };
+		5BB82711925A3764235C2CEB /* FileExtensionFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD291FB03292C6D352C26FE /* FileExtensionFilter.cpp */; };
+		62509F39EA6197BEA0194276 /* ByteBufferReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 021CAF811F031FFBDFB18797 /* ByteBufferReader.cpp */; };
 		62545D179C94265CA1389D4A /* OscOutboundPacketStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 63A47AC60FFAFC3BF093EC0F /* OscOutboundPacketStream.cpp */; };
+		636DAC49BE6C8E3C2C59B8E0 /* NoteLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3F548F79241870F153D7E27 /* NoteLoop.cpp */; };
 		63B57AC5BF4EF088491E0317 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 50DF87D612C5AAE17AAFA6C0 /* ofxXmlSettings.cpp */; };
 		640279EE111671BD026CB013 /* ofxOscReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2FAC65C491D4231379F3298 /* ofxOscReceiver.cpp */; };
+		66A80FD312926DEB8C9FE7F6 /* ByteBufferUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FE5B3B19544657B6F9CCCA03 /* ByteBufferUtils.cpp */; };
+		66CA411C5A9664E27326BF36 /* ofxTCPServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C085E327DAB912CFA2A443D /* ofxTCPServer.cpp */; };
 		67FE4C7B15C2F0478C8126C2 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B361208CD4107E479F04E7B /* NetworkingUtils.cpp */; };
 		72A929D3561B8232A182ABFC /* ofxOscBundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 65EEFA3DA3526E9CDD9C21F9 /* ofxOscBundle.cpp */; };
+		75DAB2C0241361FA996D226A /* MidiPlayback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8827C9F242D2DCC2B176F0E /* MidiPlayback.cpp */; };
+		790CD6606BE3D38A9AD52AF1 /* URIEncoding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60F63F5C68476F0C9095B247 /* URIEncoding.cpp */; };
 		83D9F930112E0944444124EE /* ofxMidiOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F77E5C73A62E2E77C78EC6 /* ofxMidiOut.cpp */; };
+		84FED53B4CEB4C25C00E172B /* DirectoryFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E362E12547978AB05ABA9C57 /* DirectoryFilter.cpp */; };
+		868BEDC19B53FD512D7E3100 /* snappy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7362D621E1B9A92F5F4AC73B /* snappy.cc */; };
+		86B56E23D787A5F24641398F /* LinkFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 370DA13018950E5BFF8CF171 /* LinkFilter.cpp */; };
 		879A251454401BC0B6E4F238 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9BFFBBF4CC43DEE890B3C3E /* OscTypes.cpp */; };
+		899BAF53175868463FE1B029 /* RecursiveDirectoryIteratorStategies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F27637AABA89A235C5974D56 /* RecursiveDirectoryIteratorStategies.cpp */; };
+		8D8EDF5CF2AFFD8206D98FCA /* MidiOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B7E6FBF611D6686B753FD3EA /* MidiOut.cpp */; };
 		8F5205AEF8861EF234F0651A /* ofxOscSender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81967292BFC87A0144BD32C6 /* ofxOscSender.cpp */; };
 		933A2227713C720CEFF80FD9 /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B40EDA85BEB63E46785BC29 /* tinyxml.cpp */; };
+		93640C223A2F5BEAD6DA2E35 /* Compression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FC8E2266FE2F5545775A16D /* Compression.cpp */; };
+		960D20B191346612D5C05A6A /* ofxTCPClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF88F02779DD820913ACEA06 /* ofxTCPClient.cpp */; };
 		9CF4130A7E6DA19A3DC42B9A /* ofxSmartFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C954E0E8B7DB9D6983309883 /* ofxSmartFont.cpp */; };
 		9D44DC88EF9E7991B4A09951 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 832BDC407620CDBA568B713D /* tinyxmlerror.cpp */; };
+		ACA2275EC67328437ED72910 /* OscSerial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CD845B860A278E86EBBF69D /* OscSerial.cpp */; };
 		ADE367465D2A8EBAD4C7A8D9 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADD194746185E2DA11468377 /* IpEndpointName.cpp */; };
+		B1BF03D79762719793CC9F1A /* SLIPEncoding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1616DA13ECD5FC9DB4D5714 /* SLIPEncoding.cpp */; };
+		B3E6D60405574847412D7441 /* HiddenFileFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FCAF85B857266C511DB50341 /* HiddenFileFilter.cpp */; };
+		B7E0003B826CBA379A3F66E5 /* PathFilterCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5114D2AF276E4E6E9A67B342 /* PathFilterCollection.cpp */; };
+		BCF45E588F6C24FFCE0FA80B /* DataInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4537FF365F4C6A1F291F2A00 /* DataInput.cpp */; };
+		BE177617474F11F05E9260FC /* DirectoryWatcherManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B6179498D0110BD2E161373 /* DirectoryWatcherManager.cpp */; };
+		BFE673E52FC8E0F5B8758F87 /* SensorGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7B6705D0F4966C1BCBDFC9BE /* SensorGraph.cpp */; };
 		C4782ECC372420ACE0615B74 /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BC8881B3C8C0A1C45F042E7A /* OscPrintReceivedElements.cpp */; };
+		C7C084E969FC01CD49093B8C /* Sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 920A200958CDB5BAFA4700BC /* Sensor.cpp */; };
 		C9466C434D1CF8AB968D298D /* ofxDatGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26490D7CC31EF7D6ED5F925A /* ofxDatGui.cpp */; };
+		CDB5B1D2D12F42502906F30F /* DeviceFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00F3330A5DEBD082CEE0C12C /* DeviceFilter.cpp */; };
+		CEFD3CCAB8B3251DFCAAA0EE /* DirectoryUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A967D1FAFA98A7CBBFA4F55 /* DirectoryUtils.cpp */; };
 		D3C1C48E59CAA2D68C0DD477 /* ofxDatGuiComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A3E3B8F332A1A3C7EDF4998 /* ofxDatGuiComponent.cpp */; };
+		D81A435CE7FDF51B41956210 /* snappy-sinksource.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9A430D6BD10DC31AE2D07DA0 /* snappy-sinksource.cc */; };
+		D932A5A24FCF08AE510A265D /* ByteBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93384835C77BD4299F8A7F90 /* ByteBuffer.cpp */; };
+		DFA0F30B1193D5DC1BB53E5E /* Base64Encoding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9D639BA31583580D80CFE15D /* Base64Encoding.cpp */; };
+		E2564CF7DDB3713772BB682E /* ofxUDPManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35BB9BB90DBABFD3B39F8DB6 /* ofxUDPManager.cpp */; };
+		E2C54FD4C85A860582282F7C /* RecursiveDirectoryIterator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E95C4518AEDCDBEA357754B0 /* RecursiveDirectoryIterator.cpp */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1D0A3A1BDC003C02F2 /* main.cpp */; };
 		E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */; };
+		E6D314829A5CB45717C872CC /* Trigger3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE8141C7BAB8E70C3BA94C0D /* Trigger3D.cpp */; };
+		EB4F14C4AE3B3EFD04520383 /* DirectoryWatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 12A42DF3BFDE28A4818C2EC4 /* DirectoryWatcher.cpp */; };
+		F8359D34C308C97119F91488 /* DataTriggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79D4ACD1CA6544C1756A2289 /* DataTriggers.cpp */; };
+		F953E11952BFF8C207418550 /* HexBinaryEncoding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22565CAF8FFEF25C805A438F /* HexBinaryEncoding.cpp */; };
+		FE9170FE54D704DF97B0E5BD /* COBSEncoding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4164C6C6CE5115889A99F42C /* COBSEncoding.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,101 +111,160 @@
 
 /* Begin PBXFileReference section */
 		00D6D32B84B099226431108C /* ofxOsc.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxOsc.h; path = ../../../addons/ofxOsc/src/ofxOsc.h; sourceTree = SOURCE_ROOT; };
+		00F3330A5DEBD082CEE0C12C /* DeviceFilter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = DeviceFilter.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/DeviceFilter.cpp; sourceTree = SOURCE_ROOT; };
+		01DA24B272F55E10A90B946D /* Layout.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Layout.cpp; path = src/Layout.cpp; sourceTree = SOURCE_ROOT; };
 		01DCC0911400F9ACF5B65578 /* ofxXmlSettings.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxXmlSettings.h; path = ../../../addons/ofxXmlSettings/src/ofxXmlSettings.h; sourceTree = SOURCE_ROOT; };
+		021CAF811F031FFBDFB18797 /* ByteBufferReader.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ByteBufferReader.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/ByteBufferReader.cpp; sourceTree = SOURCE_ROOT; };
 		029684CF678F70F6D3537A29 /* OscOutboundPacketStream.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscOutboundPacketStream.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscOutboundPacketStream.h; sourceTree = SOURCE_ROOT; };
 		04C339FF9ADCF05DF2DA62A3 /* ofxDatGuiTextInputField.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiTextInputField.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiTextInputField.h; sourceTree = SOURCE_ROOT; };
 		04F77E5C73A62E2E77C78EC6 /* ofxMidiOut.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxMidiOut.cpp; path = ../../../addons/ofxMidi/src/ofxMidiOut.cpp; sourceTree = SOURCE_ROOT; };
 		05F6CF127D4A621113D4A62F /* ofxMidi.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxMidi.h; path = ../../../addons/ofxMidi/src/ofxMidi.h; sourceTree = SOURCE_ROOT; };
+		08401BD1A5AEF44AFF422B23 /* ByteBufferStream.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ByteBufferStream.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/ByteBufferStream.h; sourceTree = SOURCE_ROOT; };
 		0A42C807BEF3A18E8E105A3B /* ofxDatGuiTimeGraph.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiTimeGraph.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiTimeGraph.h; sourceTree = SOURCE_ROOT; };
 		0AED834CE4DEC5260AF302A2 /* ofxOscParameterSync.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxOscParameterSync.cpp; path = ../../../addons/ofxOsc/src/ofxOscParameterSync.cpp; sourceTree = SOURCE_ROOT; };
+		0B6179498D0110BD2E161373 /* DirectoryWatcherManager.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = DirectoryWatcherManager.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/DirectoryWatcherManager.cpp; sourceTree = SOURCE_ROOT; };
+		0C166BBD08D3B35CB0D77592 /* Version.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Version.h; path = src/Version.h; sourceTree = SOURCE_ROOT; };
+		0FC82546C315D104CC8178D7 /* PathFilterCollection.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = PathFilterCollection.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/PathFilterCollection.h; sourceTree = SOURCE_ROOT; };
+		12A42DF3BFDE28A4818C2EC4 /* DirectoryWatcher.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = DirectoryWatcher.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/DirectoryWatcher.cpp; sourceTree = SOURCE_ROOT; };
+		13D68F0C2CAE7809D621924C /* RegexPathFilter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = RegexPathFilter.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/RegexPathFilter.cpp; sourceTree = SOURCE_ROOT; };
+		14290ED8DE68778AE3023FBC /* LinkFilter.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = LinkFilter.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/LinkFilter.h; sourceTree = SOURCE_ROOT; };
+		181F02B531162F6039F6ADC2 /* DirectoryWatcher.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = DirectoryWatcher.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/DirectoryWatcher.h; sourceTree = SOURCE_ROOT; };
 		1A3E3B8F332A1A3C7EDF4998 /* ofxDatGuiComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxDatGuiComponent.cpp; path = ../../../addons/ofxDatGui/src/core/ofxDatGuiComponent.cpp; sourceTree = SOURCE_ROOT; };
 		1B6880421FC381A2DD71AB8A /* ofxMidiEvents.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxMidiEvents.h; path = ../../../addons/ofxMidi/src/ofxMidiEvents.h; sourceTree = SOURCE_ROOT; };
+		1C011DA756FF131FC46A2907 /* FileExtensionFilter.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = FileExtensionFilter.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/FileExtensionFilter.h; sourceTree = SOURCE_ROOT; };
+		1C085E327DAB912CFA2A443D /* ofxTCPServer.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxTCPServer.cpp; path = ../../../addons/ofxNetwork/src/ofxTCPServer.cpp; sourceTree = SOURCE_ROOT; };
+		1DFA26F2C6BBD1B8AC24C0B1 /* ofxNetworkUtils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxNetworkUtils.h; path = ../../../addons/ofxNetwork/src/ofxNetworkUtils.h; sourceTree = SOURCE_ROOT; };
+		1E8B79D0091B95C305295952 /* URIEncoding.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = URIEncoding.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/URIEncoding.h; sourceTree = SOURCE_ROOT; };
 		202FDD3A01CBDDCFE807CCEE /* RtMidi.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = RtMidi.cpp; path = ../../../addons/ofxMidi/libs/RtMidi.cpp; sourceTree = SOURCE_ROOT; };
 		20F35AFADAF0068B067E713F /* OscReceivedElements.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscReceivedElements.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.h; sourceTree = SOURCE_ROOT; };
 		21E1E3071CB7B11914428B62 /* ofxDatGuiThemes.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiThemes.h; path = ../../../addons/ofxDatGui/src/themes/ofxDatGuiThemes.h; sourceTree = SOURCE_ROOT; };
+		22565CAF8FFEF25C805A438F /* HexBinaryEncoding.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = HexBinaryEncoding.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/HexBinaryEncoding.cpp; sourceTree = SOURCE_ROOT; };
 		23640F57DF6C4BB6BFC5DA4C /* PacketListener.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = PacketListener.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/PacketListener.h; sourceTree = SOURCE_ROOT; };
 		26490D7CC31EF7D6ED5F925A /* ofxDatGui.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxDatGui.cpp; path = ../../../addons/ofxDatGui/src/ofxDatGui.cpp; sourceTree = SOURCE_ROOT; };
+		26EF3E71A07C6948EAF6709E /* ofxTCPManager.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxTCPManager.h; path = ../../../addons/ofxNetwork/src/ofxTCPManager.h; sourceTree = SOURCE_ROOT; };
 		2B40EDA85BEB63E46785BC29 /* tinyxml.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = tinyxml.cpp; path = ../../../addons/ofxXmlSettings/libs/tinyxml.cpp; sourceTree = SOURCE_ROOT; };
+		2BC552B95352F479531DC424 /* snappy-stubs-internal.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = "snappy-stubs-internal.h"; path = "../../../addons/ofxIO/libs/snappy/src/snappy-stubs-internal.h"; sourceTree = SOURCE_ROOT; };
+		2D170F102215CF0511959D79 /* ByteBuffer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ByteBuffer.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/ByteBuffer.h; sourceTree = SOURCE_ROOT; };
+		2F519EB3B0DCD7378FB86ABE /* ofxUDPManager.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxUDPManager.h; path = ../../../addons/ofxNetwork/src/ofxUDPManager.h; sourceTree = SOURCE_ROOT; };
+		2FB74FF42B08FC378F74B2B7 /* snappy-stubs-internal.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = "snappy-stubs-internal.cc"; path = "../../../addons/ofxIO/libs/snappy/src/snappy-stubs-internal.cc"; sourceTree = SOURCE_ROOT; };
+		2FC8E2266FE2F5545775A16D /* Compression.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Compression.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/Compression.cpp; sourceTree = SOURCE_ROOT; };
 		2FD4B0329909D3527F003494 /* UdpSocket.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = UdpSocket.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/UdpSocket.h; sourceTree = SOURCE_ROOT; };
+		30841703B7AC8487D16FB4AA /* ofxTCPServer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxTCPServer.h; path = ../../../addons/ofxNetwork/src/ofxTCPServer.h; sourceTree = SOURCE_ROOT; };
+		35BB9BB90DBABFD3B39F8DB6 /* ofxUDPManager.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxUDPManager.cpp; path = ../../../addons/ofxNetwork/src/ofxUDPManager.cpp; sourceTree = SOURCE_ROOT; };
+		370DA13018950E5BFF8CF171 /* LinkFilter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = LinkFilter.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/LinkFilter.cpp; sourceTree = SOURCE_ROOT; };
 		3B361208CD4107E479F04E7B /* NetworkingUtils.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = NetworkingUtils.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/posix/NetworkingUtils.cpp; sourceTree = SOURCE_ROOT; };
+		3CFE04CCE515BDEA95DEAA71 /* ByteBufferReader.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ByteBufferReader.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/ByteBufferReader.h; sourceTree = SOURCE_ROOT; };
 		3DD359247F3ED1550D8BB5C9 /* ofxMidiIn.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxMidiIn.cpp; path = ../../../addons/ofxMidi/src/ofxMidiIn.cpp; sourceTree = SOURCE_ROOT; };
+		4164C6C6CE5115889A99F42C /* COBSEncoding.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = COBSEncoding.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/COBSEncoding.cpp; sourceTree = SOURCE_ROOT; };
 		422C4E1AAC7EC4D30B17702D /* ofxDatGuiIntObject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiIntObject.h; path = ../../../addons/ofxDatGui/src/core/ofxDatGuiIntObject.h; sourceTree = SOURCE_ROOT; };
 		444657A12E59D0ED86981498 /* TimerListener.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = TimerListener.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/TimerListener.h; sourceTree = SOURCE_ROOT; };
+		4537FF365F4C6A1F291F2A00 /* DataInput.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = DataInput.cpp; path = src/DataInput.cpp; sourceTree = SOURCE_ROOT; };
+		4593838C4B4BCE40284AAE07 /* ofxIO.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxIO.h; path = ../../../addons/ofxIO/src/ofxIO.h; sourceTree = SOURCE_ROOT; };
 		468DA5FAA292E91A9DD7875F /* RtError.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = RtError.h; path = ../../../addons/ofxMidi/libs/RtError.h; sourceTree = SOURCE_ROOT; };
+		469AA5350C4777BED9805BC4 /* RecursiveDirectoryIteratorStategies.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = RecursiveDirectoryIteratorStategies.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/RecursiveDirectoryIteratorStategies.h; sourceTree = SOURCE_ROOT; };
 		48974F980F51769171D0B2F5 /* IpEndpointName.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = IpEndpointName.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.h; sourceTree = SOURCE_ROOT; };
+		4986EF0FFF4409E373B97203 /* MidiPlayback.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = MidiPlayback.h; path = src/MidiPlayback.h; sourceTree = SOURCE_ROOT; };
+		4C5D361776A52E8163212C9F /* LibloDumpFile.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = LibloDumpFile.h; path = src/LibloDumpFile.h; sourceTree = SOURCE_ROOT; };
+		4D38898647BBFEEBB89C1569 /* alphanum.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = alphanum.hpp; path = ../../../addons/ofxIO/libs/alphanum/include/alphanum.hpp; sourceTree = SOURCE_ROOT; };
 		4E95FB446A9C9C6F0DE12D75 /* OscPrintReceivedElements.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscPrintReceivedElements.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscPrintReceivedElements.h; sourceTree = SOURCE_ROOT; };
+		4EAC68CB142D702F9E3FD73E /* HexBinaryEncoding.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = HexBinaryEncoding.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/HexBinaryEncoding.h; sourceTree = SOURCE_ROOT; };
 		50DF87D612C5AAE17AAFA6C0 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxXmlSettings.cpp; path = ../../../addons/ofxXmlSettings/src/ofxXmlSettings.cpp; sourceTree = SOURCE_ROOT; };
+		5114D2AF276E4E6E9A67B342 /* PathFilterCollection.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = PathFilterCollection.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/PathFilterCollection.cpp; sourceTree = SOURCE_ROOT; };
 		51E7C79AF368893179194CBC /* RtMidi.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = RtMidi.h; path = ../../../addons/ofxMidi/libs/RtMidi.h; sourceTree = SOURCE_ROOT; };
 		545BBA6F6669BED2DA497BC6 /* ofxDatGuiScrollView.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiScrollView.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiScrollView.h; sourceTree = SOURCE_ROOT; };
-		58AAA01720839841899D00BA /* SensorGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SensorGraph.cpp; sourceTree = "<group>"; };
-		58AAA0539EF7BE90BC9F19BA /* DumpFrames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumpFrames.h; sourceTree = "<group>"; };
-		58AAA057C9D822D698E44D29 /* RemoteControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteControl.h; sourceTree = "<group>"; };
-		58AAA0CA209626B2C020D1E7 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
-		58AAA1023ADB64F7778304C8 /* NoteLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoteLoop.h; sourceTree = "<group>"; };
-		58AAA194413875707A6765C0 /* NoteEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoteEvent.h; sourceTree = "<group>"; };
-		58AAA22388E56AD791D2660B /* MidiPlayback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MidiPlayback.cpp; sourceTree = "<group>"; };
-		58AAA26F239DA2B09A3DCA21 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Version.h; sourceTree = "<group>"; };
-		58AAA3C3732C06BB13EFEE9A /* NoteLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NoteLoop.cpp; sourceTree = "<group>"; };
-		58AAA3E6EE7CF4B263237E1A /* MidiOut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MidiOut.cpp; sourceTree = "<group>"; };
-		58AAA404FB18D64E711FBA42 /* Sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sensor.cpp; sourceTree = "<group>"; };
-		58AAA49B5A2CBF8BBA1D63CC /* DataTriggers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataTriggers.h; sourceTree = "<group>"; };
-		58AAA54BA76D2C723F09082F /* Layout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Layout.cpp; sourceTree = "<group>"; };
-		58AAA6849C02360632FCE842 /* NoteEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NoteEvent.cpp; sourceTree = "<group>"; };
-		58AAA87E24EAC572D386E225 /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Types.h; sourceTree = "<group>"; };
-		58AAA890C6DB4AB1F75EA649 /* Trigger3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Trigger3D.h; sourceTree = "<group>"; };
-		58AAA8B1A6AB18EC13864723 /* DataInput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataInput.cpp; sourceTree = "<group>"; };
-		58AAA9CE54DBE714CAF0FA10 /* NoteGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NoteGenerator.cpp; sourceTree = "<group>"; };
-		58AAA9FF8661E1C9E9C0302A /* Layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Layout.h; sourceTree = "<group>"; };
-		58AAAA23596047E05BC6382C /* DataInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataInput.h; sourceTree = "<group>"; };
-		58AAACC0BCF29B14ECC0D096 /* TimeKeeper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeKeeper.h; sourceTree = "<group>"; };
-		58AAACE359BB989FB74300C0 /* Sensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sensor.h; sourceTree = "<group>"; };
-		58AAAD48DC6B23C7DCD7991F /* MidiPlayback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MidiPlayback.h; sourceTree = "<group>"; };
-		58AAAD8E6F5077477D67FF6A /* RemoteControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteControl.cpp; sourceTree = "<group>"; };
-		58AAADDE3AE620A26789B5FD /* SensorGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorGraph.h; sourceTree = "<group>"; };
-		58AAAE3803E39282D5306C12 /* Trigger3D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Trigger3D.cpp; sourceTree = "<group>"; };
-		58AAAE5B1A52F1E537B72942 /* NoteGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoteGenerator.h; sourceTree = "<group>"; };
-		58AAAE5CDCCF481E14CC401D /* MidiOut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MidiOut.h; sourceTree = "<group>"; };
-		58AAAEF7CE58F782A027BFFB /* DataTriggers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataTriggers.cpp; sourceTree = "<group>"; };
-		58AAAF05E8A935DCBB81EA70 /* LibloDumpFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibloDumpFile.h; sourceTree = "<group>"; };
+		557678EEFF0D0C6D692D0DEC /* DeviceFilter.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = DeviceFilter.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/DeviceFilter.h; sourceTree = SOURCE_ROOT; };
+		57E858FCDF1AB73089F1A9F0 /* HiddenFileFilter.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = HiddenFileFilter.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/HiddenFileFilter.h; sourceTree = SOURCE_ROOT; };
+		58AAAEB7FF464A0A1EA45797 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
+		5B1EE11B5F08927EA2C43D0D /* Trigger3D.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Trigger3D.h; path = src/Trigger3D.h; sourceTree = SOURCE_ROOT; };
+		5CB4852DC14A6B6FE1304C2F /* NoteGenerator.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = NoteGenerator.cpp; path = src/NoteGenerator.cpp; sourceTree = SOURCE_ROOT; };
+		5CD845B860A278E86EBBF69D /* OscSerial.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = OscSerial.cpp; path = src/OscSerial.cpp; sourceTree = SOURCE_ROOT; };
+		5D4C9D17E0C3F84DDB888544 /* ByteBufferUtils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ByteBufferUtils.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/ByteBufferUtils.h; sourceTree = SOURCE_ROOT; };
+		5F08C45FA7A03BD20520721B /* NoteEvent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = NoteEvent.cpp; path = src/NoteEvent.cpp; sourceTree = SOURCE_ROOT; };
+		60F63F5C68476F0C9095B247 /* URIEncoding.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = URIEncoding.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/URIEncoding.cpp; sourceTree = SOURCE_ROOT; };
 		63A47AC60FFAFC3BF093EC0F /* OscOutboundPacketStream.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = OscOutboundPacketStream.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscOutboundPacketStream.cpp; sourceTree = SOURCE_ROOT; };
 		64C563B8158C37E9D07AE29D /* ofxDatGuiFRM.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiFRM.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiFRM.h; sourceTree = SOURCE_ROOT; };
+		64F728D0405D9777ECF43CD9 /* Base64Encoding.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Base64Encoding.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/Base64Encoding.h; sourceTree = SOURCE_ROOT; };
 		65EEFA3DA3526E9CDD9C21F9 /* ofxOscBundle.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxOscBundle.cpp; path = ../../../addons/ofxOsc/src/ofxOscBundle.cpp; sourceTree = SOURCE_ROOT; };
+		67B9F66F8197CB04B450E465 /* SLIPEncoding.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = SLIPEncoding.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/SLIPEncoding.h; sourceTree = SOURCE_ROOT; };
 		6B65E6930994CC4B2D2B8B33 /* OscPacketListener.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscPacketListener.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscPacketListener.h; sourceTree = SOURCE_ROOT; };
+		6BD291FB03292C6D352C26FE /* FileExtensionFilter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = FileExtensionFilter.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/FileExtensionFilter.cpp; sourceTree = SOURCE_ROOT; };
+		6E277464DFBC8ED997677A18 /* DumpFrames.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = DumpFrames.h; path = src/DumpFrames.h; sourceTree = SOURCE_ROOT; };
+		72804EF074677512091594C2 /* snappy.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = snappy.h; path = ../../../addons/ofxIO/libs/snappy/src/snappy.h; sourceTree = SOURCE_ROOT; };
+		7362D621E1B9A92F5F4AC73B /* snappy.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = snappy.cc; path = ../../../addons/ofxIO/libs/snappy/src/snappy.cc; sourceTree = SOURCE_ROOT; };
 		744031A3E8F8DAF9FE6F3EA8 /* ofxDatGuiGroups.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiGroups.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiGroups.h; sourceTree = SOURCE_ROOT; };
 		7689F8A0F3D0B7635A8C3104 /* ofxOscArg.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxOscArg.h; path = ../../../addons/ofxOsc/src/ofxOscArg.h; sourceTree = SOURCE_ROOT; };
+		76E32CCCDEE603FA7E9C26EE /* SensorGraph.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = SensorGraph.h; path = src/SensorGraph.h; sourceTree = SOURCE_ROOT; };
 		787315438BF1DD00C81DF413 /* ofxDatGuiLabel.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiLabel.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiLabel.h; sourceTree = SOURCE_ROOT; };
+		7913239832BBBF6B56ED2600 /* lz4.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = lz4.c; path = ../../../addons/ofxIO/libs/lz4/src/lz4.c; sourceTree = SOURCE_ROOT; };
+		79D4ACD1CA6544C1756A2289 /* DataTriggers.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = DataTriggers.cpp; path = src/DataTriggers.cpp; sourceTree = SOURCE_ROOT; };
+		7B6705D0F4966C1BCBDFC9BE /* SensorGraph.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = SensorGraph.cpp; path = src/SensorGraph.cpp; sourceTree = SOURCE_ROOT; };
+		7EA1A0F72ECDF1CE6BAA35AB /* RemoteControl.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = RemoteControl.cpp; path = src/RemoteControl.cpp; sourceTree = SOURCE_ROOT; };
 		81436E53CC4A77E326F659C3 /* ofxMidiOut.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxMidiOut.h; path = ../../../addons/ofxMidi/src/ofxMidiOut.h; sourceTree = SOURCE_ROOT; };
 		81967292BFC87A0144BD32C6 /* ofxOscSender.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxOscSender.cpp; path = ../../../addons/ofxOsc/src/ofxOscSender.cpp; sourceTree = SOURCE_ROOT; };
 		832BDC407620CDBA568B713D /* tinyxmlerror.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = tinyxmlerror.cpp; path = ../../../addons/ofxXmlSettings/libs/tinyxmlerror.cpp; sourceTree = SOURCE_ROOT; };
+		85B399C99F9879F6C78EDE1B /* snappy-stubs-public.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = "snappy-stubs-public.h"; path = "../../../addons/ofxIO/libs/snappy/src/snappy-stubs-public.h"; sourceTree = SOURCE_ROOT; };
 		896211FFD7650884437CE42C /* ofxSmartFont.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxSmartFont.h; path = ../../../addons/ofxDatGui/src/libs/ofxSmartFont/ofxSmartFont.h; sourceTree = SOURCE_ROOT; };
+		89B60FB247E1F64013C716DC /* AbstractTypes.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = AbstractTypes.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/AbstractTypes.h; sourceTree = SOURCE_ROOT; };
 		8B30E93FD3D3475EED522A0E /* ofxOscBundle.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxOscBundle.h; path = ../../../addons/ofxOsc/src/ofxOscBundle.h; sourceTree = SOURCE_ROOT; };
 		8C75AFC8774A62495DD53464 /* ofxOscReceiver.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxOscReceiver.h; path = ../../../addons/ofxOsc/src/ofxOscReceiver.h; sourceTree = SOURCE_ROOT; };
+		8D76B424A6DF4D70AACCDBAE /* SearchPath.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = SearchPath.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/SearchPath.cpp; sourceTree = SOURCE_ROOT; };
 		902724601B82C6AD81BBCD71 /* ofxDatGui2dPad.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGui2dPad.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGui2dPad.h; sourceTree = SOURCE_ROOT; };
+		920A200958CDB5BAFA4700BC /* Sensor.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Sensor.cpp; path = src/Sensor.cpp; sourceTree = SOURCE_ROOT; };
+		93384835C77BD4299F8A7F90 /* ByteBuffer.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ByteBuffer.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/ByteBuffer.cpp; sourceTree = SOURCE_ROOT; };
 		938214A2795AA8FED29086DB /* ofxMidiConstants.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxMidiConstants.h; path = ../../../addons/ofxMidi/src/ofxMidiConstants.h; sourceTree = SOURCE_ROOT; };
 		9705D66270ED89ECA6E6FECE /* ofxDatGui.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGui.h; path = ../../../addons/ofxDatGui/src/ofxDatGui.h; sourceTree = SOURCE_ROOT; };
+		9912FEC53B46A243A4DAC743 /* json.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = json.hpp; path = ../../../addons/ofxIO/libs/json/include/json.hpp; sourceTree = SOURCE_ROOT; };
+		9A430D6BD10DC31AE2D07DA0 /* snappy-sinksource.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = "snappy-sinksource.cc"; path = "../../../addons/ofxIO/libs/snappy/src/snappy-sinksource.cc"; sourceTree = SOURCE_ROOT; };
+		9A967D1FAFA98A7CBBFA4F55 /* DirectoryUtils.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = DirectoryUtils.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/DirectoryUtils.cpp; sourceTree = SOURCE_ROOT; };
 		9B5051062C6A871714E6F5F4 /* ofxDatGuiConstants.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiConstants.h; path = ../../../addons/ofxDatGui/src/core/ofxDatGuiConstants.h; sourceTree = SOURCE_ROOT; };
 		9BF3AA0D4FAA89D0F8A0E545 /* OscReceivedElements.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = OscReceivedElements.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.cpp; sourceTree = SOURCE_ROOT; };
+		9D639BA31583580D80CFE15D /* Base64Encoding.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Base64Encoding.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/Base64Encoding.cpp; sourceTree = SOURCE_ROOT; };
+		9E2A709AC0FDCAC46BEC3DB4 /* RecursiveDirectoryIterator.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = RecursiveDirectoryIterator.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/RecursiveDirectoryIterator.h; sourceTree = SOURCE_ROOT; };
 		9F7986DC4EB05E75FCE2C777 /* ofxOscSender.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxOscSender.h; path = ../../../addons/ofxOsc/src/ofxOscSender.h; sourceTree = SOURCE_ROOT; };
 		A2AAA8CA403479E6FCDF920E /* OscHostEndianness.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscHostEndianness.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscHostEndianness.h; sourceTree = SOURCE_ROOT; };
+		A9ABBF4A56F7A5AAB5A5DC5D /* snappy-sinksource.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = "snappy-sinksource.h"; path = "../../../addons/ofxIO/libs/snappy/src/snappy-sinksource.h"; sourceTree = SOURCE_ROOT; };
+		ACCFF4C095464D7FE1FAB4B0 /* NoteEvent.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = NoteEvent.h; path = src/NoteEvent.h; sourceTree = SOURCE_ROOT; };
 		ADD194746185E2DA11468377 /* IpEndpointName.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = IpEndpointName.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.cpp; sourceTree = SOURCE_ROOT; };
 		AE335EB4709BFD4671EEAC84 /* MessageMappingOscPacketListener.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = MessageMappingOscPacketListener.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/MessageMappingOscPacketListener.h; sourceTree = SOURCE_ROOT; };
+		AECD9ACC0916B9D211F50CD7 /* MidiOut.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = MidiOut.h; path = src/MidiOut.h; sourceTree = SOURCE_ROOT; };
 		B21E7E5F548EEA92F368040B /* tinyxml.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = tinyxml.h; path = ../../../addons/ofxXmlSettings/libs/tinyxml.h; sourceTree = SOURCE_ROOT; };
 		B31C608870ECEB2490A93736 /* ofxOscParameterSync.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxOscParameterSync.h; path = ../../../addons/ofxOsc/src/ofxOscParameterSync.h; sourceTree = SOURCE_ROOT; };
+		B3F548F79241870F153D7E27 /* NoteLoop.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = NoteLoop.cpp; path = src/NoteLoop.cpp; sourceTree = SOURCE_ROOT; };
 		B498F0559F473CF855EF6062 /* ofxDatGuiTheme.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiTheme.h; path = ../../../addons/ofxDatGui/src/themes/ofxDatGuiTheme.h; sourceTree = SOURCE_ROOT; };
+		B608BB92EA071BC82EB9F62F /* RecursiveDirectoryIteratorImpl.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = RecursiveDirectoryIteratorImpl.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/RecursiveDirectoryIteratorImpl.h; sourceTree = SOURCE_ROOT; };
 		B76FA489151DBAF1616DF378 /* ofxMidiIn.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxMidiIn.h; path = ../../../addons/ofxMidi/src/ofxMidiIn.h; sourceTree = SOURCE_ROOT; };
+		B7E6FBF611D6686B753FD3EA /* MidiOut.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = MidiOut.cpp; path = src/MidiOut.cpp; sourceTree = SOURCE_ROOT; };
 		BC8881B3C8C0A1C45F042E7A /* OscPrintReceivedElements.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = OscPrintReceivedElements.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscPrintReceivedElements.cpp; sourceTree = SOURCE_ROOT; };
 		BCC84C6EB3417706F4F762F0 /* ofxDatGuiComponent.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiComponent.h; path = ../../../addons/ofxDatGui/src/core/ofxDatGuiComponent.h; sourceTree = SOURCE_ROOT; };
+		BEFFAA5B8275E0AE066FC2E3 /* DirectoryWatcherManager.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = DirectoryWatcherManager.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/DirectoryWatcherManager.h; sourceTree = SOURCE_ROOT; };
+		BF0BB2F28A4522316B1563A5 /* COBSEncoding.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = COBSEncoding.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/COBSEncoding.h; sourceTree = SOURCE_ROOT; };
+		BF196CFC69672A269DB3D55F /* Layout.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Layout.h; path = src/Layout.h; sourceTree = SOURCE_ROOT; };
+		BF88F02779DD820913ACEA06 /* ofxTCPClient.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxTCPClient.cpp; path = ../../../addons/ofxNetwork/src/ofxTCPClient.cpp; sourceTree = SOURCE_ROOT; };
 		C085A33340AB0C1DB647AC2F /* ofxDatGuiTextInput.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiTextInput.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiTextInput.h; sourceTree = SOURCE_ROOT; };
 		C2FAC65C491D4231379F3298 /* ofxOscReceiver.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxOscReceiver.cpp; path = ../../../addons/ofxOsc/src/ofxOscReceiver.cpp; sourceTree = SOURCE_ROOT; };
 		C58862C6D212C8E8A83810F4 /* ofxOscMessage.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxOscMessage.h; path = ../../../addons/ofxOsc/src/ofxOscMessage.h; sourceTree = SOURCE_ROOT; };
 		C6937888E126BADC8777423B /* OscTypes.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscTypes.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.h; sourceTree = SOURCE_ROOT; };
+		C6C68D431AF8FD1A9E2DCFF2 /* ByteBufferStream.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ByteBufferStream.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/ByteBufferStream.cpp; sourceTree = SOURCE_ROOT; };
 		C84ED7FCC017328C6F58283D /* ofxDatGuiColorPicker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiColorPicker.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiColorPicker.h; sourceTree = SOURCE_ROOT; };
+		C8C9B823D7872F9CBF03A813 /* ofxTCPClient.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxTCPClient.h; path = ../../../addons/ofxNetwork/src/ofxTCPClient.h; sourceTree = SOURCE_ROOT; };
+		C8F2762F4CCE12D7C1022DAA /* Compression.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Compression.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/Compression.h; sourceTree = SOURCE_ROOT; };
+		C95104DA008B2AAA73832624 /* Types.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Types.h; path = src/Types.h; sourceTree = SOURCE_ROOT; };
 		C954E0E8B7DB9D6983309883 /* ofxSmartFont.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxSmartFont.cpp; path = ../../../addons/ofxDatGui/src/libs/ofxSmartFont/ofxSmartFont.cpp; sourceTree = SOURCE_ROOT; };
+		C9BE77ADAEF79E623523E9D9 /* ByteBufferWriter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ByteBufferWriter.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/ByteBufferWriter.cpp; sourceTree = SOURCE_ROOT; };
 		CDF7278CB636137FE7BF91A5 /* ofxDatGuiMatrix.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiMatrix.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiMatrix.h; sourceTree = SOURCE_ROOT; };
+		CECE089D24F272DB22504892 /* DirectoryFilter.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = DirectoryFilter.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/DirectoryFilter.h; sourceTree = SOURCE_ROOT; };
 		D0D6A66BEBA820EA1D396889 /* ofxDatGuiSlider.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiSlider.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiSlider.h; sourceTree = SOURCE_ROOT; };
+		D1616DA13ECD5FC9DB4D5714 /* SLIPEncoding.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = SLIPEncoding.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/SLIPEncoding.cpp; sourceTree = SOURCE_ROOT; };
+		D1F82A94BD80BDC78E0B1922 /* DirectoryUtils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = DirectoryUtils.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/DirectoryUtils.h; sourceTree = SOURCE_ROOT; };
+		D2CD639C92C80F0936938BD0 /* NoteGenerator.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = NoteGenerator.h; path = src/NoteGenerator.h; sourceTree = SOURCE_ROOT; };
+		D8827C9F242D2DCC2B176F0E /* MidiPlayback.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = MidiPlayback.cpp; path = src/MidiPlayback.cpp; sourceTree = SOURCE_ROOT; };
 		D9BFFBBF4CC43DEE890B3C3E /* OscTypes.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = OscTypes.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.cpp; sourceTree = SOURCE_ROOT; };
+		DE8141C7BAB8E70C3BA94C0D /* Trigger3D.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Trigger3D.cpp; path = src/Trigger3D.cpp; sourceTree = SOURCE_ROOT; };
+		DF082EFBD9CBC8E813355CD5 /* Sensor.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Sensor.h; path = src/Sensor.h; sourceTree = SOURCE_ROOT; };
 		DF49D76C45D5DB505A234880 /* ofxOscMessage.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxOscMessage.cpp; path = ../../../addons/ofxOsc/src/ofxOscMessage.cpp; sourceTree = SOURCE_ROOT; };
 		E100ED9DCB412957A879CD5A /* ofxDatGuiControls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiControls.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiControls.h; sourceTree = SOURCE_ROOT; };
+		E1DD706EC4DC995108A5EA3B /* NoteLoop.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = NoteLoop.h; path = src/NoteLoop.h; sourceTree = SOURCE_ROOT; };
+		E362E12547978AB05ABA9C57 /* DirectoryFilter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = DirectoryFilter.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/DirectoryFilter.cpp; sourceTree = SOURCE_ROOT; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E4B69B5B0A3A1756003C02F2 /* PulsationsDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulsationsDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
@@ -182,11 +274,27 @@
 		E4EB691F138AFCF100A09F29 /* CoreOF.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CoreOF.xcconfig; path = ../../../libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig; sourceTree = SOURCE_ROOT; };
 		E4EB6923138AFD0F00A09F29 /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
 		E6DEF695B88BA5FAACEAA937 /* UdpSocket.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = UdpSocket.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/posix/UdpSocket.cpp; sourceTree = SOURCE_ROOT; };
+		E8AF8381484827A10A418B26 /* SearchPath.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = SearchPath.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/SearchPath.h; sourceTree = SOURCE_ROOT; };
+		E9438787E7DF374042109734 /* DataInput.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = DataInput.h; path = src/DataInput.h; sourceTree = SOURCE_ROOT; };
+		E95C4518AEDCDBEA357754B0 /* RecursiveDirectoryIterator.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = RecursiveDirectoryIterator.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/RecursiveDirectoryIterator.cpp; sourceTree = SOURCE_ROOT; };
+		EBECBB67C55635D1B4871A42 /* snappy-internal.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = "snappy-internal.h"; path = "../../../addons/ofxIO/libs/snappy/src/snappy-internal.h"; sourceTree = SOURCE_ROOT; };
+		EF611EE17E6333C6EF9BA82C /* TimeKeeper.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = TimeKeeper.h; path = src/TimeKeeper.h; sourceTree = SOURCE_ROOT; };
+		F27637AABA89A235C5974D56 /* RecursiveDirectoryIteratorStategies.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = RecursiveDirectoryIteratorStategies.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/RecursiveDirectoryIteratorStategies.cpp; sourceTree = SOURCE_ROOT; };
+		F399B91E98DC31CDA6DDACB4 /* ofxTCPManager.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxTCPManager.cpp; path = ../../../addons/ofxNetwork/src/ofxTCPManager.cpp; sourceTree = SOURCE_ROOT; };
+		F4030B6B8EDE26878C8D74F1 /* ByteBufferWriter.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ByteBufferWriter.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/ByteBufferWriter.h; sourceTree = SOURCE_ROOT; };
 		F4F5B6B8BA2BD52C646ED908 /* OscException.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscException.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscException.h; sourceTree = SOURCE_ROOT; };
 		F59384ED57A7C6A7A8B0351D /* ofxDatGuiEvents.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiEvents.h; path = ../../../addons/ofxDatGui/src/core/ofxDatGuiEvents.h; sourceTree = SOURCE_ROOT; };
+		F5E31A831B4A68051A87AB3F /* lz4.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = lz4.h; path = ../../../addons/ofxIO/libs/lz4/src/lz4.h; sourceTree = SOURCE_ROOT; };
+		F66993296A3AEEC70FD444F5 /* ofxNetwork.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxNetwork.h; path = ../../../addons/ofxNetwork/src/ofxNetwork.h; sourceTree = SOURCE_ROOT; };
+		F6F1796AF2B14303C408AC86 /* RemoteControl.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = RemoteControl.h; path = src/RemoteControl.h; sourceTree = SOURCE_ROOT; };
+		F73640FE7F5F55973A115D6D /* OscSerial.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscSerial.h; path = src/OscSerial.h; sourceTree = SOURCE_ROOT; };
 		F7FBC56859535E597B24BB91 /* NetworkingUtils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = NetworkingUtils.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/NetworkingUtils.h; sourceTree = SOURCE_ROOT; };
+		F984E007C857A4DEE09F437A /* DataTriggers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = DataTriggers.h; path = src/DataTriggers.h; sourceTree = SOURCE_ROOT; };
 		FC5DA1C87211D4F6377DA719 /* tinyxmlparser.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = tinyxmlparser.cpp; path = ../../../addons/ofxXmlSettings/libs/tinyxmlparser.cpp; sourceTree = SOURCE_ROOT; };
+		FCAF85B857266C511DB50341 /* HiddenFileFilter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = HiddenFileFilter.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/HiddenFileFilter.cpp; sourceTree = SOURCE_ROOT; };
+		FD35DEC21FE06BF7F1516022 /* RegexPathFilter.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = RegexPathFilter.h; path = ../../../addons/ofxIO/libs/ofxIO/include/ofx/IO/RegexPathFilter.h; sourceTree = SOURCE_ROOT; };
 		FDA86F4C2F1F1964D35391C6 /* ofxDatGuiButton.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiButton.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiButton.h; sourceTree = SOURCE_ROOT; };
+		FE5B3B19544657B6F9CCCA03 /* ByteBufferUtils.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ByteBufferUtils.cpp; path = ../../../addons/ofxIO/libs/ofxIO/src/ByteBufferUtils.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,13 +303,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */,
-				58AAA10A316F680076FC0002 /* CoreMIDI.framework in Frameworks */,
+				58AAA42E65EB3437FEDECA4E /* CoreMIDI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		02C663A3035CB2AF8BCE07DC /* src */ = {
+			isa = PBXGroup;
+			children = (
+				7913239832BBBF6B56ED2600 /* lz4.c */,
+				F5E31A831B4A68051A87AB3F /* lz4.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
 		0EF29D3ABD6E4147AE024D7A /* ofxSmartFont */ = {
 			isa = PBXGroup;
 			children = (
@@ -211,6 +328,14 @@
 			name = ofxSmartFont;
 			sourceTree = "<group>";
 		};
+		18240ECCE4076FB0833A8578 /* ofxNetwork */ = {
+			isa = PBXGroup;
+			children = (
+				219374A14594D121F27FED3A /* src */,
+			);
+			name = ofxNetwork;
+			sourceTree = "<group>";
+		};
 		1F4FB5C423662B96ADFDCC0B /* ofxXmlSettings */ = {
 			isa = PBXGroup;
 			children = (
@@ -218,6 +343,35 @@
 				6E54289412D2D94F45A05113 /* libs */,
 			);
 			name = ofxXmlSettings;
+			sourceTree = "<group>";
+		};
+		1FE55F3FCBD156AC7D591F69 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				B40D93E4E6198327D6DA7BFA /* alphanum */,
+				DFC5BBCB8B0B86B7FF7C1CE8 /* json */,
+				8FE15F6815C4A8DE40915EAE /* lz4 */,
+				92CF4367AF54E202BCF9E084 /* ofxIO */,
+				D86EF5293C3BFC96A82C8EB7 /* snappy */,
+			);
+			name = libs;
+			sourceTree = "<group>";
+		};
+		219374A14594D121F27FED3A /* src */ = {
+			isa = PBXGroup;
+			children = (
+				F66993296A3AEEC70FD444F5 /* ofxNetwork.h */,
+				1DFA26F2C6BBD1B8AC24C0B1 /* ofxNetworkUtils.h */,
+				BF88F02779DD820913ACEA06 /* ofxTCPClient.cpp */,
+				C8C9B823D7872F9CBF03A813 /* ofxTCPClient.h */,
+				F399B91E98DC31CDA6DDACB4 /* ofxTCPManager.cpp */,
+				26EF3E71A07C6948EAF6709E /* ofxTCPManager.h */,
+				1C085E327DAB912CFA2A443D /* ofxTCPServer.cpp */,
+				30841703B7AC8487D16FB4AA /* ofxTCPServer.h */,
+				35BB9BB90DBABFD3B39F8DB6 /* ofxUDPManager.cpp */,
+				2F519EB3B0DCD7378FB86ABE /* ofxUDPManager.h */,
+			);
+			name = src;
 			sourceTree = "<group>";
 		};
 		2413C01760B1811BED0F502D /* ofxMidi */ = {
@@ -256,10 +410,33 @@
 			name = libs;
 			sourceTree = "<group>";
 		};
-		58AAA1FE2B8D6534A3F4A6D2 /* Frameworks */ = {
+		3F13BF933566839ED4C7CCED /* include */ = {
 			isa = PBXGroup;
 			children = (
-				58AAA0CA209626B2C020D1E7 /* CoreMIDI.framework */,
+				D1C382A37EE661F51AA773CC /* ofx */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
+		4A9E9C4D593FEAC751445421 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				EBECBB67C55635D1B4871A42 /* snappy-internal.h */,
+				9A430D6BD10DC31AE2D07DA0 /* snappy-sinksource.cc */,
+				A9ABBF4A56F7A5AAB5A5DC5D /* snappy-sinksource.h */,
+				2FB74FF42B08FC378F74B2B7 /* snappy-stubs-internal.cc */,
+				2BC552B95352F479531DC424 /* snappy-stubs-internal.h */,
+				85B399C99F9879F6C78EDE1B /* snappy-stubs-public.h */,
+				7362D621E1B9A92F5F4AC73B /* snappy.cc */,
+				72804EF074677512091594C2 /* snappy.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		58AAACB222CE80D91C01B31D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				58AAAEB7FF464A0A1EA45797 /* CoreMIDI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -281,6 +458,14 @@
 				E6DEF695B88BA5FAACEAA937 /* UdpSocket.cpp */,
 			);
 			name = posix;
+			sourceTree = "<group>";
+		};
+		671923EC06F4340D8255DA22 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				4D38898647BBFEEBB89C1569 /* alphanum.hpp */,
+			);
+			name = include;
 			sourceTree = "<group>";
 		};
 		69146F0BA46E48E576618E5E /* libs */ = {
@@ -318,6 +503,66 @@
 			name = src;
 			sourceTree = "<group>";
 		};
+		81B9E335116A816EA1D2A2FA /* IO */ = {
+			isa = PBXGroup;
+			children = (
+				89B60FB247E1F64013C716DC /* AbstractTypes.h */,
+				64F728D0405D9777ECF43CD9 /* Base64Encoding.h */,
+				2D170F102215CF0511959D79 /* ByteBuffer.h */,
+				3CFE04CCE515BDEA95DEAA71 /* ByteBufferReader.h */,
+				08401BD1A5AEF44AFF422B23 /* ByteBufferStream.h */,
+				5D4C9D17E0C3F84DDB888544 /* ByteBufferUtils.h */,
+				F4030B6B8EDE26878C8D74F1 /* ByteBufferWriter.h */,
+				BF0BB2F28A4522316B1563A5 /* COBSEncoding.h */,
+				C8F2762F4CCE12D7C1022DAA /* Compression.h */,
+				557678EEFF0D0C6D692D0DEC /* DeviceFilter.h */,
+				CECE089D24F272DB22504892 /* DirectoryFilter.h */,
+				D1F82A94BD80BDC78E0B1922 /* DirectoryUtils.h */,
+				BEFFAA5B8275E0AE066FC2E3 /* DirectoryWatcherManager.h */,
+				1C011DA756FF131FC46A2907 /* FileExtensionFilter.h */,
+				4EAC68CB142D702F9E3FD73E /* HexBinaryEncoding.h */,
+				57E858FCDF1AB73089F1A9F0 /* HiddenFileFilter.h */,
+				14290ED8DE68778AE3023FBC /* LinkFilter.h */,
+				0FC82546C315D104CC8178D7 /* PathFilterCollection.h */,
+				FD35DEC21FE06BF7F1516022 /* RegexPathFilter.h */,
+				E8AF8381484827A10A418B26 /* SearchPath.h */,
+				67B9F66F8197CB04B450E465 /* SLIPEncoding.h */,
+				1E8B79D0091B95C305295952 /* URIEncoding.h */,
+			);
+			name = IO;
+			sourceTree = "<group>";
+		};
+		827E879AF9EC79A81A74CC6F /* src */ = {
+			isa = PBXGroup;
+			children = (
+				9D639BA31583580D80CFE15D /* Base64Encoding.cpp */,
+				93384835C77BD4299F8A7F90 /* ByteBuffer.cpp */,
+				021CAF811F031FFBDFB18797 /* ByteBufferReader.cpp */,
+				C6C68D431AF8FD1A9E2DCFF2 /* ByteBufferStream.cpp */,
+				FE5B3B19544657B6F9CCCA03 /* ByteBufferUtils.cpp */,
+				C9BE77ADAEF79E623523E9D9 /* ByteBufferWriter.cpp */,
+				4164C6C6CE5115889A99F42C /* COBSEncoding.cpp */,
+				2FC8E2266FE2F5545775A16D /* Compression.cpp */,
+				00F3330A5DEBD082CEE0C12C /* DeviceFilter.cpp */,
+				E362E12547978AB05ABA9C57 /* DirectoryFilter.cpp */,
+				9A967D1FAFA98A7CBBFA4F55 /* DirectoryUtils.cpp */,
+				12A42DF3BFDE28A4818C2EC4 /* DirectoryWatcher.cpp */,
+				0B6179498D0110BD2E161373 /* DirectoryWatcherManager.cpp */,
+				6BD291FB03292C6D352C26FE /* FileExtensionFilter.cpp */,
+				22565CAF8FFEF25C805A438F /* HexBinaryEncoding.cpp */,
+				FCAF85B857266C511DB50341 /* HiddenFileFilter.cpp */,
+				370DA13018950E5BFF8CF171 /* LinkFilter.cpp */,
+				5114D2AF276E4E6E9A67B342 /* PathFilterCollection.cpp */,
+				E95C4518AEDCDBEA357754B0 /* RecursiveDirectoryIterator.cpp */,
+				F27637AABA89A235C5974D56 /* RecursiveDirectoryIteratorStategies.cpp */,
+				13D68F0C2CAE7809D621924C /* RegexPathFilter.cpp */,
+				8D76B424A6DF4D70AACCDBAE /* SearchPath.cpp */,
+				D1616DA13ECD5FC9DB4D5714 /* SLIPEncoding.cpp */,
+				60F63F5C68476F0C9095B247 /* URIEncoding.cpp */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
 		86D2677079A3AF4A5A88E29A /* oscpack */ = {
 			isa = PBXGroup;
 			children = (
@@ -338,6 +583,14 @@
 			name = core;
 			sourceTree = "<group>";
 		};
+		8FE15F6815C4A8DE40915EAE /* lz4 */ = {
+			isa = PBXGroup;
+			children = (
+				02C663A3035CB2AF8BCE07DC /* src */,
+			);
+			name = lz4;
+			sourceTree = "<group>";
+		};
 		911FE1C75E520EE70A7B4830 /* themes */ = {
 			isa = PBXGroup;
 			children = (
@@ -345,6 +598,15 @@
 				21E1E3071CB7B11914428B62 /* ofxDatGuiThemes.h */,
 			);
 			name = themes;
+			sourceTree = "<group>";
+		};
+		92CF4367AF54E202BCF9E084 /* ofxIO */ = {
+			isa = PBXGroup;
+			children = (
+				3F13BF933566839ED4C7CCED /* include */,
+				827E879AF9EC79A81A74CC6F /* src */,
+			);
+			name = ofxIO;
 			sourceTree = "<group>";
 		};
 		947FCD1248D8B0A16B53C1AA /* components */ = {
@@ -381,11 +643,30 @@
 			name = src;
 			sourceTree = "<group>";
 		};
+		A8792B4B23B2F70E1065D67F /* ofxIO */ = {
+			isa = PBXGroup;
+			children = (
+				D86C6322CF7554A9BE5EB8BF /* src */,
+				1FE55F3FCBD156AC7D591F69 /* libs */,
+			);
+			name = ofxIO;
+			sourceTree = "<group>";
+		};
+		B40D93E4E6198327D6DA7BFA /* alphanum */ = {
+			isa = PBXGroup;
+			children = (
+				671923EC06F4340D8255DA22 /* include */,
+			);
+			name = alphanum;
+			sourceTree = "<group>";
+		};
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
 				D8DD1043C333F6F63C8685E6 /* ofxDatGui */,
+				A8792B4B23B2F70E1065D67F /* ofxIO */,
 				2413C01760B1811BED0F502D /* ofxMidi */,
+				18240ECCE4076FB0833A8578 /* ofxNetwork */,
 				E6053AB7FEC63D5F83825B88 /* ofxOsc */,
 				1F4FB5C423662B96ADFDCC0B /* ofxXmlSettings */,
 			);
@@ -411,6 +692,18 @@
 			name = src;
 			sourceTree = "<group>";
 		};
+		D1C382A37EE661F51AA773CC /* ofx */ = {
+			isa = PBXGroup;
+			children = (
+				181F02B531162F6039F6ADC2 /* DirectoryWatcher.h */,
+				81B9E335116A816EA1D2A2FA /* IO */,
+				9E2A709AC0FDCAC46BEC3DB4 /* RecursiveDirectoryIterator.h */,
+				B608BB92EA071BC82EB9F62F /* RecursiveDirectoryIteratorImpl.h */,
+				469AA5350C4777BED9805BC4 /* RecursiveDirectoryIteratorStategies.h */,
+			);
+			name = ofx;
+			sourceTree = "<group>";
+		};
 		D27B2221A225CA523C019676 /* src */ = {
 			isa = PBXGroup;
 			children = (
@@ -420,12 +713,36 @@
 			name = src;
 			sourceTree = "<group>";
 		};
+		D86C6322CF7554A9BE5EB8BF /* src */ = {
+			isa = PBXGroup;
+			children = (
+				4593838C4B4BCE40284AAE07 /* ofxIO.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		D86EF5293C3BFC96A82C8EB7 /* snappy */ = {
+			isa = PBXGroup;
+			children = (
+				4A9E9C4D593FEAC751445421 /* src */,
+			);
+			name = snappy;
+			sourceTree = "<group>";
+		};
 		D8DD1043C333F6F63C8685E6 /* ofxDatGui */ = {
 			isa = PBXGroup;
 			children = (
 				E9B32C117486580389FAFF01 /* src */,
 			);
 			name = ofxDatGui;
+			sourceTree = "<group>";
+		};
+		DFC5BBCB8B0B86B7FF7C1CE8 /* json */ = {
+			isa = PBXGroup;
+			children = (
+				FC2042CCE56D976895CD4536 /* include */,
+			);
+			name = json;
 			sourceTree = "<group>";
 		};
 		E4328144138ABC890047C5CB /* Products */ = {
@@ -446,7 +763,7 @@
 				BB4B014C10F69532006C3DED /* addons */,
 				6948EE371B920CB800B5AC1A /* local_addons */,
 				E4B69B5B0A3A1756003C02F2 /* PulsationsDebug.app */,
-				58AAA1FE2B8D6534A3F4A6D2 /* Frameworks */,
+				58AAACB222CE80D91C01B31D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -456,35 +773,37 @@
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
-				58AAA8B1A6AB18EC13864723 /* DataInput.cpp */,
-				58AAAF05E8A935DCBB81EA70 /* LibloDumpFile.h */,
-				58AAA0539EF7BE90BC9F19BA /* DumpFrames.h */,
-				58AAAEF7CE58F782A027BFFB /* DataTriggers.cpp */,
-				58AAA49B5A2CBF8BBA1D63CC /* DataTriggers.h */,
-				58AAAA23596047E05BC6382C /* DataInput.h */,
-				58AAA3C3732C06BB13EFEE9A /* NoteLoop.cpp */,
-				58AAAD48DC6B23C7DCD7991F /* MidiPlayback.h */,
-				58AAAE5CDCCF481E14CC401D /* MidiOut.h */,
-				58AAA6849C02360632FCE842 /* NoteEvent.cpp */,
-				58AAA22388E56AD791D2660B /* MidiPlayback.cpp */,
-				58AAA194413875707A6765C0 /* NoteEvent.h */,
-				58AAA1023ADB64F7778304C8 /* NoteLoop.h */,
-				58AAA3E6EE7CF4B263237E1A /* MidiOut.cpp */,
-				58AAAE5B1A52F1E537B72942 /* NoteGenerator.h */,
-				58AAA9CE54DBE714CAF0FA10 /* NoteGenerator.cpp */,
-				58AAA404FB18D64E711FBA42 /* Sensor.cpp */,
-				58AAA01720839841899D00BA /* SensorGraph.cpp */,
-				58AAADDE3AE620A26789B5FD /* SensorGraph.h */,
-				58AAAE3803E39282D5306C12 /* Trigger3D.cpp */,
-				58AAA890C6DB4AB1F75EA649 /* Trigger3D.h */,
-				58AAACE359BB989FB74300C0 /* Sensor.h */,
-				58AAA87E24EAC572D386E225 /* Types.h */,
-				58AAA26F239DA2B09A3DCA21 /* Version.h */,
-				58AAACC0BCF29B14ECC0D096 /* TimeKeeper.h */,
-				58AAA54BA76D2C723F09082F /* Layout.cpp */,
-				58AAAD8E6F5077477D67FF6A /* RemoteControl.cpp */,
-				58AAA9FF8661E1C9E9C0302A /* Layout.h */,
-				58AAA057C9D822D698E44D29 /* RemoteControl.h */,
+				4537FF365F4C6A1F291F2A00 /* DataInput.cpp */,
+				E9438787E7DF374042109734 /* DataInput.h */,
+				79D4ACD1CA6544C1756A2289 /* DataTriggers.cpp */,
+				F984E007C857A4DEE09F437A /* DataTriggers.h */,
+				6E277464DFBC8ED997677A18 /* DumpFrames.h */,
+				01DA24B272F55E10A90B946D /* Layout.cpp */,
+				BF196CFC69672A269DB3D55F /* Layout.h */,
+				4C5D361776A52E8163212C9F /* LibloDumpFile.h */,
+				B7E6FBF611D6686B753FD3EA /* MidiOut.cpp */,
+				AECD9ACC0916B9D211F50CD7 /* MidiOut.h */,
+				D8827C9F242D2DCC2B176F0E /* MidiPlayback.cpp */,
+				4986EF0FFF4409E373B97203 /* MidiPlayback.h */,
+				5F08C45FA7A03BD20520721B /* NoteEvent.cpp */,
+				ACCFF4C095464D7FE1FAB4B0 /* NoteEvent.h */,
+				5CB4852DC14A6B6FE1304C2F /* NoteGenerator.cpp */,
+				D2CD639C92C80F0936938BD0 /* NoteGenerator.h */,
+				B3F548F79241870F153D7E27 /* NoteLoop.cpp */,
+				E1DD706EC4DC995108A5EA3B /* NoteLoop.h */,
+				5CD845B860A278E86EBBF69D /* OscSerial.cpp */,
+				F73640FE7F5F55973A115D6D /* OscSerial.h */,
+				7EA1A0F72ECDF1CE6BAA35AB /* RemoteControl.cpp */,
+				F6F1796AF2B14303C408AC86 /* RemoteControl.h */,
+				920A200958CDB5BAFA4700BC /* Sensor.cpp */,
+				DF082EFBD9CBC8E813355CD5 /* Sensor.h */,
+				7B6705D0F4966C1BCBDFC9BE /* SensorGraph.cpp */,
+				76E32CCCDEE603FA7E9C26EE /* SensorGraph.h */,
+				EF611EE17E6333C6EF9BA82C /* TimeKeeper.h */,
+				DE8141C7BAB8E70C3BA94C0D /* Trigger3D.cpp */,
+				5B1EE11B5F08927EA2C43D0D /* Trigger3D.h */,
+				C95104DA008B2AAA73832624 /* Types.h */,
+				0C166BBD08D3B35CB0D77592 /* Version.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -518,6 +837,14 @@
 				911FE1C75E520EE70A7B4830 /* themes */,
 			);
 			name = src;
+			sourceTree = "<group>";
+		};
+		FC2042CCE56D976895CD4536 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				9912FEC53B46A243A4DAC743 /* json.hpp */,
+			);
+			name = include;
 			sourceTree = "<group>";
 		};
 		FF8CDF57858E9B94E3237115 /* ip */ = {
@@ -623,12 +950,57 @@
 			files = (
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
+				BCF45E588F6C24FFCE0FA80B /* DataInput.cpp in Sources */,
+				F8359D34C308C97119F91488 /* DataTriggers.cpp in Sources */,
+				2F34054252AB0F064B7883F5 /* Layout.cpp in Sources */,
+				8D8EDF5CF2AFFD8206D98FCA /* MidiOut.cpp in Sources */,
+				75DAB2C0241361FA996D226A /* MidiPlayback.cpp in Sources */,
+				0220BA19066C88339369ED4D /* NoteEvent.cpp in Sources */,
+				21AE5ED8548D14CB92D6223F /* NoteGenerator.cpp in Sources */,
+				636DAC49BE6C8E3C2C59B8E0 /* NoteLoop.cpp in Sources */,
+				ACA2275EC67328437ED72910 /* OscSerial.cpp in Sources */,
+				1DE95F1A222E13F46E13BBF5 /* RemoteControl.cpp in Sources */,
+				C7C084E969FC01CD49093B8C /* Sensor.cpp in Sources */,
+				BFE673E52FC8E0F5B8758F87 /* SensorGraph.cpp in Sources */,
+				E6D314829A5CB45717C872CC /* Trigger3D.cpp in Sources */,
 				D3C1C48E59CAA2D68C0DD477 /* ofxDatGuiComponent.cpp in Sources */,
 				9CF4130A7E6DA19A3DC42B9A /* ofxSmartFont.cpp in Sources */,
 				C9466C434D1CF8AB968D298D /* ofxDatGui.cpp in Sources */,
+				3BFC7CF50BEB0307821B90A6 /* lz4.c in Sources */,
+				DFA0F30B1193D5DC1BB53E5E /* Base64Encoding.cpp in Sources */,
+				D932A5A24FCF08AE510A265D /* ByteBuffer.cpp in Sources */,
+				62509F39EA6197BEA0194276 /* ByteBufferReader.cpp in Sources */,
+				347D67CCF4C7C7725118DD59 /* ByteBufferStream.cpp in Sources */,
+				66A80FD312926DEB8C9FE7F6 /* ByteBufferUtils.cpp in Sources */,
+				494950167FFB212CEB9ECD0A /* ByteBufferWriter.cpp in Sources */,
+				FE9170FE54D704DF97B0E5BD /* COBSEncoding.cpp in Sources */,
+				93640C223A2F5BEAD6DA2E35 /* Compression.cpp in Sources */,
+				CDB5B1D2D12F42502906F30F /* DeviceFilter.cpp in Sources */,
+				84FED53B4CEB4C25C00E172B /* DirectoryFilter.cpp in Sources */,
+				CEFD3CCAB8B3251DFCAAA0EE /* DirectoryUtils.cpp in Sources */,
+				EB4F14C4AE3B3EFD04520383 /* DirectoryWatcher.cpp in Sources */,
+				BE177617474F11F05E9260FC /* DirectoryWatcherManager.cpp in Sources */,
+				5BB82711925A3764235C2CEB /* FileExtensionFilter.cpp in Sources */,
+				F953E11952BFF8C207418550 /* HexBinaryEncoding.cpp in Sources */,
+				B3E6D60405574847412D7441 /* HiddenFileFilter.cpp in Sources */,
+				86B56E23D787A5F24641398F /* LinkFilter.cpp in Sources */,
+				B7E0003B826CBA379A3F66E5 /* PathFilterCollection.cpp in Sources */,
+				E2C54FD4C85A860582282F7C /* RecursiveDirectoryIterator.cpp in Sources */,
+				899BAF53175868463FE1B029 /* RecursiveDirectoryIteratorStategies.cpp in Sources */,
+				3C9A355A55D68A8E882FEF85 /* RegexPathFilter.cpp in Sources */,
+				1CC07C1A616F29EB8EEC3D21 /* SearchPath.cpp in Sources */,
+				B1BF03D79762719793CC9F1A /* SLIPEncoding.cpp in Sources */,
+				790CD6606BE3D38A9AD52AF1 /* URIEncoding.cpp in Sources */,
+				D81A435CE7FDF51B41956210 /* snappy-sinksource.cc in Sources */,
+				1298066D39CE7EC3DA60256A /* snappy-stubs-internal.cc in Sources */,
+				868BEDC19B53FD512D7E3100 /* snappy.cc in Sources */,
 				0BFC9C20FD7E3C8D5873AA97 /* ofxMidiIn.cpp in Sources */,
 				83D9F930112E0944444124EE /* ofxMidiOut.cpp in Sources */,
 				21CDB58613992D2404983D3F /* RtMidi.cpp in Sources */,
+				960D20B191346612D5C05A6A /* ofxTCPClient.cpp in Sources */,
+				125506CD3E5F428AAFE5CC65 /* ofxTCPManager.cpp in Sources */,
+				66CA411C5A9664E27326BF36 /* ofxTCPServer.cpp in Sources */,
+				E2564CF7DDB3713772BB682E /* ofxUDPManager.cpp in Sources */,
 				72A929D3561B8232A182ABFC /* ofxOscBundle.cpp in Sources */,
 				5864AD82E20F15536D054EA3 /* ofxOscMessage.cpp in Sources */,
 				4ADB88E2FB52E76A471065DE /* ofxOscParameterSync.cpp in Sources */,
@@ -645,18 +1017,6 @@
 				933A2227713C720CEFF80FD9 /* tinyxml.cpp in Sources */,
 				9D44DC88EF9E7991B4A09951 /* tinyxmlerror.cpp in Sources */,
 				5A4349E9754D6FA14C0F2A3A /* tinyxmlparser.cpp in Sources */,
-				58AAAA427EFA2166EEBF3C28 /* DataInput.cpp in Sources */,
-				58AAAA64F045CE1E6968856D /* DataTriggers.cpp in Sources */,
-				58AAAA9DE31DBB6316CB27DA /* NoteLoop.cpp in Sources */,
-				58AAAE356CB2A33F18DB93E0 /* NoteEvent.cpp in Sources */,
-				58AAA9E0FE3840D0F96D24A1 /* MidiPlayback.cpp in Sources */,
-				58AAA76A942458E5DADFB4D5 /* MidiOut.cpp in Sources */,
-				58AAAD30E0E3D17CC9CCF9FB /* NoteGenerator.cpp in Sources */,
-				58AAAFC44EC22BCB6D63AB77 /* Sensor.cpp in Sources */,
-				58AAA8E8B8D04B25F346F7B3 /* SensorGraph.cpp in Sources */,
-				58AAA3C16E09A7650C471593 /* Trigger3D.cpp in Sources */,
-				58AAA1E5F92C968E1E512269 /* Layout.cpp in Sources */,
-				58AAAE21328E8D622635F231 /* RemoteControl.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -699,8 +1059,25 @@
 					../../../addons/ofxDatGui/src/libs,
 					../../../addons/ofxDatGui/src/libs/ofxSmartFont,
 					../../../addons/ofxDatGui/src/themes,
+					../../../addons/ofxIO/libs,
+					../../../addons/ofxIO/libs/alphanum,
+					../../../addons/ofxIO/libs/alphanum/include,
+					../../../addons/ofxIO/libs/json,
+					../../../addons/ofxIO/libs/json/include,
+					../../../addons/ofxIO/libs/json/license,
+					../../../addons/ofxIO/libs/lz4,
+					../../../addons/ofxIO/libs/lz4/src,
+					../../../addons/ofxIO/libs/ofxIO,
+					../../../addons/ofxIO/libs/ofxIO/include,
+					../../../addons/ofxIO/libs/ofxIO/include/ofx,
+					../../../addons/ofxIO/libs/ofxIO/include/ofx/IO,
+					../../../addons/ofxIO/libs/ofxIO/src,
+					../../../addons/ofxIO/libs/snappy,
+					../../../addons/ofxIO/libs/snappy/src,
+					../../../addons/ofxIO/src,
 					../../../addons/ofxMidi/libs,
 					../../../addons/ofxMidi/src,
+					../../../addons/ofxNetwork/src,
 					../../../addons/ofxOsc/libs,
 					../../../addons/ofxOsc/libs/oscpack,
 					../../../addons/ofxOsc/libs/oscpack/src,
@@ -751,8 +1128,25 @@
 					../../../addons/ofxDatGui/src/libs,
 					../../../addons/ofxDatGui/src/libs/ofxSmartFont,
 					../../../addons/ofxDatGui/src/themes,
+					../../../addons/ofxIO/libs,
+					../../../addons/ofxIO/libs/alphanum,
+					../../../addons/ofxIO/libs/alphanum/include,
+					../../../addons/ofxIO/libs/json,
+					../../../addons/ofxIO/libs/json/include,
+					../../../addons/ofxIO/libs/json/license,
+					../../../addons/ofxIO/libs/lz4,
+					../../../addons/ofxIO/libs/lz4/src,
+					../../../addons/ofxIO/libs/ofxIO,
+					../../../addons/ofxIO/libs/ofxIO/include,
+					../../../addons/ofxIO/libs/ofxIO/include/ofx,
+					../../../addons/ofxIO/libs/ofxIO/include/ofx/IO,
+					../../../addons/ofxIO/libs/ofxIO/src,
+					../../../addons/ofxIO/libs/snappy,
+					../../../addons/ofxIO/libs/snappy/src,
+					../../../addons/ofxIO/src,
 					../../../addons/ofxMidi/libs,
 					../../../addons/ofxMidi/src,
+					../../../addons/ofxNetwork/src,
 					../../../addons/ofxOsc/libs,
 					../../../addons/ofxOsc/libs/oscpack,
 					../../../addons/ofxOsc/libs/oscpack/src,
@@ -796,8 +1190,25 @@
 					../../../addons/ofxDatGui/src/libs,
 					../../../addons/ofxDatGui/src/libs/ofxSmartFont,
 					../../../addons/ofxDatGui/src/themes,
+					../../../addons/ofxIO/libs,
+					../../../addons/ofxIO/libs/alphanum,
+					../../../addons/ofxIO/libs/alphanum/include,
+					../../../addons/ofxIO/libs/json,
+					../../../addons/ofxIO/libs/json/include,
+					../../../addons/ofxIO/libs/json/license,
+					../../../addons/ofxIO/libs/lz4,
+					../../../addons/ofxIO/libs/lz4/src,
+					../../../addons/ofxIO/libs/ofxIO,
+					../../../addons/ofxIO/libs/ofxIO/include,
+					../../../addons/ofxIO/libs/ofxIO/include/ofx,
+					../../../addons/ofxIO/libs/ofxIO/include/ofx/IO,
+					../../../addons/ofxIO/libs/ofxIO/src,
+					../../../addons/ofxIO/libs/snappy,
+					../../../addons/ofxIO/libs/snappy/src,
+					../../../addons/ofxIO/src,
 					../../../addons/ofxMidi/libs,
 					../../../addons/ofxMidi/src,
+					../../../addons/ofxNetwork/src,
 					../../../addons/ofxOsc/libs,
 					../../../addons/ofxOsc/libs/oscpack,
 					../../../addons/ofxOsc/libs/oscpack/src,
@@ -841,8 +1252,25 @@
 					../../../addons/ofxDatGui/src/libs,
 					../../../addons/ofxDatGui/src/libs/ofxSmartFont,
 					../../../addons/ofxDatGui/src/themes,
+					../../../addons/ofxIO/libs,
+					../../../addons/ofxIO/libs/alphanum,
+					../../../addons/ofxIO/libs/alphanum/include,
+					../../../addons/ofxIO/libs/json,
+					../../../addons/ofxIO/libs/json/include,
+					../../../addons/ofxIO/libs/json/license,
+					../../../addons/ofxIO/libs/lz4,
+					../../../addons/ofxIO/libs/lz4/src,
+					../../../addons/ofxIO/libs/ofxIO,
+					../../../addons/ofxIO/libs/ofxIO/include,
+					../../../addons/ofxIO/libs/ofxIO/include/ofx,
+					../../../addons/ofxIO/libs/ofxIO/include/ofx/IO,
+					../../../addons/ofxIO/libs/ofxIO/src,
+					../../../addons/ofxIO/libs/snappy,
+					../../../addons/ofxIO/libs/snappy/src,
+					../../../addons/ofxIO/src,
 					../../../addons/ofxMidi/libs,
 					../../../addons/ofxMidi/src,
+					../../../addons/ofxNetwork/src,
 					../../../addons/ofxOsc/libs,
 					../../../addons/ofxOsc/libs/oscpack,
 					../../../addons/ofxOsc/libs/oscpack/src,

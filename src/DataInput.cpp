@@ -44,7 +44,7 @@ void DataInput::threadedFunction() {
             ofxOscMessage msg;
             _oscInput.getNextMessage(msg);
             vector<string> address = ofSplitString(msg.getAddress(), "/", true, true);
-            if (address.size() == 2 && address[0] == "bno055") {
+            if (address.size() == 2 && address[0] == "u") {
                 lock();
                 for (Sensor * sensor : _sources) {
                     if (!sensor->getStatus().active) {

@@ -49,26 +49,22 @@ void Trigger3D::update(ofVec3f value) {
     triggerValue.z = t - _lastTriggerTime.z > _trigger_debounce.z ?
             getTriggerValue(value.z, _threshold_low.z, _threshold_high.z, _trigger_mask.z) : .0f;
 
-    _triggerValueLastMax.x = triggerValue.x > _triggerValueLastMax.x ? triggerValue.x : _triggerValueLastMax.x;
-    _triggerValueLastMax.y = triggerValue.y > _triggerValueLastMax.y ? triggerValue.y : _triggerValueLastMax.y;
-    _triggerValueLastMax.z = triggerValue.z > _triggerValueLastMax.z ? triggerValue.z : _triggerValueLastMax.z;
-
     if (time.getTimeMillis() - _lastUpdate >= 40) {
         _lastUpdate = time.getTimeMillis();
         bool send = false;
 
-        if (t - _lastTriggerTime.x > _trigger_debounce.x && _triggerValue.x != .0f && _triggerValueLastMax.x > _triggerValue.x) {
-            _triggerValue.x = _triggerValue.x < _triggerValueLastMax.x ? triggerValue.x : _triggerValueLastMax.x;
+        if (t - _lastTriggerTime.x > _trigger_debounce.x && _triggerValue.x != .0f) {
+            _triggerValue.x = triggerValue.x;
             _lastTriggerTime.x = _lastUpdate;
             send = true;
         }
         if (t - _lastTriggerTime.y > _trigger_debounce.y && _triggerValue.y != .0f) {
-            _triggerValue.y = _triggerValue.y < _triggerValueLastMax.y ? triggerValue.y : _triggerValueLastMax.y;
+            _triggerValue.y = triggerValue.y;
             _lastTriggerTime.y = _lastUpdate;
             send = true;
         }
         if (t - _lastTriggerTime.z > _trigger_debounce.z && _triggerValue.z != .0f) {
-            _triggerValue.z = _triggerValue.z < _triggerValueLastMax.z ? triggerValue.z : _triggerValueLastMax.z;
+            _triggerValue.z = triggerValue.z;
             _lastTriggerTime.z = _lastUpdate;
             send = true;
         }
@@ -87,9 +83,11 @@ void Trigger3D::update(ofVec3f value) {
 
         _triggerValueLastMax = { .0f, .0f, .0f };
     } else {
+        /*
         _triggerValue.x *= _triggerFalloff.x == .0f ? 1.f : _triggerFalloff.x;
         _triggerValue.y *= _triggerFalloff.y == .0f ? 1.f : _triggerFalloff.y;
         _triggerValue.z *= _triggerFalloff.z == .0f ? 1.f : _triggerFalloff.z;
+         */
     }
 }
 
@@ -181,7 +179,9 @@ bool Trigger3D::isTriggered() {
 }
 
 ofVec3f Trigger3D::getTrigger() {
-    return _triggerValue;
+    ofVec3f triggerValue = { _triggerValue.x, _triggerValue.y, _triggerValue.z };
+    _triggerValue = { .0f, .0f, .0f };
+    return triggerValue;
 }
 
 uint8_t Trigger3D::getSensorIndex() {
@@ -241,7 +241,7 @@ float Trigger3D::getTriggerValue(float value, float threshold_low, float thresho
         }
         if (add) {
             if (_isRange) {
-                result = value - threshold_low / (threshold_high - threshold_low);
+                result = value;
             } else {
                 result = value;
             }
