@@ -13,6 +13,17 @@ OscSerial::OscSerial() {
     _endpoint.port = osc::IpEndpointName::ANY_PORT;
 
     _serial.listDevices();
+
+    _packetSize = 3;
+#ifdef RECEIVE_QUATERNION
+    _packetSize += 5 * sizeof(float);
+#endif
+#ifdef RECEIVE_EULER
+    _packetSize += 3 * sizeof(float);
+#endif
+#ifdef RECEIVE_LINEAR_ACCELERATION
+    _packetSize += 3 * sizeof(float);
+#endif
 }
 
 bool OscSerial::setup(string deviceName, uint32_t baud) {
@@ -65,7 +76,7 @@ void OscSerial::threadedFunction() {
                 } else if (read != OF_SERIAL_NO_DATA) {
                     if (read == EOT) {
                         if (_buffer.size() >= 3) {
-                            if (_buffer[0] == 1 && _buffer.size() == 47) {
+                            if (_buffer[0] == 1 && _buffer.size() == _packetSize) {
                                 sensor_frame_t frame;
                                 frame.time_received = _time.getTimeMillis();
                                 frame.time = frame.time_received;
@@ -74,10 +85,11 @@ void OscSerial::threadedFunction() {
                                 const char *data = (const char *) _buffer.data();
                                 int size = (int) data[2];
 
-                                if (size == 47) {
+                                if (size == _packetSize) {
                                     int i = 3;
                                     float *fl;
 
+#ifdef RECEIVE_QUATERNION
                                     fl = (float *) &data[i];
                                     frame.quaternion.w = *fl;
                                     i += sizeof(float);
@@ -94,7 +106,9 @@ void OscSerial::threadedFunction() {
                                     fl = (float *) &data[i];
                                     frame.magnitude = *fl;
                                     i += sizeof(float);
+#endif
 
+#ifdef RECEIVE_EULER
                                     fl = (float *) &data[i];
                                     frame.orientation.x = *fl;
                                     i += sizeof(float);
@@ -104,7 +118,9 @@ void OscSerial::threadedFunction() {
                                     fl = (float *) &data[i];
                                     frame.orientation.z = *fl;
                                     i += sizeof(float);
+#endif
 
+#ifdef RECEIVE_LINEAR_ACCELERATION
                                     fl = (float *) &data[i];
                                     frame.acceleration.x = *fl;
                                     i += sizeof(float);
@@ -114,6 +130,7 @@ void OscSerial::threadedFunction() {
                                     fl = (float *) &data[i];
                                     frame.acceleration.z = *fl;
                                     i += sizeof(float);
+#endif
 
                                     lock();
                                     _frames.push_back(frame);

@@ -5,6 +5,10 @@
 #ifndef PULSATIONS_OSCSERIAL_H
 #define PULSATIONS_OSCSERIAL_H
 
+#define RECEIVE_QUATERNION = 1;
+#define RECEIVE_LINEAR_ACCELERATION = 1;
+#define RECEIVE_EULER = 1;
+
 #include "ofMain.h"
 #include "ofxOscReceiver.h"
 #include "ofxOscSender.h"
@@ -35,6 +39,8 @@ private:
     vector<sensor_frame_t> _frames;
     vector<sensor_status_t> _status;
     osc::IpEndpointName _endpoint;
+
+    uint8_t _packetSize;
     int _lastRead;
     bool _isReady;
 

@@ -236,6 +236,7 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
 
 //--------------------------------------------------------------
 void ofApp::onSliderEvent(ofxDatGuiSliderEvent e) {
+    // TODO: fix the gui
     sensor_trigger_4d_t trigger;
     int8_t id = -1;
 
