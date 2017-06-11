@@ -13,17 +13,18 @@ struct sensor_frame_t {
     uint64_t time_received;
     ofVec3f acceleration;
     ofVec3f orientation;
-    vector<float> data;
-    ofBuffer calibration;
+    ofVec4f quaternion;
+    float magnitude;
     string sensor_id;
 };
 
 struct sensor_status_t {
     bool active;
     ofBuffer calibration;
+    ofBuffer system;
 };
 
-struct sensor_trigger_3d_t {
+struct sensor_trigger_4d_t {
     string target;
     string target_sid;
     uint8_t sensor_index;
@@ -31,13 +32,13 @@ struct sensor_trigger_3d_t {
     int trigger_index;
 };
 
-struct sensor_trigger_3d_result_t {
+struct sensor_trigger_4d_result_t {
     string target;
     string target_sid;
     int trigger_index;
     string name;
-    ofVec3f triggerValue;
-    ofVec3f debounceStatus;
+    ofVec4f triggerValue;
+    ofVec4f debounceStatus;
     bool isTriggered;
 };
 
@@ -90,10 +91,11 @@ struct remote_command_t {
     float floatValue;
 };
 
-struct trigger_time_3d_t {
+struct trigger_time_4d_t {
     int64_t x;
     int64_t y;
     int64_t z;
+    int64_t w;
 };
 
 class Types {

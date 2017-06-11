@@ -14,7 +14,8 @@ class Sensor {
 public:
     Sensor(string id, string name, string type, uint8_t index);
 
-    void addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleration, ofVec3f orientation);
+    void addFrame(sensor_frame_t frame);
+    void addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleration, ofVec3f orientation, ofVec4f quaternion);
 
     Trigger3D* addTrigger(string name, string target, float threshold, bool absolute);
     Trigger3D* addTrigger(string name, string target, float lowThreshold, float highThreshold, bool absolute);
@@ -34,6 +35,7 @@ public:
     string getOSCAddress();
     string getDataAsString();
     string getCalibrationStatus();
+    string getSystemStatus();
 
     vector<sensor_frame_t> getFrameBuffer();
     sensor_frame_t getCurrentFrame();

@@ -49,6 +49,7 @@ sensor_status_t OscSerial::getStatus(uint8_t id) {
         status = _status[id];
     } else {
         status.calibration.allocate(4);
+        status.system.allocate(3);
     }
     unlock();
     return status;
@@ -64,7 +65,7 @@ void OscSerial::threadedFunction() {
                 } else if (read != OF_SERIAL_NO_DATA) {
                     if (read == EOT) {
                         if (_buffer.size() >= 3) {
-                            if (_buffer[0] == 1 && _buffer.size() == 27) {
+                            if (_buffer[0] == 1 && _buffer.size() == 47) {
                                 sensor_frame_t frame;
                                 frame.time_received = _time.getTimeMillis();
                                 frame.time = frame.time_received;
@@ -72,30 +73,48 @@ void OscSerial::threadedFunction() {
 
                                 const char *data = (const char *) _buffer.data();
                                 int size = (int) data[2];
-                                int i = 3;
-                                float *fl;
 
-                                fl = (float *) &data[i];
-                                frame.orientation.x = *fl;
-                                i += sizeof(float);
-                                fl = (float *) &data[i];
-                                frame.orientation.y = *fl;
-                                i += sizeof(float);
-                                fl = (float *) &data[i];
-                                frame.orientation.z = *fl;
-                                i += sizeof(float);
+                                if (size == 47) {
+                                    int i = 3;
+                                    float *fl;
 
-                                fl = (float *) &data[i];
-                                frame.acceleration.x = *fl;
-                                i += sizeof(float);
-                                fl = (float *) &data[i];
-                                frame.acceleration.y = *fl;
-                                i += sizeof(float);
-                                fl = (float *) &data[i];
-                                frame.acceleration.z = *fl;
-                                i += sizeof(float);
+                                    fl = (float *) &data[i];
+                                    frame.quaternion.w = *fl;
+                                    i += sizeof(float);
+                                    fl = (float *) &data[i];
+                                    frame.quaternion.x = *fl;
+                                    i += sizeof(float);
+                                    fl = (float *) &data[i];
+                                    frame.quaternion.y = *fl;
+                                    i += sizeof(float);
+                                    fl = (float *) &data[i];
+                                    frame.quaternion.z = *fl;
+                                    i += sizeof(float);
 
-                                if (size == 27) {
+                                    fl = (float *) &data[i];
+                                    frame.magnitude = *fl;
+                                    i += sizeof(float);
+
+                                    fl = (float *) &data[i];
+                                    frame.orientation.x = *fl;
+                                    i += sizeof(float);
+                                    fl = (float *) &data[i];
+                                    frame.orientation.y = *fl;
+                                    i += sizeof(float);
+                                    fl = (float *) &data[i];
+                                    frame.orientation.z = *fl;
+                                    i += sizeof(float);
+
+                                    fl = (float *) &data[i];
+                                    frame.acceleration.x = *fl;
+                                    i += sizeof(float);
+                                    fl = (float *) &data[i];
+                                    frame.acceleration.y = *fl;
+                                    i += sizeof(float);
+                                    fl = (float *) &data[i];
+                                    frame.acceleration.z = *fl;
+                                    i += sizeof(float);
+
                                     lock();
                                     _frames.push_back(frame);
                                     unlock();
@@ -109,12 +128,29 @@ void OscSerial::threadedFunction() {
                                         sensor_status_t status;
                                         status.active = true;
                                         status.calibration.allocate(4);
+                                        status.system.allocate(3);
                                         _status.push_back(status);
                                     }
                                     _status[id].calibration.getData()[0] = data[3];
                                     _status[id].calibration.getData()[1] = data[4];
                                     _status[id].calibration.getData()[2] = data[5];
                                     _status[id].calibration.getData()[3] = data[6];
+                                }
+                            } else if (_buffer[0] == 3 && _buffer.size() == 6) {
+                                const char *data = (const char *) _buffer.data();
+                                int size = (int) data[2];
+                                if (size == 6) {
+                                    uint8_t id = (uint8_t)data[1];
+                                    while (id >= _status.size()) {
+                                        sensor_status_t status;
+                                        status.active = true;
+                                        status.calibration.allocate(4);
+                                        status.system.allocate(3);
+                                        _status.push_back(status);
+                                    }
+                                    _status[id].system.getData()[0] = data[3];
+                                    _status[id].system.getData()[1] = data[4];
+                                    _status[id].system.getData()[2] = data[5];
                                 }
                             }
                         }

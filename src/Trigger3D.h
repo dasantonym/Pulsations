@@ -12,39 +12,40 @@
 class Trigger3D {
 public:
     Trigger3D(float threshold);
-    Trigger3D(ofVec3f threshold);
+    Trigger3D(ofVec4f threshold);
     Trigger3D(float threshold_low, float threshold_high);
-    Trigger3D(ofVec3f threshold_low, ofVec3f threshold_high);
+    Trigger3D(ofVec4f threshold_low, ofVec4f threshold_high);
 
     void update(ofVec3f value);
+    void update(ofVec4f value);
 
     void setTrigger(float threshold);
-    void setTrigger(ofVec3f threshold);
+    void setTrigger(ofVec4f threshold);
     void setTrigger(float lowThreshold, float highThreshold);
-    void setTrigger(ofVec3f lowThreshold, ofVec3f highThreshold);
+    void setTrigger(ofVec4f lowThreshold, ofVec4f highThreshold);
 
     void setFalloff(float falloff);
-    void setFalloff(ofVec3f falloff);
+    void setFalloff(ofVec4f falloff);
 
     void setDebounce(float millis);
-    void setDebounce(ofVec3f millis);
+    void setDebounce(ofVec4f millis);
     void setMask(float mask);
-    void setMask(ofVec3f mask);
+    void setMask(ofVec4f mask);
     void setAbsolute(bool isAbsolute);
     void setSensorInfo(uint8_t index);
 
     bool isTriggered();
-    ofVec3f getTrigger();
-    ofVec3f getDebounceStatus();
+    ofVec4f getTrigger();
+    ofVec4f getDebounceStatus();
     string getTriggerAsString();
     uint8_t getSensorIndex();
     float getTriggerMax();
     float getTriggerMin();
     float getTriggerValue(float value, float threshold_high, float threshold_low, float mask);
-    sensor_trigger_3d_result_t getTriggerResult();
+    sensor_trigger_4d_result_t getTriggerResult();
 
-    sensor_trigger_3d_t* trigger;
-    ofFastEvent<sensor_trigger_3d_result_t> triggerValueEvent;
+    sensor_trigger_4d_t* trigger;
+    ofFastEvent<sensor_trigger_4d_result_t> triggerValueEvent;
 
 private:
     bool _isRange;
@@ -55,15 +56,15 @@ private:
     uint8_t _sensor_index;
     uint64_t _lastUpdate;
 
-    ofVec3f _triggerValueLastMax;
-    ofVec3f _triggerValue;
-    ofVec3f _triggerFalloff;
-    trigger_time_3d_t _lastTriggerTime;
+    ofVec4f _triggerValueLastMax;
+    ofVec4f _triggerValue;
+    ofVec4f _triggerFalloff;
+    trigger_time_4d_t _lastTriggerTime;
 
-    ofVec3f _trigger_debounce;
-    ofVec3f _trigger_mask;
-    ofVec3f _threshold_low;
-    ofVec3f _threshold_high;
+    ofVec4f _trigger_debounce;
+    ofVec4f _trigger_mask;
+    ofVec4f _threshold_low;
+    ofVec4f _threshold_high;
 
     TimeKeeper time;
 };

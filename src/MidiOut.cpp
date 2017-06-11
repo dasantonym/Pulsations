@@ -22,7 +22,7 @@ void MidiOut::openPort(string port) {
 
 //--------------------------------------------------------------
 vector<string> MidiOut::getPorts() {
-    return _midi->portNames;
+    return _midi->getPortList();
 }
 
 //--------------------------------------------------------------

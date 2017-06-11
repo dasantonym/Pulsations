@@ -16,20 +16,22 @@ void ofApp::setup(){
         settings.setValue("layout", layoutName);
     }
 
-    _drawCurves = (bool) settings.getValue("ui:drawCurves", true);
+    _drawGraph = (bool) settings.getValue("ui:drawGraph", true);
+    _drawGui = (bool) settings.getValue("ui:drawGui", true);
 
     string version = "v0.2.0";
 
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
+    gui->setAutoDraw(false, 0);
     gui->addHeader(":: PULSATIONS " + version + " ::");
 
     gui->addFRM();
 
-    gui->addToggle("Draw curves", _drawCurves);
+    gui->addToggle("Draw graph", _drawGraph);
 
     ofxDatGuiFolder *xbee = gui->addFolder("XBee", ofColor::blue);
     xbee->addTextInput("Device name", ofToString(settings.getValue("xbee:serial:deviceName", "cu.usbserial-DN02N1QK")));
-    xbee->addTextInput("Baud", ofToString(settings.getValue("xbee:serial:baud", 57600)));
+    xbee->addTextInput("Baud", ofToString(settings.getValue("xbee:serial:baud", 115200)));
 
     ofxDatGuiFolder *osc = gui->addFolder("OSC", ofColor::white);
     osc->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
@@ -39,7 +41,7 @@ void ofApp::setup(){
     oscSerial = new OscSerial();
     if (oscSerial->setup(
             settings.getValue("xbee:serial:deviceName", "cu.usbserial-DN02N1QK"),
-            (uint32_t)settings.getValue("xbee:serial:baud", 57600)
+            (uint32_t)settings.getValue("xbee:serial:baud", 115200)
     )) {
         oscSerial->startThread(true);
     }
@@ -159,7 +161,7 @@ void ofApp::update(){
         for (sensor_frame_t & frame : frames) {
             uint8_t idx = (uint8_t)(ofToInt(frame.sensor_id) - 1);
             if (idx >= 0 && idx < sensors.size()) {
-                sensors[idx]->addFrame(frame.time, frame.time_received, frame.acceleration, frame.orientation);
+                sensors[idx]->addFrame(frame);
             }
         }
     }
@@ -170,7 +172,7 @@ void ofApp::update(){
         sensor->update();
 
         for (Trigger3D * trigger : sensor->getTriggers()) {
-            sensor_trigger_3d_result_t triggerResult = trigger->getTriggerResult();
+            sensor_trigger_4d_result_t triggerResult = trigger->getTriggerResult();
             if (triggerResult.isTriggered) {
                 vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult);
                 for (NoteEvent & noteEvent : notes) {
@@ -180,14 +182,21 @@ void ofApp::update(){
         }
 
     }
+
+    if (_drawGui) {
+        gui->update();
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    if (_drawCurves) {
+    if (_drawGraph) {
         for (Sensor * sensor : sensors) {
             sensor->draw();
         }
+    }
+    if (_drawGui) {
+        gui->draw();
     }
 }
 
@@ -196,6 +205,10 @@ void ofApp::keyPressed(int key){
     switch (key) {
         case 'f':
             ofToggleFullscreen();
+            break;
+        case ' ':
+            _drawGui = !_drawGui;
+            settings.setValue("ui:drawGui", _drawGui);
             break;
         default:
             break;
@@ -215,15 +228,15 @@ void ofApp::exit() {
 
 //--------------------------------------------------------------
 void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
-    if (e.target->getLabel() == "Draw curves") {
-        _drawCurves = !_drawCurves;
-        settings.setValue("ui:drawCurves", _drawCurves);
+    if (e.target->getLabel() == "Draw graph") {
+        _drawGraph = !_drawGraph;
+        settings.setValue("ui:drawGraph", _drawGraph);
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::onSliderEvent(ofxDatGuiSliderEvent e) {
-    sensor_trigger_3d_t trigger;
+    sensor_trigger_4d_t trigger;
     int8_t id = -1;
 
     if (e.target->getLabel() == "Buffer (ms) #1") {

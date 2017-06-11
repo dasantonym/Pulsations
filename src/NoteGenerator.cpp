@@ -9,12 +9,12 @@ NoteGenerator::NoteGenerator() {
     layout.load(settings.getValue("layout", "empty"));
 }
 
-vector<NoteEvent> NoteGenerator::evaluateTriggerResult(sensor_trigger_3d_result_t triggerResult) {
+vector<NoteEvent> NoteGenerator::evaluateTriggerResult(sensor_trigger_4d_result_t triggerResult) {
     vector<NoteEvent> notes;
     string sensorPath = "layout:sensor" + triggerResult.target_sid;
     if (triggerResult.isTriggered) {
         string triggerPath = sensorPath + ":trigger" + ofToString(triggerResult.trigger_index + 1);
-        ofVec3f val = triggerResult.triggerValue;
+        ofVec4f val = triggerResult.triggerValue;
 
         if (val.x > 0.f && triggerResult.debounceStatus.x == 1.f) {
             NoteEvent noteX = NoteEvent(
@@ -47,6 +47,17 @@ vector<NoteEvent> NoteGenerator::evaluateTriggerResult(sensor_trigger_3d_result_
                     (uint8_t) layout.get().getValue(triggerPath + ":midi:z:channel", 1)
             );
             notes.push_back(noteZ);
+        }
+
+        if (val.w > 0.f && triggerResult.debounceStatus.w == 1.f) {
+            NoteEvent noteW = NoteEvent(
+                    _time.getTimeMillis(),
+                    (uint64_t)layout.get().getValue(triggerPath + ":midi:w:duration", 250),
+                    (float) layout.get().getValue(triggerPath + ":midi:w:pitch", .5f),
+                    (float) layout.get().getValue(triggerPath + ":midi:w:velocity", .8f),
+                    (uint8_t) layout.get().getValue(triggerPath + ":midi:w:channel", 1)
+            );
+            notes.push_back(noteW);
         }
 
         return notes;

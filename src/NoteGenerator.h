@@ -15,7 +15,7 @@ class NoteGenerator {
 public:
     NoteGenerator();
 
-    vector<NoteEvent> evaluateTriggerResult(sensor_trigger_3d_result_t triggerResult);
+    vector<NoteEvent> evaluateTriggerResult(sensor_trigger_4d_result_t triggerResult);
 
 private:
     TimeKeeper _time;

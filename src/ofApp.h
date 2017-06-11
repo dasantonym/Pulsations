@@ -41,7 +41,8 @@ public:
     NoteGenerator *noteGenerator;
     vector<Sensor *> sensors;
 
-    bool _drawCurves;
+    bool _drawGraph;
+    bool _drawGui;
     
     uint64_t frameCount;
 };
