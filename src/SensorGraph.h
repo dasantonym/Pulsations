@@ -12,7 +12,7 @@ class SensorGraph {
 public:
     SensorGraph(ofPoint position, float width, float height);
 
-    void update(vector<sensor_frame_t> frames);
+    void update(vector<sensor_frame_t> *frames);
     void draw();
 
 private:

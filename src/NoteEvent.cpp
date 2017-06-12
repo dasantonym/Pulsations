@@ -35,7 +35,7 @@ uint8_t NoteEvent::getChannel() {
 }
 
 uint8_t NoteEvent::getMidiPitch() {
-    uint32_t pitch = roundf(fabs(_pitch) * 127.f);
+    uint8_t pitch = (uint8_t)roundf(fabs(_pitch) * 127.f);
     return (uint8_t)(pitch > 127 ? 127 : pitch);
 }
 
@@ -44,7 +44,7 @@ float NoteEvent::getVelocity() {
 }
 
 uint8_t NoteEvent::getMidiVelocity() {
-    uint32_t velocity = roundf(fabs(_velocity) * 127.f);
+    uint8_t velocity = (uint8_t)roundf(fabs(_velocity) * 127.f);
     return (uint8_t)(velocity > 127 ? 127 : velocity);
 }
 

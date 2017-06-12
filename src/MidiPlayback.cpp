@@ -14,6 +14,16 @@ void MidiPlayback::setMidi(uint8_t port) {
 
 void MidiPlayback::addNote(NoteEvent inputNote) {
     lock();
+    bool exists = false;
+    for (NoteEvent & note : _notes) {
+        if (note.isNoteOff() && note.getTime() <= inputNote.getEndTime() &&
+                note.getMidiPitch() == inputNote.getMidiPitch()) {
+            exists = true;
+        }
+    }
+    unlock();
+    if (exists) return;
+    lock();
     _notes.push_back(inputNote);
     NoteEvent offNote = NoteEvent(inputNote.getEndTime(), 0,
             inputNote.getPitch(), inputNote.getVelocity(), inputNote.getChannel());
@@ -28,8 +38,8 @@ bool sortNotesByTime(NoteEvent &a, NoteEvent &b) {
 
 void MidiPlayback::threadedFunction() {
     while (isThreadRunning()) {
-        lock();
         uint64_t i = 0, noteCount = _notes.size();
+        lock();
         std::sort(_notes.begin(), _notes.end(), sortNotesByTime);
         unlock();
 
@@ -48,9 +58,10 @@ void MidiPlayback::threadedFunction() {
             }
             unlock();
         }
-
+        /*
         milliseconds slt(5);
         std::this_thread::sleep_for(slt);
+         */
     }
     ofLogNotice() << "MidiPlayback exited" << endl;
 }

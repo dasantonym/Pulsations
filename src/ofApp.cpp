@@ -43,7 +43,7 @@ void ofApp::setup(){
             settings.getValue("xbee:serial:deviceName", "cu.usbserial-DN02N1QK"),
             (uint32_t)settings.getValue("xbee:serial:baud", 115200)
     )) {
-        oscSerial->startThread(true);
+        oscSerial->startThread(false);
     }
 
     midiPlayback = new MidiPlayback();
@@ -148,14 +148,16 @@ void ofApp::setup(){
     gui->onSliderEvent(this, &ofApp::onSliderEvent);
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
-    receiver.setup(settings.getValue("osc:inputPort", 8888));
-    sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
+    //receiver.setup(settings.getValue("osc:inputPort", 8888));
+    //sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
 
-    midiPlayback->startThread(true);
+    midiPlayback->startThread(false);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+
+/*
     while (oscSerial->hasFrames()) {
         vector<sensor_frame_t> frames = oscSerial->getFrames();
         for (sensor_frame_t & frame : frames) {
@@ -165,22 +167,27 @@ void ofApp::update(){
             }
         }
     }
-
+*/
+    uint8_t idx = 0;
     for (Sensor * sensor : sensors) {
-        sensor_status_t status = oscSerial->getStatus((uint8_t)(ofToInt(sensor->getSensorID())-1));
+        if (oscSerial->hasFrames(idx)) {
+            sensor_frame_t frame = oscSerial->getMaxFrame(idx);
+            sensors[idx]->addFrame(frame);
+        }
+
+        sensor_status_t status = oscSerial->getStatus(idx);
         sensor->setCalibrationStatus(status.calibration);
         sensor->update();
 
         for (Trigger3D * trigger : sensor->getTriggers()) {
-            sensor_trigger_4d_result_t triggerResult = trigger->getTriggerResult();
-            if (triggerResult.isTriggered) {
-                vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(triggerResult);
-                for (NoteEvent & noteEvent : notes) {
-                    midiPlayback->addNote(noteEvent);
-                }
+            vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(trigger->getTriggerResult());
+            for (NoteEvent & noteEvent : notes) {
+                midiPlayback->addNote(noteEvent);
             }
+            trigger->update();
         }
 
+        idx++;
     }
 
     if (_drawGui) {
@@ -237,7 +244,7 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e) {
 //--------------------------------------------------------------
 void ofApp::onSliderEvent(ofxDatGuiSliderEvent e) {
     // TODO: fix the gui
-    sensor_trigger_4d_t trigger;
+    sensor_trigger_t trigger;
     int8_t id = -1;
 
     if (e.target->getLabel() == "Buffer (ms) #1") {

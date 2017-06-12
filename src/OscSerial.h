@@ -5,7 +5,7 @@
 #ifndef PULSATIONS_OSCSERIAL_H
 #define PULSATIONS_OSCSERIAL_H
 
-#define RECEIVE_QUATERNION = 1;
+//#define RECEIVE_QUATERNION = 1;
 #define RECEIVE_LINEAR_ACCELERATION = 1;
 #define RECEIVE_EULER = 1;
 
@@ -21,7 +21,10 @@ public:
 
     bool setup(string deviceName, uint32_t baud);
     bool hasFrames();
+    bool hasFrames(uint8_t sensor_id);
     vector<sensor_frame_t> getFrames();
+    sensor_frame_t getAverageFrame(uint8_t sensor_id, bool skipOrientation = true);
+    sensor_frame_t getMaxFrame(uint8_t sensor_id, bool absolute = false, bool skipOrientation = true);
     sensor_status_t getStatus(uint8_t id);
 
     void threadedFunction();
@@ -37,6 +40,8 @@ private:
     vector<uint8_t> _buffer;
     vector <ofSerialDeviceInfo> _deviceList;
     vector<sensor_frame_t> _frames;
+    vector<vector<sensor_frame_t>> _sensorFrames;
+    vector<sensor_frame_t> _avgFrame;
     vector<sensor_status_t> _status;
     osc::IpEndpointName _endpoint;
 

@@ -37,7 +37,7 @@ public:
     string getCalibrationStatus();
     string getSystemStatus();
 
-    vector<sensor_frame_t> getFrameBuffer();
+    vector<sensor_frame_t> *getFrameBuffer();
     sensor_frame_t getCurrentFrame();
     vector<Trigger3D *> getTriggers();
     sensor_status_t getStatus();
@@ -52,6 +52,11 @@ private:
     bool _hasGraph;
 
     uint64_t _bufferTimeMillis;
+    uint64_t _bufferSize;
+    uint64_t _packetCount;
+    uint64_t _lastPacketCount;
+    uint64_t _lastPPSTime;
+    float _pps;
 
     vector<sensor_frame_t> _frames;
     vector<Trigger3D *> _triggers;

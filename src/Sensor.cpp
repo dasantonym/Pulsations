@@ -17,6 +17,11 @@ Sensor::Sensor(string id, string name, string type, uint8_t index) {
     _index = index;
 
     _bufferTimeMillis = 2000;
+    _bufferSize = 100;
+    _packetCount = 0;
+    _lastPacketCount = 0;
+    _pps = 0;
+    _lastPPSTime = time.getTimeMillis();
 
     _status.active = true;
     _status.calibration = { 0x00, 0x00, 0x00, 0x00 };
@@ -35,6 +40,16 @@ void Sensor::update() {
         return;
     }
 
+    if (time.getTimeMillis() - _lastPPSTime >= 1000) {
+        _lastPPSTime = time.getTimeMillis();
+        _pps = _packetCount - _lastPacketCount;
+        _lastPacketCount = _packetCount;
+    }
+
+    if (_frames.size() > _bufferSize) {
+        _frames.erase(_frames.begin(), _frames.begin() + _frames.size() - _bufferSize);
+    }
+
     if (_hasGraph) {
         _graph->update(getFrameBuffer());
     }
@@ -50,7 +65,7 @@ void Sensor::draw() {
     ofDrawBitmapString(getDataAsString(), 40.f, 40.f + 160.f * _index);
     for (Trigger3D * trigger : _triggers) {
         ofDrawBitmapString(trigger->getTriggerAsString(),
-                40.f, 40.f + 160.f * _index + 20.f * (trigger->trigger->trigger_index + 1));
+                40.f, 40.f + 160.f * _index + 20.f * (trigger->getMeta()->trigger_id + 1));
     }
     ofPopStyle();
 
@@ -89,27 +104,16 @@ void Sensor::draw() {
 
 void Sensor::addFrame(sensor_frame_t frame) {
     _frames.push_back(frame);
+    _packetCount++;
 
     for (Trigger3D * trigger : _triggers) {
-        if (trigger->trigger->target == "orientation") {
+        if (trigger->getMeta()->target_type == "orientation") {
             trigger->update(frame.orientation);
-        }
-        if (trigger->trigger->target == "acceleration") {
+        } else if (trigger->getMeta()->target_type == "acceleration") {
             trigger->update(frame.acceleration);
-        }
-        if (trigger->trigger->target == "quaternion") {
+        } else if (trigger->getMeta()->target_type == "quaternion") {
             trigger->update(frame.quaternion);
         }
-        // TODO: magnitude?
-    }
-
-    uint32_t count = 0;
-    while (count < _frames.size() && frame.time_received - _frames[count].time_received > _bufferTimeMillis) {
-        count++;
-    }
-
-    if (count) {
-        _frames.erase(_frames.begin(), _frames.begin() + count - 1);
     }
 }
 
@@ -121,8 +125,6 @@ void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleratio
     frame.orientation = orientation;
     frame.quaternion = quaternion;
     frame.sensor_id = _id;
-    _frames.push_back(frame);
-
     addFrame(frame);
 }
 
@@ -133,45 +135,45 @@ void Sensor::addFrame(uint64_t time, uint64_t time_received, ofVec3f acceleratio
 // Adding triggers
 //
 
-Trigger3D* Sensor::addTrigger(string name, string target, float threshold, bool absolute = false) {
+Trigger3D* Sensor::addTrigger(string name, string target_type, float threshold, bool absolute = false) {
     Trigger3D* trigger = new Trigger3D(threshold);
-    trigger->trigger->name = name;
-    trigger->trigger->target = target;
-    trigger->trigger->target_sid = _id;
-    trigger->trigger->trigger_index = (int)_triggers.size();
+    trigger->getMeta()->name = name;
+    trigger->getMeta()->target_type = target_type;
+    trigger->getMeta()->sensor_id = _id;
+    trigger->getMeta()->trigger_id = (uint16_t)_triggers.size();
     trigger->setAbsolute(absolute);
     _triggers.push_back(trigger);
     return trigger;
 }
 
-Trigger3D* Sensor::addTrigger(string name, string target, float lowThreshold, float highThreshold, bool absolute = false) {
+Trigger3D* Sensor::addTrigger(string name, string target_type, float lowThreshold, float highThreshold, bool absolute = false) {
     Trigger3D* trigger = new Trigger3D(lowThreshold, highThreshold);
-    trigger->trigger->name = name;
-    trigger->trigger->target = target;
-    trigger->trigger->target_sid = _id;
-    trigger->trigger->trigger_index = (int)_triggers.size();
+    trigger->getMeta()->name = name;
+    trigger->getMeta()->target_type = target_type;
+    trigger->getMeta()->sensor_id = _id;
+    trigger->getMeta()->trigger_id = (uint16_t)_triggers.size();
     trigger->setAbsolute(absolute);
     _triggers.push_back(trigger);
     return trigger;
 }
 
-Trigger3D* Sensor::addTrigger(string name, string target, ofVec3f threshold, bool absolute = false) {
+Trigger3D* Sensor::addTrigger(string name, string target_type, ofVec3f threshold, bool absolute = false) {
     Trigger3D* trigger = new Trigger3D(threshold);
-    trigger->trigger->name = name;
-    trigger->trigger->target = target;
-    trigger->trigger->target_sid = _id;
-    trigger->trigger->trigger_index = (int)_triggers.size();
+    trigger->getMeta()->name = name;
+    trigger->getMeta()->target_type = target_type;
+    trigger->getMeta()->sensor_id = _id;
+    trigger->getMeta()->trigger_id = (uint16_t)_triggers.size();
     trigger->setAbsolute(absolute);
     _triggers.push_back(trigger);
     return trigger;
 }
 
-Trigger3D* Sensor::addTrigger(string name, string target, ofVec3f lowThreshold, ofVec3f highThreshold, bool absolute = false) {
+Trigger3D* Sensor::addTrigger(string name, string target_type, ofVec3f lowThreshold, ofVec3f highThreshold, bool absolute = false) {
     Trigger3D* trigger = new Trigger3D(lowThreshold, highThreshold);
-    trigger->trigger->name = name;
-    trigger->trigger->target = target;
-    trigger->trigger->target_sid = _id;
-    trigger->trigger->trigger_index = (int)_triggers.size();
+    trigger->getMeta()->name = name;
+    trigger->getMeta()->target_type = target_type;
+    trigger->getMeta()->sensor_id = _id;
+    trigger->getMeta()->trigger_id = (uint16_t)_triggers.size();
     trigger->setAbsolute(absolute);
     _triggers.push_back(trigger);
     return trigger;
@@ -225,13 +227,13 @@ string Sensor::getDataAsString() {
     result += getCalibrationStatus() + "   ";
     result += getSystemStatus() + "   ";
     if (hasFrames()) {
+#ifdef RECEIVE_QUATERNION
         result += "QUAT:    ";
         result += ofToString(getCurrentFrame().quaternion.w, 2, 7, ' ') + " ";
         result += ofToString(getCurrentFrame().quaternion.x, 2, 7, ' ') + " ";
         result += ofToString(getCurrentFrame().quaternion.y, 2, 7, ' ') + " ";
         result += ofToString(getCurrentFrame().quaternion.z, 2, 7, ' ') + "   ";
-        result += "MAG: ";
-        result += ofToString(getCurrentFrame().magnitude, 2, 7, ' ') + "   ";
+#endif
         result += "EUL: ";
         result += ofToString(getCurrentFrame().orientation.x, 2, 7, ' ') + " ";
         result += ofToString(getCurrentFrame().orientation.y, 2, 7, ' ') + " ";
@@ -239,7 +241,9 @@ string Sensor::getDataAsString() {
         result += "ACC: ";
         result += ofToString(getCurrentFrame().acceleration.x, 2, 7, ' ') + " ";
         result += ofToString(getCurrentFrame().acceleration.y, 2, 7, ' ') + " ";
-        result += ofToString(getCurrentFrame().acceleration.z, 2, 7, ' ');
+        result += ofToString(getCurrentFrame().acceleration.z, 2, 7, ' ') + "   ";
+        result += ofToString(_packetCount, 2, 7, ' ') + " ";
+        result += ofToString(_pps, 2, 7, ' ') + " ";
     }
     return result;
 }
@@ -257,8 +261,8 @@ string Sensor::getSystemStatus() {
     return "" + ofToString(buf);
 }
 
-vector<sensor_frame_t> Sensor::getFrameBuffer() {
-    return _frames;
+vector<sensor_frame_t> * Sensor::getFrameBuffer() {
+    return &_frames;
 }
 
 bool Sensor::hasFrames() {

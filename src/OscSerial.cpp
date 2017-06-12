@@ -16,13 +16,13 @@ OscSerial::OscSerial() {
 
     _packetSize = 3;
 #ifdef RECEIVE_QUATERNION
-    _packetSize += 5 * sizeof(float);
+    _packetSize += 4 * sizeof(float);
 #endif
 #ifdef RECEIVE_EULER
-    _packetSize += 3 * sizeof(float);
+    _packetSize += 3 * sizeof(int16_t);
 #endif
 #ifdef RECEIVE_LINEAR_ACCELERATION
-    _packetSize += 3 * sizeof(float);
+    _packetSize += 3 * sizeof(int16_t);
 #endif
 }
 
@@ -39,10 +39,11 @@ bool OscSerial::setup(string deviceName, uint32_t baud) {
 }
 
 bool OscSerial::hasFrames() {
-    lock();
-    bool hasFrames = _frames.size() != 0;
-    unlock();
-    return hasFrames;
+    return _frames.size() != 0;
+}
+
+bool OscSerial::hasFrames(uint8_t sensor_id) {
+    return sensor_id < _sensorFrames.size() && _sensorFrames[sensor_id].size();
 }
 
 vector<sensor_frame_t> OscSerial::getFrames() {
@@ -53,16 +54,90 @@ vector<sensor_frame_t> OscSerial::getFrames() {
     return frames;
 }
 
+sensor_frame_t OscSerial::getAverageFrame(uint8_t sensor_id, bool skipOrientation) {
+    sensor_frame_t avgFrame;
+    avgFrame.sensor_id = ofToString(sensor_id + 1);
+    avgFrame.acceleration = { .0f, .0f, .0f };
+    avgFrame.orientation = { .0f, .0f, .0f };
+    uint64_t count = 0;
+    for (sensor_frame_t & frame : _sensorFrames[sensor_id]) {
+        avgFrame.acceleration.x += frame.acceleration.x;
+        avgFrame.acceleration.y += frame.acceleration.y;
+        avgFrame.acceleration.z += frame.acceleration.z;
+        if (skipOrientation) {
+            avgFrame.orientation = frame.orientation;
+        } else {
+            avgFrame.orientation.x += frame.orientation.x;
+            avgFrame.orientation.y += frame.orientation.y;
+            avgFrame.orientation.z += frame.orientation.z;
+        }
+        count++;
+    }
+    if (count) {
+        avgFrame.acceleration.x /= count;
+        avgFrame.acceleration.y /= count;
+        avgFrame.acceleration.z /= count;
+        if (!skipOrientation) {
+            avgFrame.orientation.x /= count;
+            avgFrame.orientation.y /= count;
+            avgFrame.orientation.z /= count;
+        }
+        lock();
+        _sensorFrames[sensor_id].clear();
+        unlock();
+    }
+
+    avgFrame.time = _time.getTimeMillis();
+    avgFrame.time_received = avgFrame.time;
+    return avgFrame;
+}
+
+sensor_frame_t OscSerial::getMaxFrame(uint8_t sensor_id, bool absolute, bool skipOrientation) {
+    sensor_frame_t maxFrame;
+    maxFrame.sensor_id = ofToString(sensor_id + 1);
+    maxFrame.acceleration = { .0f, .0f, .0f };
+    maxFrame.orientation = { .0f, .0f, .0f };
+    for (sensor_frame_t & frame : _sensorFrames[sensor_id]) {
+        float val;
+
+        val = absolute ? fabs(frame.acceleration.x) : frame.acceleration.x;
+        if (val > maxFrame.acceleration.x) maxFrame.acceleration.x = frame.acceleration.x;
+        val = absolute ? fabs(frame.acceleration.y) : frame.acceleration.y;
+        if (val > maxFrame.acceleration.y) maxFrame.acceleration.y = frame.acceleration.y;
+        val = absolute ? fabs(frame.acceleration.z) : frame.acceleration.z;
+        if (val > maxFrame.acceleration.z) maxFrame.acceleration.z = frame.acceleration.z;
+
+        if (skipOrientation) {
+            maxFrame.orientation = frame.orientation;
+        } else {
+            val = absolute ? fabs(frame.orientation.x) : frame.orientation.x;
+            if (val > maxFrame.orientation.x) maxFrame.orientation.x = frame.orientation.x;
+            val = absolute ? fabs(frame.orientation.y) : frame.orientation.y;
+            if (val > maxFrame.orientation.y) maxFrame.orientation.y = frame.orientation.y;
+            val = absolute ? fabs(frame.orientation.z) : frame.orientation.z;
+            if (val > maxFrame.orientation.z) maxFrame.orientation.z = frame.orientation.z;
+        }
+    }
+    if (_sensorFrames[sensor_id].size()) {
+        lock();
+        _sensorFrames[sensor_id].clear();
+        unlock();
+    }
+    maxFrame.time = _time.getTimeMillis();
+    maxFrame.time_received = maxFrame.time;
+    return maxFrame;
+}
+
 sensor_status_t OscSerial::getStatus(uint8_t id) {
     sensor_status_t status;
-    lock();
     if (id < _status.size()) {
+        lock();
         status = _status[id];
+        unlock();
     } else {
         status.calibration.allocate(4);
         status.system.allocate(3);
     }
-    unlock();
     return status;
 }
 
@@ -77,64 +152,89 @@ void OscSerial::threadedFunction() {
                     if (read == EOT) {
                         if (_buffer.size() >= 3) {
                             if (_buffer[0] == 1 && _buffer.size() == _packetSize) {
+                                ofxOscMessage msg;
+                                msg.setAddress("/bno055/10" + ofToString((int)_buffer[1] - 1));
+
                                 sensor_frame_t frame;
+                                frame.sensor_id = ofToString((int) _buffer[1]);
+
                                 frame.time_received = _time.getTimeMillis();
                                 frame.time = frame.time_received;
-                                frame.sensor_id = ofToString((int) _buffer[1]);
+                                msg.addTimetagArg(frame.time);
 
                                 const char *data = (const char *) _buffer.data();
                                 int size = (int) data[2];
 
                                 if (size == _packetSize) {
                                     int i = 3;
-                                    float *fl;
+                                    int16_t *fl;
 
 #ifdef RECEIVE_QUATERNION
                                     fl = (float *) &data[i];
                                     frame.quaternion.w = *fl;
+                                    msg.addFloatArg(frame.quaternion.w);
                                     i += sizeof(float);
                                     fl = (float *) &data[i];
                                     frame.quaternion.x = *fl;
+                                    msg.addFloatArg(frame.quaternion.x);
                                     i += sizeof(float);
                                     fl = (float *) &data[i];
                                     frame.quaternion.y = *fl;
+                                    msg.addFloatArg(frame.quaternion.y);
                                     i += sizeof(float);
                                     fl = (float *) &data[i];
                                     frame.quaternion.z = *fl;
-                                    i += sizeof(float);
-
-                                    fl = (float *) &data[i];
-                                    frame.magnitude = *fl;
+                                    msg.addFloatArg(frame.quaternion.z);
                                     i += sizeof(float);
 #endif
 
 #ifdef RECEIVE_EULER
-                                    fl = (float *) &data[i];
-                                    frame.orientation.x = *fl;
-                                    i += sizeof(float);
-                                    fl = (float *) &data[i];
-                                    frame.orientation.y = *fl;
-                                    i += sizeof(float);
-                                    fl = (float *) &data[i];
-                                    frame.orientation.z = *fl;
-                                    i += sizeof(float);
+                                    fl = (int16_t *) &data[i];
+                                    frame.orientation.x = (float)(*fl) / 80.f;
+                                    msg.addFloatArg(frame.orientation.x);
+                                    i += sizeof(int16_t);
+                                    fl = (int16_t *) &data[i];
+                                    frame.orientation.y = (float)(*fl) / 80.f;
+                                    msg.addFloatArg(frame.orientation.y);
+                                    i += sizeof(int16_t);
+                                    fl = (int16_t *) &data[i];
+                                    frame.orientation.z = (float)(*fl) / 80.f;
+                                    msg.addFloatArg(frame.orientation.z);
+                                    i += sizeof(int16_t);
 #endif
 
 #ifdef RECEIVE_LINEAR_ACCELERATION
-                                    fl = (float *) &data[i];
-                                    frame.acceleration.x = *fl;
-                                    i += sizeof(float);
-                                    fl = (float *) &data[i];
-                                    frame.acceleration.y = *fl;
-                                    i += sizeof(float);
-                                    fl = (float *) &data[i];
-                                    frame.acceleration.z = *fl;
-                                    i += sizeof(float);
+                                    fl = (int16_t *) &data[i];
+                                    frame.acceleration.x = (float)(*fl) / 80.f;
+                                    msg.addFloatArg(frame.acceleration.x);
+                                    i += sizeof(int16_t);
+                                    fl = (int16_t *) &data[i];
+                                    frame.acceleration.y = (float)(*fl) / 80.f;
+                                    msg.addFloatArg(frame.acceleration.y);
+                                    i += sizeof(int16_t);
+                                    fl = (int16_t *) &data[i];
+                                    frame.acceleration.z = (float)(*fl) / 80.f;
+                                    msg.addFloatArg(frame.acceleration.z);
+                                    i += sizeof(int16_t);
 #endif
 
                                     lock();
                                     _frames.push_back(frame);
+
+                                    int id = (uint8_t)data[1] - 1;
+                                    while (id >= _sensorFrames.size()) {
+                                        vector<sensor_frame_t> frames;
+                                        _sensorFrames.push_back(frames);
+                                    }
+
+                                    if (id >= 0 && id < _sensorFrames.size()) {
+                                        _sensorFrames[id].push_back(frame);
+                                    }
                                     unlock();
+
+                                    _oscOut.sendMessage(msg, true);
+                                } else {
+                                    ofLogNotice() << "Malformed packet size" << endl;
                                 }
                             } else if (_buffer[0] == 2 && _buffer.size() == 7) {
                                 const char *data = (const char *) _buffer.data();
@@ -185,8 +285,10 @@ void OscSerial::threadedFunction() {
                 }
             }
         }
+        /*
         milliseconds slt(1);
         std::this_thread::sleep_for(slt);
+         */
     }
     ofLogNotice() << "OscSerial: Thread ended" << endl;
 }
