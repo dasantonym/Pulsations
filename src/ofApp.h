@@ -44,6 +44,8 @@ public:
 
     bool _drawGraph;
     bool _drawGui;
+
+    char _version[255];
     
     uint64_t frameCount;
 };

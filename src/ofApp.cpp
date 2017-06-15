@@ -4,6 +4,8 @@
 void ofApp::setup(){
     ofBackground(0);
 
+    sprintf(_version, "v%u.%u.%u", Version::VERSION_MAJ, Version::VERSION_MIN, Version::VERSION_PATCH);
+
     settings.load("settings.xml");
 
     if (settings.getValue("layout", "empty") != "empty") {
@@ -205,6 +207,10 @@ void ofApp::draw(){
     if (_drawGui) {
         gui->draw();
     }
+    ofPushStyle();
+    ofSetColor(120, 120, 120);
+    ofDrawBitmapString(_version, ofGetWindowWidth() - 110.f, ofGetWindowHeight() - 60.f);
+    ofPopStyle();
 }
 
 //--------------------------------------------------------------

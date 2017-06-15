@@ -8,6 +8,7 @@
 #include "ofMain.h"
 #include "TimeKeeper.h"
 #include "MidiOut.h"
+#include "ofxOscSender.h"
 
 class MidiPlayback : public ofThread {
 public:
@@ -20,6 +21,7 @@ public:
 
 private:
     MidiOut* _midi;
+    ofxOscSender _osc;
     TimeKeeper _time;
     vector<NoteEvent> _notes;
 };

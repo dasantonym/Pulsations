@@ -47,14 +47,14 @@ void NoteLoop::update() {
 
 void NoteLoop::addNote(NoteEvent note) {
     if (_recording) {
-        NoteEvent noteAdd = NoteEvent(note.getTime(), note.getEndTime() - note.getTime(), note.getPitch(), note.getVelocity(), note.getChannel());
+        NoteEvent noteAdd = NoteEvent(note.getTime(), note.getEndTime() - note.getTime(), note.getPitch(), note.getVelocity(), note.getChannel(), note.getTriggerName(), note.getTriggerValue());
         _notes.push_back(noteAdd);
     }
 }
 
-void NoteLoop::addNote(uint64_t duration, float pitch, float velocity, uint8_t channel) {
+void NoteLoop::addNote(uint64_t duration, float pitch, float velocity, uint8_t channel, string triggerName, float triggerValue) {
     if (_recording) {
-        NoteEvent note = NoteEvent(time.getTimeMillis() - _recording_start, duration, pitch, velocity, channel);
+        NoteEvent note = NoteEvent(time.getTimeMillis() - _recording_start, duration, pitch, velocity, channel, triggerName, triggerValue);
         addNote(note);
     }
 }

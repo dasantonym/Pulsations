@@ -47,8 +47,6 @@ void Trigger3D::update(ofVec3f value) {
             if (_triggerValue.x != .0f) {
                 _lastTriggerTime.x = time.getTimeMillis();
             }
-        } else {
-            _triggerValue.x = .0f;
         }
 
         if (time.getTimeMillis() - _lastTriggerTime.y > _trigger_debounce.y) {
@@ -56,8 +54,6 @@ void Trigger3D::update(ofVec3f value) {
             if (_triggerValue.y != .0f) {
                 _lastTriggerTime.y = time.getTimeMillis();
             }
-        } else {
-            _triggerValue.y = .0f;
         }
 
         if (time.getTimeMillis() - _lastTriggerTime.z > _trigger_debounce.z) {
@@ -65,9 +61,9 @@ void Trigger3D::update(ofVec3f value) {
             if (_triggerValue.z != .0f) {
                 _lastTriggerTime.z = time.getTimeMillis();
             }
-        } else {
-            _triggerValue.z = .0f;
         }
+
+        update();
     }
 }
 
@@ -227,7 +223,11 @@ float Trigger3D::getTriggerValue(float value, float threshold_low, float thresho
     if (_isAbsolute) {
         add = mask == .0f && fabs(value) >= fabs(threshold_low) && (!_isRange || fabs(value) < fabs(threshold_high));
     } else {
-        add = mask == .0f && value >= threshold_low && (!_isRange || value < threshold_high);
+        if (threshold_low < 0 || threshold_high < 0) {
+            add = mask == .0f && value <= threshold_low && (!_isRange || value > threshold_high);
+        } else {
+            add = mask == .0f && value >= threshold_low && (!_isRange || value < threshold_high);
+        }
     }
     if (add) {
         result = value;

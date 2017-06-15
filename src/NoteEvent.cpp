@@ -4,7 +4,7 @@
 
 #include "NoteEvent.h"
 
-NoteEvent::NoteEvent(uint64_t time, uint64_t duration, float pitch, float velocity, uint8_t channel = 1) {
+NoteEvent::NoteEvent(uint64_t time, uint64_t duration, float pitch, float velocity, uint8_t channel = 1, string triggerName = "", float triggerValue = .0f) {
     _isOff = false;
 
     _time = time;
@@ -12,6 +12,8 @@ NoteEvent::NoteEvent(uint64_t time, uint64_t duration, float pitch, float veloci
     _pitch = pitch;
     _velocity = velocity;
     _channel = channel;
+    _triggerName = triggerName;
+    _triggerValue = triggerValue;
 }
 
 uint64_t NoteEvent::getTime() {
@@ -32,6 +34,14 @@ float NoteEvent::getPitch() {
 
 uint8_t NoteEvent::getChannel() {
     return _channel;
+}
+
+string NoteEvent::getTriggerName() {
+    return _triggerName;
+}
+
+float NoteEvent::getTriggerValue() {
+    return _triggerValue;
 }
 
 uint8_t NoteEvent::getMidiPitch() {
