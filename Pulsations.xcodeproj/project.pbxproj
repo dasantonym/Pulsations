@@ -112,6 +112,7 @@
 		50DF87D612C5AAE17AAFA6C0 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxXmlSettings.cpp; path = ../../../addons/ofxXmlSettings/src/ofxXmlSettings.cpp; sourceTree = SOURCE_ROOT; };
 		545BBA6F6669BED2DA497BC6 /* ofxDatGuiScrollView.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxDatGuiScrollView.h; path = ../../../addons/ofxDatGui/src/components/ofxDatGuiScrollView.h; sourceTree = SOURCE_ROOT; };
 		58AAA3D208166735072EED4C /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
+		58AAAC3944C7FB0AC44646DF /* Packets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Packets.h; sourceTree = "<group>"; };
 		5B1EE11B5F08927EA2C43D0D /* Trigger3D.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Trigger3D.h; path = src/Trigger3D.h; sourceTree = SOURCE_ROOT; };
 		5CB4852DC14A6B6FE1304C2F /* NoteGenerator.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = NoteGenerator.cpp; path = src/NoteGenerator.cpp; sourceTree = SOURCE_ROOT; };
 		5CD845B860A278E86EBBF69D /* OscSerial.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = OscSerial.cpp; path = src/OscSerial.cpp; sourceTree = SOURCE_ROOT; };
@@ -525,6 +526,7 @@
 				5B1EE11B5F08927EA2C43D0D /* Trigger3D.h */,
 				C95104DA008B2AAA73832624 /* Types.h */,
 				0C166BBD08D3B35CB0D77592 /* Version.h */,
+				58AAAC3944C7FB0AC44646DF /* Packets.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;

@@ -30,24 +30,32 @@ void ofApp::setup(){
     gui->addToggle("Draw graph", _drawGraph);
 
     ofxDatGuiFolder *xbee = gui->addFolder("XBee", ofColor::blue);
-    xbee->addTextInput("Device name", ofToString(settings.getValue("xbee:serial:deviceName", "cu.usbserial-DN02N1QK")));
-    xbee->addTextInput("Baud", ofToString(settings.getValue("xbee:serial:baud", 115200)));
+    xbee->addTextInput("Device name", ofToString(settings.getValue("xbee:serial:deviceName", "cu.usbserial-AH01H39A")));
+    xbee->addTextInput("Baud", ofToString(settings.getValue("xbee:serial:baud", 57600)));
 
     ofxDatGuiFolder *osc = gui->addFolder("OSC", ofColor::white);
     osc->addTextInput("Input port", ofToString(settings.getValue("osc:inputPort", 8888)));
     osc->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
     osc->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
 
-    oscSerial = new OscSerial();
-    if (oscSerial->setup(
-            settings.getValue("xbee:serial:deviceName", "cu.usbserial-DN02N1QK"),
-            (uint32_t)settings.getValue("xbee:serial:baud", 115200)
+    oscSerialA = new OscSerial();
+    if (oscSerialA->setup(
+            settings.getValue("xbee:serial:a:deviceName", "cu.usbserial-AH01H39A"),
+            (uint32_t)settings.getValue("xbee:serial:a:baud", 57600)
     )) {
-        oscSerial->startThread(false);
+        oscSerialA->startThread(false);
+    }
+
+    oscSerialB = new OscSerial();
+    if (oscSerialB->setup(
+            settings.getValue("xbee:serial:b:deviceName", "cu.usbserial-DN02N1QK"),
+            (uint32_t)settings.getValue("xbee:serial:b:baud", 57600)
+    )) {
+        oscSerialB->startThread(false);
     }
 
     midiPlayback = new MidiPlayback();
-    midiPlayback->setMidi(0);
+    midiPlayback->setMidi((uint8_t)settings.getValue("midi:outputPort", 0));
 
     noteGenerator = new NoteGenerator();
 
@@ -139,7 +147,7 @@ void ofApp::setup(){
             trigger->setFalloff(falloff);
         }
 
-        sensor->setGraph(ofPoint(40.f, 40.f + 160.f * i), ofGetWindowWidth() - 80.f, 140.f);
+        sensor->setGraph(ofPoint(80.f, 80.f + 160.f * i), ofGetWindowWidth() - 80.f, 140.f);
 
         sensors.push_back(sensor);
     }
@@ -148,35 +156,27 @@ void ofApp::setup(){
     gui->onSliderEvent(this, &ofApp::onSliderEvent);
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
-    //receiver.setup(settings.getValue("osc:inputPort", 8888));
-    //sender.setup(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
-
     midiPlayback->startThread(false);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
-/*
-    while (oscSerial->hasFrames()) {
-        vector<sensor_frame_t> frames = oscSerial->getFrames();
-        for (sensor_frame_t & frame : frames) {
-            uint8_t idx = (uint8_t)(ofToInt(frame.sensor_id) - 1);
-            if (idx >= 0 && idx < sensors.size()) {
-                sensors[idx]->addFrame(frame);
-            }
-        }
-    }
-*/
     uint8_t idx = 0;
     for (Sensor * sensor : sensors) {
-        if (oscSerial->hasFrames(idx)) {
-            sensor_frame_t frame = oscSerial->getMaxFrame(idx);
+        if (oscSerialA->hasFrames(idx)) {
+            sensor_frame_t frame = oscSerialA->getMaxFrame(idx);
             sensors[idx]->addFrame(frame);
+            sensor_status_t status = oscSerialA->getStatus(idx);
+            sensor->setCalibrationStatus(status.calibration);
         }
 
-        sensor_status_t status = oscSerial->getStatus(idx);
-        sensor->setCalibrationStatus(status.calibration);
+        if (oscSerialB->hasFrames(idx)) {
+            sensor_frame_t frame = oscSerialB->getMaxFrame(idx);
+            sensors[idx]->addFrame(frame);
+            sensor_status_t status = oscSerialB->getStatus(idx);
+            sensor->setCalibrationStatus(status.calibration);
+        }
+
         sensor->update();
 
         for (Trigger3D * trigger : sensor->getTriggers()) {

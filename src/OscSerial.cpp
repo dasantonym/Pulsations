@@ -14,16 +14,7 @@ OscSerial::OscSerial() {
 
     _serial.listDevices();
 
-    _packetSize = 3;
-#ifdef RECEIVE_QUATERNION
-    _packetSize += 4 * sizeof(float);
-#endif
-#ifdef RECEIVE_EULER
-    _packetSize += 3 * sizeof(int16_t);
-#endif
-#ifdef RECEIVE_LINEAR_ACCELERATION
-    _packetSize += 3 * sizeof(int16_t);
-#endif
+    _packetSize = Packets::getPacketSize();
 }
 
 bool OscSerial::setup(string deviceName, uint32_t baud) {
@@ -135,8 +126,10 @@ sensor_status_t OscSerial::getStatus(uint8_t id) {
         status = _status[id];
         unlock();
     } else {
+        lock();
         status.calibration.allocate(4);
         status.system.allocate(3);
+        unlock();
     }
     return status;
 }
@@ -167,72 +160,57 @@ void OscSerial::threadedFunction() {
 
                                 if (size == _packetSize) {
                                     int i = 3;
-                                    int16_t *fl;
-
 #ifdef RECEIVE_QUATERNION
-                                    fl = (float *) &data[i];
-                                    frame.quaternion.w = *fl;
-                                    msg.addFloatArg(frame.quaternion.w);
-                                    i += sizeof(float);
-                                    fl = (float *) &data[i];
-                                    frame.quaternion.x = *fl;
+                                    i = Packets::unpackFloat(frame.quaternion.x, data, i);
                                     msg.addFloatArg(frame.quaternion.x);
-                                    i += sizeof(float);
-                                    fl = (float *) &data[i];
-                                    frame.quaternion.y = *fl;
+                                    i = Packets::unpackFloat(frame.quaternion.y, data, i);
                                     msg.addFloatArg(frame.quaternion.y);
-                                    i += sizeof(float);
-                                    fl = (float *) &data[i];
-                                    frame.quaternion.z = *fl;
+                                    i = Packets::unpackFloat(frame.quaternion.z, data, i);
                                     msg.addFloatArg(frame.quaternion.z);
-                                    i += sizeof(float);
+                                    i = Packets::unpackFloat(frame.quaternion.w, data, i);
+                                    msg.addFloatArg(frame.quaternion.w);
 #endif
 
 #ifdef RECEIVE_EULER
-                                    fl = (int16_t *) &data[i];
-                                    frame.orientation.x = (float)(*fl) / 80.f;
+                                    i = Packets::unpackFloat(frame.orientation.x, data, i);
                                     msg.addFloatArg(frame.orientation.x);
-                                    i += sizeof(int16_t);
-                                    fl = (int16_t *) &data[i];
-                                    frame.orientation.y = (float)(*fl) / 80.f;
+                                    i = Packets::unpackFloat(frame.orientation.y, data, i);
                                     msg.addFloatArg(frame.orientation.y);
-                                    i += sizeof(int16_t);
-                                    fl = (int16_t *) &data[i];
-                                    frame.orientation.z = (float)(*fl) / 80.f;
+                                    i = Packets::unpackFloat(frame.orientation.z, data, i);
                                     msg.addFloatArg(frame.orientation.z);
-                                    i += sizeof(int16_t);
 #endif
 
 #ifdef RECEIVE_LINEAR_ACCELERATION
-                                    fl = (int16_t *) &data[i];
-                                    frame.acceleration.x = (float)(*fl) / 80.f;
+                                    i = Packets::unpackFloat(frame.acceleration.x, data, i);
+                                    frame.acceleration.x *= ofSign(frame.orientation.x - 180.f);
                                     msg.addFloatArg(frame.acceleration.x);
-                                    i += sizeof(int16_t);
-                                    fl = (int16_t *) &data[i];
-                                    frame.acceleration.y = (float)(*fl) / 80.f;
+                                    i = Packets::unpackFloat(frame.acceleration.y, data, i);
+                                    frame.acceleration.y *= ofSign(frame.orientation.y);
                                     msg.addFloatArg(frame.acceleration.y);
-                                    i += sizeof(int16_t);
-                                    fl = (int16_t *) &data[i];
-                                    frame.acceleration.z = (float)(*fl) / 80.f;
+                                    i = Packets::unpackFloat(frame.acceleration.z, data, i);
+                                    frame.acceleration.z *= ofSign(frame.orientation.z);
                                     msg.addFloatArg(frame.acceleration.z);
-                                    i += sizeof(int16_t);
 #endif
+
+                                    _oscOut.sendMessage(msg, true);
 
                                     lock();
                                     _frames.push_back(frame);
+                                    unlock();
 
                                     int id = (uint8_t)data[1] - 1;
                                     while (id >= _sensorFrames.size()) {
                                         vector<sensor_frame_t> frames;
+                                        lock();
                                         _sensorFrames.push_back(frames);
+                                        unlock();
                                     }
 
                                     if (id >= 0 && id < _sensorFrames.size()) {
+                                        lock();
                                         _sensorFrames[id].push_back(frame);
+                                        unlock();
                                     }
-                                    unlock();
-
-                                    _oscOut.sendMessage(msg, true);
                                 } else {
                                     ofLogNotice() << "Malformed packet size" << endl;
                                 }
@@ -241,6 +219,7 @@ void OscSerial::threadedFunction() {
                                 int size = (int) data[2];
                                 if (size == 7) {
                                     uint8_t id = (uint8_t)data[1];
+                                    lock();
                                     while (id >= _status.size()) {
                                         sensor_status_t status;
                                         status.active = true;
@@ -248,10 +227,14 @@ void OscSerial::threadedFunction() {
                                         status.system.allocate(3);
                                         _status.push_back(status);
                                     }
+                                    unlock();
+
+                                    lock();
                                     _status[id].calibration.getData()[0] = data[3];
                                     _status[id].calibration.getData()[1] = data[4];
                                     _status[id].calibration.getData()[2] = data[5];
                                     _status[id].calibration.getData()[3] = data[6];
+                                    unlock();
                                 }
                             } else if (_buffer[0] == 3 && _buffer.size() == 6) {
                                 const char *data = (const char *) _buffer.data();
@@ -263,11 +246,16 @@ void OscSerial::threadedFunction() {
                                         status.active = true;
                                         status.calibration.allocate(4);
                                         status.system.allocate(3);
+                                        lock();
                                         _status.push_back(status);
+                                        unlock();
                                     }
+
+                                    lock();
                                     _status[id].system.getData()[0] = data[3];
                                     _status[id].system.getData()[1] = data[4];
                                     _status[id].system.getData()[2] = data[5];
+                                    unlock();
                                 }
                             }
                         }

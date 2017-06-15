@@ -60,12 +60,14 @@ void Sensor::draw() {
         _graph->draw();
     }
 
+    float border = 80.f;
+
     ofPushStyle();
     ofSetColor(140, 140, 140);
-    ofDrawBitmapString(getDataAsString(), 40.f, 40.f + 160.f * _index);
+    ofDrawBitmapString(getDataAsString(), border, border + 160.f * _index);
     for (Trigger3D * trigger : _triggers) {
         ofDrawBitmapString(trigger->getTriggerAsString(),
-                40.f, 40.f + 160.f * _index + 20.f * (trigger->getMeta()->trigger_id + 1));
+                border, border + 160.f * _index + 20.f * (trigger->getMeta()->trigger_id + 1));
     }
     ofPopStyle();
 
@@ -79,21 +81,21 @@ void Sensor::draw() {
         ofSetColor(180, 0, 0);
 
         ofPushMatrix();
-        ofTranslate(40.f + 35.f, 40.f + 160.f * (_index + 1) - 70.f);
+        ofTranslate(border + 35.f, border + 160.f * (_index + 1) - 70.f);
         ofRotate(getCurrentFrame().orientation.x);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
 
         ofSetColor(180, 180, 0);
         ofPushMatrix();
-        ofTranslate(40.f + 35.f + 70.f, 40.f + 160.f * (_index + 1) - 70.f);
+        ofTranslate(border + 35.f + 70.f, border + 160.f * (_index + 1) - 70.f);
         ofRotate(getCurrentFrame().orientation.y);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
 
         ofSetColor(0, 180, 180);
         ofPushMatrix();
-        ofTranslate(40.f + 35.f + 70.f * 2.f, 40.f + 160.f * (_index + 1) - 70.f);
+        ofTranslate(border + 35.f + 70.f * 2.f, border + 160.f * (_index + 1) - 70.f);
         ofRotate((getCurrentFrame().orientation.z * -1.f) + 90.f);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();

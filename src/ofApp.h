@@ -34,7 +34,8 @@ public:
     ofxOscSender sender;
     ofxOscSender uiResponder;
     ofxOscReceiver receiver;
-    OscSerial *oscSerial;
+    OscSerial *oscSerialA;
+    OscSerial *oscSerialB;
 
     TimeKeeper time;
     MidiPlayback *midiPlayback;

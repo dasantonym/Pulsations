@@ -48,41 +48,36 @@ void SensorGraph::update(vector<sensor_frame_t> *frames) {
         return;
     }
     float tickSize = (_size.x - _position.x) / frames->size();
-    /*
-    for (int i = 0; i < _paths.size(); i++) {
-        _paths[i].lineTo(_position.x, _position.y + _size.y * .5f);
-    }
-     */
     for (long f = 0; f < frames->size() ; f++) {
         sensor_frame_t frame = frames->at(f);
         for (int i = 0; i < _paths.size(); i++) {
             float ypos = .0f;
             switch (i) {
                 case 0:
-                    // ypos = frame.quaternion.x * 2.f;
+                    // ypos = frame.quaternion.x;
                     break;
                 case 1:
-                    // ypos = frame.quaternion.y * 2.f;
+                    // ypos = frame.quaternion.y;
                     break;
                 case 2:
-                    // ypos = frame.quaternion.z * 2.f;
+                    // ypos = frame.quaternion.z;
                     break;
                 case 3:
-                    // ypos = frame.quaternion.w * 2.f;
+                    // ypos = frame.quaternion.w;
                     break;
                 case 4:
-                    ypos = frame.acceleration.x * 2.f;
+                    ypos = frame.acceleration.x;
                     break;
                 case 5:
-                    ypos = frame.acceleration.y * 2.f;
+                    ypos = frame.acceleration.y;
                     break;
                 case 6:
-                    ypos = frame.acceleration.z * 2.f;
+                    ypos = frame.acceleration.z;
                     break;
                 default:
                     break;
             }
-            _paths[i].lineTo(_position.x + f * tickSize, _position.y + _size.y * .5f + ypos);
+            _paths[i].lineTo(_position.x + f * tickSize, _position.y + _size.y * .5f + ypos * 2.f);
         }
     }
 }

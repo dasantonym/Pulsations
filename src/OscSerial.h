@@ -12,7 +12,7 @@
 #include "ofMain.h"
 #include "ofxOscReceiver.h"
 #include "ofxOscSender.h"
-#include "Types.h"
+#include "Packets.h"
 #include "TimeKeeper.h"
 
 class OscSerial: public ofThread {
@@ -45,7 +45,7 @@ private:
     vector<sensor_status_t> _status;
     osc::IpEndpointName _endpoint;
 
-    uint8_t _packetSize;
+    uint32_t _packetSize;
     int _lastRead;
     bool _isReady;
 
