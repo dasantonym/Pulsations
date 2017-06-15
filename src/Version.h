@@ -9,7 +9,7 @@ class Version {
 public:
     static const uint8_t VERSION_MAJ = 0;
     static const uint8_t VERSION_MIN = 2;
-    static const uint8_t VERSION_PATCH = 0;
+    static const uint8_t VERSION_PATCH = 1;
 };
 
 

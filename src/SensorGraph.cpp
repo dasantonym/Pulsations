@@ -9,32 +9,32 @@ SensorGraph::SensorGraph(ofPoint position, float width, float height) {
     _size.x = width;
     _size.y = height;
 
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 3; ++i) {
         ofPath path;
         path.setFilled(false);
         path.setStrokeWidth(1.0f);
         ofColor color;
         switch (i) {
             case 0:
-                path.setStrokeColor(color.red);
-                break;
-            case 1:
-                path.setStrokeColor(color.green);
-                break;
-            case 2:
-                path.setStrokeColor(color.blue);
-                break;
-            case 3:
-                path.setStrokeColor(color.yellow);
-                break;
-            case 4:
                 path.setStrokeColor(color.cyan);
                 break;
-            case 5:
+            case 1:
                 path.setStrokeColor(color.magenta);
                 break;
+            case 2:
+                path.setStrokeColor(color.yellow);
+                break;
+            case 3:
+                path.setStrokeColor(color.red);
+                break;
+            case 4:
+                path.setStrokeColor(color.green);
+                break;
+            case 5:
+                path.setStrokeColor(color.blue);
+                break;
             case 6:
-                path.setStrokeColor(color.orange);
+                path.setStrokeColor(color.yellow);
                 break;
             default:
                 break;
@@ -54,24 +54,12 @@ void SensorGraph::update(vector<sensor_frame_t> *frames) {
             float ypos = .0f;
             switch (i) {
                 case 0:
-                    // ypos = frame.quaternion.x;
-                    break;
-                case 1:
-                    // ypos = frame.quaternion.y;
-                    break;
-                case 2:
-                    // ypos = frame.quaternion.z;
-                    break;
-                case 3:
-                    // ypos = frame.quaternion.w;
-                    break;
-                case 4:
                     ypos = frame.acceleration.x;
                     break;
-                case 5:
+                case 1:
                     ypos = frame.acceleration.y;
                     break;
-                case 6:
+                case 2:
                     ypos = frame.acceleration.z;
                     break;
                 default:

@@ -24,7 +24,7 @@ public:
     bool hasFrames(uint8_t sensor_id);
     vector<sensor_frame_t> getFrames();
     sensor_frame_t getAverageFrame(uint8_t sensor_id, bool skipOrientation = true);
-    sensor_frame_t getMaxFrame(uint8_t sensor_id, bool absolute = false, bool skipOrientation = true);
+    sensor_frame_t getMaxFrame(uint8_t sensor_id, bool absolute = true, bool skipOrientation = true);
     sensor_status_t getStatus(uint8_t id);
 
     void threadedFunction();

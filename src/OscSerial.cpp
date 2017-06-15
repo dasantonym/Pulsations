@@ -89,24 +89,30 @@ sensor_frame_t OscSerial::getMaxFrame(uint8_t sensor_id, bool absolute, bool ski
     maxFrame.acceleration = { .0f, .0f, .0f };
     maxFrame.orientation = { .0f, .0f, .0f };
     for (sensor_frame_t & frame : _sensorFrames[sensor_id]) {
-        float val;
+        float val, max;
 
         val = absolute ? fabs(frame.acceleration.x) : frame.acceleration.x;
-        if (val > maxFrame.acceleration.x) maxFrame.acceleration.x = frame.acceleration.x;
+        max = absolute ? fabs(maxFrame.acceleration.x) : maxFrame.acceleration.x;
+        if (val > max) maxFrame.acceleration.x = frame.acceleration.x;
         val = absolute ? fabs(frame.acceleration.y) : frame.acceleration.y;
-        if (val > maxFrame.acceleration.y) maxFrame.acceleration.y = frame.acceleration.y;
+        max = absolute ? fabs(maxFrame.acceleration.y) : maxFrame.acceleration.y;
+        if (val > max) maxFrame.acceleration.y = frame.acceleration.y;
         val = absolute ? fabs(frame.acceleration.z) : frame.acceleration.z;
-        if (val > maxFrame.acceleration.z) maxFrame.acceleration.z = frame.acceleration.z;
+        max = absolute ? fabs(maxFrame.acceleration.z) : maxFrame.acceleration.z;
+        if (val > max) maxFrame.acceleration.z = frame.acceleration.z;
 
         if (skipOrientation) {
             maxFrame.orientation = frame.orientation;
         } else {
             val = absolute ? fabs(frame.orientation.x) : frame.orientation.x;
-            if (val > maxFrame.orientation.x) maxFrame.orientation.x = frame.orientation.x;
+            max = absolute ? fabs(maxFrame.orientation.x) : maxFrame.orientation.x;
+            if (val > max) maxFrame.orientation.x = frame.orientation.x;
             val = absolute ? fabs(frame.orientation.y) : frame.orientation.y;
-            if (val > maxFrame.orientation.y) maxFrame.orientation.y = frame.orientation.y;
+            max = absolute ? fabs(maxFrame.orientation.y) : maxFrame.orientation.y;
+            if (val > max) maxFrame.orientation.y = frame.orientation.y;
             val = absolute ? fabs(frame.orientation.z) : frame.orientation.z;
-            if (val > maxFrame.orientation.z) maxFrame.orientation.z = frame.orientation.z;
+            max = absolute ? fabs(maxFrame.orientation.z) : maxFrame.orientation.z;
+            if (val > max) maxFrame.orientation.z = frame.orientation.z;
         }
     }
     if (_sensorFrames[sensor_id].size()) {
@@ -182,13 +188,13 @@ void OscSerial::threadedFunction() {
 
 #ifdef RECEIVE_LINEAR_ACCELERATION
                                     i = Packets::unpackFloat(frame.acceleration.x, data, i);
-                                    frame.acceleration.x *= ofSign(frame.orientation.x - 180.f);
+                                    //frame.acceleration.x *= ofSign(frame.orientation.x - 180.f);
                                     msg.addFloatArg(frame.acceleration.x);
                                     i = Packets::unpackFloat(frame.acceleration.y, data, i);
-                                    frame.acceleration.y *= ofSign(frame.orientation.y);
+                                    //frame.acceleration.y *= ofSign(frame.orientation.y);
                                     msg.addFloatArg(frame.acceleration.y);
                                     i = Packets::unpackFloat(frame.acceleration.z, data, i);
-                                    frame.acceleration.z *= ofSign(frame.orientation.z);
+                                    //frame.acceleration.z *= ofSign(frame.orientation.z);
                                     msg.addFloatArg(frame.acceleration.z);
 #endif
 
