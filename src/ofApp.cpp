@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofBackground(0);
+    _scaling = { 1.f, 1.f };
 
     sprintf(_version, "v%u.%u.%u", Version::VERSION_MAJ, Version::VERSION_MIN, Version::VERSION_PATCH);
 
@@ -199,6 +200,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    ofScale(_scaling);
     if (_drawGraph) {
         for (Sensor * sensor : sensors) {
             sensor->draw();
@@ -230,7 +232,8 @@ void ofApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+    _scaling.x = w / 1024.f;
+    _scaling.y = h / 768.f;
 }
 
 //--------------------------------------------------------------

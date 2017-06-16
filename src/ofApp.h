@@ -46,6 +46,7 @@ public:
     bool _drawGui;
 
     char _version[255];
+    ofPoint _scaling;
     
     uint64_t frameCount;
 };
