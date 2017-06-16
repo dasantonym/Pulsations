@@ -72,30 +72,30 @@ void Sensor::draw() {
     ofPopStyle();
 
     if (hasFrames()) {
-        ofPoint x1 = ofPoint(-20.f, 25.f);
-        ofPoint x2 = ofPoint(20.f, 25.f);
-        ofPoint y1 = ofPoint(.0f, -25.f);
+        ofPoint x1 = ofPoint(-10.f, 15.f);
+        ofPoint x2 = ofPoint(10.f, 15.f);
+        ofPoint y1 = ofPoint(.0f, -15.f);
 
         ofPushStyle();
         ofFill();
         ofSetColor(180, 0, 0);
 
         ofPushMatrix();
-        ofTranslate(border + 35.f, border + 160.f * (_index + 1) - 70.f);
+        ofTranslate(border + 25.f, border + 160.f * (_index + 1) - 50.f);
         ofRotate(getCurrentFrame().orientation.x);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
 
         ofSetColor(180, 180, 0);
         ofPushMatrix();
-        ofTranslate(border + 35.f + 70.f, border + 160.f * (_index + 1) - 70.f);
+        ofTranslate(border + 25.f + 50.f, border + 160.f * (_index + 1) - 50.f);
         ofRotate(getCurrentFrame().orientation.y);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
 
         ofSetColor(0, 180, 180);
         ofPushMatrix();
-        ofTranslate(border + 35.f + 70.f * 2.f, border + 160.f * (_index + 1) - 70.f);
+        ofTranslate(border + 25.f + 50.f * 2.f, border + 160.f * (_index + 1) - 50.f);
         ofRotate((getCurrentFrame().orientation.z * -1.f) + 90.f);
         ofDrawTriangle(x1, x2, y1);
         ofPopMatrix();
