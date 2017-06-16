@@ -20,13 +20,11 @@ void ofApp::setup(){
     }
 
     _drawGraph = (bool) settings.getValue("ui:drawGraph", true);
-    _drawGui = (bool) settings.getValue("ui:drawGui", true);
-
-    string version = "v0.2.0";
+    _drawGui = (bool) settings.getValue("ui:drawGui", false);
 
     gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
     gui->setAutoDraw(false, 0);
-    gui->addHeader(":: PULSATIONS " + version + " ::");
+    gui->addHeader(":: PULSATIONS " + ofToString(_version) + " ::");
 
     gui->addFRM();
 
@@ -41,7 +39,7 @@ void ofApp::setup(){
     osc->addTextInput("Forward IP", settings.getValue("osc:forwardIP", "127.0.0.1"));
     osc->addTextInput("Forward port", ofToString(settings.getValue("osc:forwardPort", 9999)));
 
-    oscSerialA = new OscSerial();
+    oscSerialA = new OscSerial(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
     if (oscSerialA->setup(
             settings.getValue("xbee:serial:a:deviceName", "cu.usbserial-AH01H39A"),
             (uint32_t)settings.getValue("xbee:serial:a:baud", 57600)
@@ -49,7 +47,7 @@ void ofApp::setup(){
         oscSerialA->startThread(false);
     }
 
-    oscSerialB = new OscSerial();
+    oscSerialB = new OscSerial(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
     if (oscSerialB->setup(
             settings.getValue("xbee:serial:b:deviceName", "cu.usbserial-DN02N1QK"),
             (uint32_t)settings.getValue("xbee:serial:b:baud", 57600)
@@ -57,7 +55,7 @@ void ofApp::setup(){
         oscSerialB->startThread(false);
     }
 
-    midiPlayback = new MidiPlayback();
+    midiPlayback = new MidiPlayback(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
     midiPlayback->setMidi((uint8_t)settings.getValue("midi:outputPort", 0));
 
     noteGenerator = new NoteGenerator();

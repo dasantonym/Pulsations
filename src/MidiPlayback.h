@@ -13,6 +13,7 @@
 class MidiPlayback : public ofThread {
 public:
     MidiPlayback();
+    MidiPlayback(string oscOutputIp, int oscOutputPort);
 
     void setMidi(uint8_t port);
     void addNote(NoteEvent inputNote);

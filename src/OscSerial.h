@@ -18,6 +18,7 @@
 class OscSerial: public ofThread {
 public:
     OscSerial();
+    OscSerial(string forwardIp, int forwardPort);
 
     bool setup(string deviceName, uint32_t baud);
     bool hasFrames();

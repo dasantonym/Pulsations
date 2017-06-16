@@ -17,6 +17,19 @@ OscSerial::OscSerial() {
     _packetSize = Packets::getPacketSize();
 }
 
+OscSerial::OscSerial(string forwardIp, int forwardPort) {
+    _isReady = false;
+
+    _oscOut.setup(forwardIp, forwardPort);
+
+    _endpoint.address = osc::IpEndpointName::ANY_ADDRESS;
+    _endpoint.port = osc::IpEndpointName::ANY_PORT;
+
+    _serial.listDevices();
+
+    _packetSize = Packets::getPacketSize();
+}
+
 bool OscSerial::setup(string deviceName, uint32_t baud) {
     _deviceList = _serial.getDeviceList();
 

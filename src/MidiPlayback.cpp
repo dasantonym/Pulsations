@@ -9,6 +9,11 @@ MidiPlayback::MidiPlayback() {
     _osc.setup("127.0.0.1", 9898);
 }
 
+MidiPlayback::MidiPlayback(string oscOutputIp, int oscOutputPort) {
+    _midi = new MidiOut();
+    _osc.setup(oscOutputIp, oscOutputPort);
+}
+
 void MidiPlayback::setMidi(uint8_t port) {
     _midi->openPort(port);
 }
