@@ -128,11 +128,11 @@ sensor_frame_t OscSerial::getMaxFrame(uint8_t sensor_id, bool absolute, bool ski
             if (val > max) maxFrame.orientation.z = frame.orientation.z;
         }
     }
+	lock();
     if (_sensorFrames[sensor_id].size()) {
-        lock();
         _sensorFrames[sensor_id].clear();
-        unlock();
     }
+	unlock();
     maxFrame.time = _time.getTimeMillis();
     maxFrame.time_received = maxFrame.time;
     return maxFrame;
@@ -140,16 +140,14 @@ sensor_frame_t OscSerial::getMaxFrame(uint8_t sensor_id, bool absolute, bool ski
 
 sensor_status_t OscSerial::getStatus(uint8_t id) {
     sensor_status_t status;
+	lock();
     if (id < _status.size()) {
-        lock();
         status = _status[id];
-        unlock();
     } else {
-        lock();
         status.calibration.allocate(4);
         status.system.allocate(3);
-        unlock();
     }
+	unlock();
     return status;
 }
 
@@ -213,7 +211,7 @@ void OscSerial::threadedFunction() {
 
                                     _oscOut.sendMessage(msg, true);
 
-                                    lock();
+									lock();
                                     _frames.push_back(frame);
                                     unlock();
 

@@ -44,7 +44,7 @@ void ofApp::setup(){
             settings.getValue("xbee:serial:a:deviceName", "cu.usbserial-AH01H39A"),
             (uint32_t)settings.getValue("xbee:serial:a:baud", 57600)
     )) {
-        oscSerialA->startThread(false);
+        oscSerialA->startThread(true);
     }
 
     oscSerialB = new OscSerial(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
@@ -52,7 +52,7 @@ void ofApp::setup(){
             settings.getValue("xbee:serial:b:deviceName", "cu.usbserial-DN02N1QK"),
             (uint32_t)settings.getValue("xbee:serial:b:baud", 57600)
     )) {
-        oscSerialB->startThread(false);
+        oscSerialB->startThread(true);
     }
 
     midiPlayback = new MidiPlayback(settings.getValue("osc:forwardIP", "127.0.0.1"), settings.getValue("osc:forwardPort", 9999));
@@ -157,7 +157,7 @@ void ofApp::setup(){
     gui->onSliderEvent(this, &ofApp::onSliderEvent);
     gui->onTextInputEvent(this, &ofApp::onTextInputEvent);
 
-    midiPlayback->startThread(false);
+    midiPlayback->startThread(true);
 }
 
 //--------------------------------------------------------------
@@ -179,7 +179,7 @@ void ofApp::update(){
         }
 
         sensor->update();
-
+		/*
         for (Trigger3D * trigger : sensor->getTriggers()) {
             vector<NoteEvent> notes = noteGenerator->evaluateTriggerResult(trigger->getTriggerResult());
             for (NoteEvent & noteEvent : notes) {
@@ -187,7 +187,7 @@ void ofApp::update(){
             }
             trigger->update();
         }
-
+		*/
         idx++;
     }
 
