@@ -5,8 +5,8 @@
 #ifndef PULSATIONS_TIME_KEEPER_H
 #define PULSATIONS_TIME_KEEPER_H
 
-#import <cstdint>
-#import <cmath>
+#include <cstdint>
+#include <cmath>
 #include <chrono>
 
 using namespace std::chrono;
